@@ -371,11 +371,11 @@ export default function DonationUnitsPage() {
                               return (
                                 <tr key={unit.id} style={{ borderBottom: "1px solid var(--border)" }}>
                                   <TableCell>יחידה {unit.id}</TableCell>
-                                  <TableCell><div className="truncate max-w-[80px] lg:max-w-[100px] xl:max-w-[120px]" title={unit.childName}>{unit.childName}</div></TableCell>
+                                  <TableCell><div className="truncate max-w-[80px] lg:max-w-[100px] xl:max-w-[140px] 2xl:max-w-none" title={unit.childName}>{unit.childName}</div></TableCell>
                                   <TableCell className="hidden xl:table-cell">{unit.joinDate}</TableCell>
                                   <TableCell className="hidden lg:table-cell">{unit.designatedYear}</TableCell>
-                                  <TableCell className="hidden lg:table-cell"><div className="truncate max-w-[80px]" title={unit.track}>{unit.track}</div></TableCell>
-                                  <TableCell className="hidden xl:table-cell"><div className="truncate max-w-[90px]" title={unit.paymentMethod}>{unit.paymentMethod}</div></TableCell>
+                                  <TableCell className="hidden lg:table-cell"><div className="truncate max-w-[80px] 2xl:max-w-none" title={unit.track}>{unit.track}</div></TableCell>
+                                  <TableCell className="hidden xl:table-cell"><div className="truncate max-w-[90px] 2xl:max-w-none" title={unit.paymentMethod}>{unit.paymentMethod}</div></TableCell>
                                   <TableCell>{unit.monthlyAmount}</TableCell>
                                   <TableCell className="hidden 2xl:table-cell">{unit.paidPayments}</TableCell>
                                   <TableCell style={{ whiteSpace: "normal", minWidth: "150px" }}>
@@ -404,7 +404,7 @@ export default function DonationUnitsPage() {
                                     <div style={{ transition: "transform 0.2s ease", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}><ChevronDown size={16} style={{ color: "var(--foreground)" }} /></div>
                                   </div>
                                 </TableCell>
-                                <TableCell style={{ fontWeight: "var(--font-weight-semibold)" }}><div className="truncate max-w-[80px] lg:max-w-[100px] xl:max-w-[120px]">{group.sharedData.childName}</div></TableCell>
+                                <TableCell style={{ fontWeight: "var(--font-weight-semibold)" }}><div className="truncate max-w-[80px] lg:max-w-[100px] xl:max-w-[140px] 2xl:max-w-none">{group.sharedData.childName}</div></TableCell>
                                 <TableCell className="hidden xl:table-cell" style={{ fontWeight: "var(--font-weight-semibold)" }}>{group.sharedData.joinDate}</TableCell>
                                 <TableCell className="hidden lg:table-cell" style={{ fontWeight: "var(--font-weight-semibold)" }}>{group.sharedData.designatedYear}</TableCell>
                                 <TableCell className="hidden lg:table-cell" style={{ fontWeight: "var(--font-weight-semibold)" }}>{group.sharedData.track}</TableCell>
