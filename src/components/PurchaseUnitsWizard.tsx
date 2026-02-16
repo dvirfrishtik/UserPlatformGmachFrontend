@@ -80,6 +80,7 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children }: PurchaseUnits
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   const [unitCount, setUnitCount] = useState(0);
   const [selectedTrack, setSelectedTrack] = useState<"קלאסי" | "פרעון מורחב">("קלאסי");
+  const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
   const totalSteps = 4;
 
   if (!isOpen) return null;
@@ -101,12 +102,14 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children }: PurchaseUnits
     setSelectedChildId(null);
     setUnitCount(0);
     setSelectedTrack("קלאסי");
+    setSelectedPaymentId(null);
     onClose();
   };
 
   const isNextDisabled =
     (currentStep === 1 && !selectedChildId) ||
-    (currentStep === 2 && unitCount === 0);
+    (currentStep === 2 && unitCount === 0) ||
+    (currentStep === 3 && !selectedPaymentId);
 
   return (
     /* Backdrop */
@@ -181,7 +184,10 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children }: PurchaseUnits
             />
           )}
           {currentStep === 3 && (
-            <StepPlaceholder title="אמצעי תשלום" description="בשלב זה תבחר את אמצעי התשלום החודשי" />
+            <StepSelectPayment
+              selectedPaymentId={selectedPaymentId}
+              onSelect={setSelectedPaymentId}
+            />
           )}
           {currentStep === 4 && (
             <StepPlaceholder title="סיכום ואישור" description="בדוק את כל הפרטים ואשר את הרכישה" />
@@ -726,7 +732,181 @@ function StepDefineUnits({
   );
 }
 
-/* ─── Placeholder for steps 3-4 ─── */
+/* ─── Bank Icon ─── */
+function BankIcon({ size = 28, color = "#676767" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
+      <path d="M2.33325 9.99723C2.33325 8.60168 2.89603 7.74644 4.06065 7.09831L8.85477 4.43033C11.3669 3.03232 12.6229 2.33331 13.9999 2.33331C15.3769 2.33331 16.633 3.03232 19.145 4.43033L23.9392 7.09831C25.1038 7.74644 25.6666 8.6017 25.6666 9.99723C25.6666 10.3756 25.6666 10.5649 25.6253 10.7204C25.4082 11.5377 24.6676 11.6666 23.9524 11.6666H4.04741C3.33223 11.6666 2.59169 11.5377 2.37458 10.7204C2.33325 10.5649 2.33325 10.3756 2.33325 9.99723Z" stroke={color} />
+      <path d="M13.9951 8.16669H14.0061" stroke={color} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4.66675 11.6667V21.5834M9.33341 11.6667V21.5834" stroke={color} />
+      <path d="M18.6667 11.6667V21.5834M23.3334 11.6667V21.5834" stroke={color} />
+      <path d="M22.1666 21.5833H5.83325C3.90026 21.5833 2.33325 23.1503 2.33325 25.0833C2.33325 25.4054 2.59442 25.6666 2.91659 25.6666H25.0833C25.4054 25.6666 25.6666 25.4054 25.6666 25.0833C25.6666 23.1503 24.0996 21.5833 22.1666 21.5833Z" stroke={color} />
+    </svg>
+  );
+}
+
+/* ─── Credit Card Icon ─── */
+function CreditCardIcon({ size = 28, color = "#676767" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
+      <path d="M1.75 14C1.75 9.6666 1.75 7.49988 3.03968 6.05331C3.24596 5.82195 3.47331 5.60797 3.71914 5.41383C5.25611 4.20001 7.55824 4.20001 12.1625 4.20001H15.8375C20.4418 4.20001 22.7439 4.20001 24.2808 5.41383C24.5267 5.60797 24.754 5.82195 24.9603 6.05331C26.25 7.49988 26.25 9.6666 26.25 14C26.25 18.3334 26.25 20.5001 24.9603 21.9467C24.754 22.1781 24.5267 22.392 24.2808 22.5862C22.7439 23.8 20.4418 23.8 15.8375 23.8H12.1625C7.55824 23.8 5.25611 23.8 3.71914 22.5862C3.47331 22.392 3.24596 22.1781 3.03968 21.9467C1.75 20.5001 1.75 18.3334 1.75 14Z" stroke={color} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M11.55 18.9H13.3875" stroke={color} strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M17.0625 18.9H21.35" stroke={color} strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M1.75 10.325H26.25" stroke={color} strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* ─── Payment Method Data ─── */
+interface PaymentMethod {
+  id: string;
+  type: 'bank' | 'credit';
+  name: string;
+  accountNumber: string;
+  monthlyCharge: number;
+}
+
+const PAYMENT_METHODS: PaymentMethod[] = [
+  {
+    id: "pm-1",
+    type: "bank",
+    name: "דיסקונט",
+    accountNumber: "10-4839853",
+    monthlyCharge: 6043,
+  },
+  {
+    id: "pm-2",
+    type: "credit",
+    name: "MAX",
+    accountNumber: "4932",
+    monthlyCharge: 1232,
+  },
+  {
+    id: "pm-3",
+    type: "bank",
+    name: "לאומי",
+    accountNumber: "10-4839853",
+    monthlyCharge: 0,
+  },
+];
+
+/* ─── Step 3: Select Payment Method ─── */
+function StepSelectPayment({
+  selectedPaymentId,
+  onSelect,
+}: {
+  selectedPaymentId: string | null;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <div className="flex flex-col items-end w-full">
+      {/* Title */}
+      <p style={{
+        fontSize: "16px",
+        color: "#141E44",
+        fontWeight: "var(--font-weight-normal)",
+        textAlign: "right",
+        marginBottom: "20px",
+        lineHeight: "20px",
+        width: "100%",
+      }}>
+        בחירת אמצעי תשלום
+      </p>
+
+      {/* Payment methods grid - 3 columns */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 w-full" style={{ gap: "14px" }}>
+        {PAYMENT_METHODS.map((method) => {
+          const isSelected = selectedPaymentId === method.id;
+          return (
+            <PaymentMethodCard
+              key={method.id}
+              method={method}
+              isSelected={isSelected}
+              onClick={() => onSelect(method.id)}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Payment Method Card ─── */
+function PaymentMethodCard({
+  method,
+  isSelected,
+  onClick,
+}: {
+  method: PaymentMethod;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const IconComponent = method.type === 'bank' ? BankIcon : CreditCardIcon;
+  const iconColor = isSelected ? "#172554" : "#676767";
+
+  return (
+    <button
+      className="flex flex-col items-center gap-3 transition-all"
+      style={{
+        padding: "28px 20px 24px",
+        borderRadius: "8px",
+        backgroundColor: "#FFFFFF",
+        border: isSelected
+          ? "1.5px solid #3B82F6"
+          : "1.5px solid transparent",
+        cursor: "pointer",
+        outline: "none",
+        boxShadow: isSelected
+          ? "0 0 12px rgba(59, 130, 246, 0.12)"
+          : isHovered
+          ? "0 0 12px rgba(24, 47, 67, 0.12)"
+          : "0 0 12px rgba(24, 47, 67, 0.06)",
+        textAlign: "center",
+      }}
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Icon with subtle circle background */}
+      <div
+        className="flex items-center justify-center transition-all duration-200"
+        style={{
+          width: "48px",
+          height: "48px",
+          borderRadius: "50%",
+          backgroundColor: isSelected ? "#EFF6FF" : "#F3F5FA",
+        }}
+      >
+        <IconComponent size={24} color={iconColor} />
+      </div>
+
+      {/* Account name & number */}
+      <p style={{
+        fontSize: "16px",
+        fontWeight: isSelected ? "var(--font-weight-bold)" : "var(--font-weight-semibold)",
+        color: isSelected ? "#141E44" : "#495157",
+        lineHeight: "22px",
+        transition: "color 0.2s ease",
+      }}>
+        {method.name} {method.accountNumber}
+      </p>
+
+      {/* Monthly charge */}
+      <span style={{
+        fontSize: "14px",
+        color: "#6B7280",
+        fontWeight: "var(--font-weight-normal)",
+        lineHeight: "20px",
+      }}>
+        חיוב חודשי נוכחי {method.monthlyCharge > 0 ? `₪${method.monthlyCharge.toLocaleString('he-IL')}` : "₪0"}
+      </span>
+    </button>
+  );
+}
+
+/* ─── Placeholder for step 4 ─── */
 function StepPlaceholder({ title, description }: { title: string; description: string }) {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-4">
