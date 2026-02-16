@@ -447,14 +447,14 @@ function StepDefineUnits({
           overflow: "hidden",
         }}
       >
-        {/* Top row: Quantity + Track (RTL: first child = right) */}
+        {/* Top row: Quantity + Track side by side, right-aligned */}
         <div
-          className="flex items-center justify-between"
+          className="flex items-end gap-6"
           style={{ padding: "24px 28px" }}
         >
-          {/* Quantity selector (appears on RIGHT in RTL) */}
-          <div className="flex flex-col items-end gap-2">
-            <p style={{ fontSize: "14px", color: "#6B7280", fontWeight: "var(--font-weight-normal)" }}>
+          {/* Quantity selector */}
+          <div className="flex flex-col gap-2 shrink-0">
+            <p style={{ fontSize: "14px", color: "#6B7280", fontWeight: "var(--font-weight-normal)", textAlign: "right" }}>
               כמות יחידות
             </p>
             <div className="flex items-center" dir="ltr">
@@ -510,23 +510,23 @@ function StepDefineUnits({
             </div>
           </div>
 
-          {/* Track selector (appears on LEFT in RTL) */}
-          <div className="flex flex-col items-start gap-2">
-            <p style={{ fontSize: "14px", color: "#6B7280", fontWeight: "var(--font-weight-normal)" }}>
+          {/* Track selector - fills remaining width */}
+          <div className="flex flex-col gap-2 flex-1">
+            <p style={{ fontSize: "14px", color: "#6B7280", fontWeight: "var(--font-weight-normal)", textAlign: "right" }}>
               מסלול יחידה
             </p>
-            <div className="relative">
+            <div className="relative w-full">
               <button
                 onClick={() => setIsTrackDropdownOpen(!isTrackDropdownOpen)}
-                className="flex items-center gap-2 transition-colors"
+                className="flex items-center gap-2 transition-colors w-full"
                 style={{
                   padding: "8px 14px",
                   borderRadius: "6px",
                   border: "1px solid #D1D5DB",
                   backgroundColor: "#FFFFFF",
                   cursor: "pointer",
-                  minWidth: "160px",
                   justifyContent: "space-between",
+                  height: "36px",
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#F9FAFB"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#FFFFFF"; }}
@@ -598,8 +598,8 @@ function StepDefineUnits({
           className="flex items-start"
           style={{ padding: "20px 28px" }}
         >
-          {/* Payment details (RIGHT in RTL) */}
-          <div className="flex flex-col gap-1 flex-1" style={{ textAlign: "right" }}>
+          {/* Payment details */}
+          <div className="flex flex-col gap-1 flex-1" style={{ textAlign: "center" }}>
             <p style={{ fontSize: "13px", color: "#6B7280", fontWeight: "var(--font-weight-normal)" }}>
               פירוט תשלומים
             </p>
@@ -618,7 +618,7 @@ function StepDefineUnits({
           {/* Divider */}
           <div className="shrink-0 mx-4" style={{ width: "1px", height: "36px", backgroundColor: "#E5E9F9" }} />
 
-          {/* Loan eligibility (CENTER) */}
+          {/* Loan eligibility */}
           <div className="flex flex-col gap-1 flex-1" style={{ textAlign: "center" }}>
             <p style={{ fontSize: "13px", color: "#6B7280", fontWeight: "var(--font-weight-normal)" }}>
               זכאות להלוואה עתידית
@@ -638,8 +638,8 @@ function StepDefineUnits({
           {/* Divider */}
           <div className="shrink-0 mx-4" style={{ width: "1px", height: "36px", backgroundColor: "#E5E9F9" }} />
 
-          {/* Grant eligibility (LEFT in RTL) */}
-          <div className="flex flex-col gap-1 flex-1" style={{ textAlign: "left" }}>
+          {/* Grant eligibility */}
+          <div className="flex flex-col gap-1 flex-1" style={{ textAlign: "center" }}>
             <p style={{ fontSize: "13px", color: "#6B7280", fontWeight: "var(--font-weight-normal)" }}>
               זכאות למענק עתידי
             </p>
