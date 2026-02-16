@@ -336,14 +336,14 @@ function ChildSelectCard({
   const [isHovered, setIsHovered] = useState(false);
 
   const IconComponent = child.gender === 'female' ? GirlIcon : BoyIcon;
-  const iconColor = isSelected ? "#3B82F6" : "#495157";
+  const iconColor = isSelected ? "#172554" : "#495157";
 
   return (
     <button
       className="flex items-center gap-4 transition-all"
       style={{
         padding: "20px 24px",
-        borderRadius: "6px",
+        borderRadius: "8px",
         backgroundColor: "#FFFFFF",
         border: isSelected
           ? "1.5px solid #3B82F6"
@@ -354,19 +354,24 @@ function ChildSelectCard({
           ? "0 0 12px rgba(59, 130, 246, 0.12)"
           : isHovered
           ? "0 0 12px rgba(24, 47, 67, 0.12)"
-          : "0 0 12px rgba(24, 47, 67, 0.08)",
+          : "0 0 12px rgba(24, 47, 67, 0.06)",
         textAlign: "right",
       }}
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Icon */}
+      {/* Icon with subtle circle background */}
       <div
         className="flex items-center justify-center shrink-0 transition-all duration-200"
-        style={{ width: "44px", height: "44px" }}
+        style={{
+          width: "48px",
+          height: "48px",
+          borderRadius: "50%",
+          backgroundColor: isSelected ? "#EFF6FF" : "#F3F5FA",
+        }}
       >
-        <IconComponent size={34} color={iconColor} />
+        <IconComponent size={28} color={iconColor} />
       </div>
 
       {/* Text content */}
