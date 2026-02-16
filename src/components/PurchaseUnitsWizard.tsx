@@ -199,7 +199,50 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children }: PurchaseUnits
             gap: "12px",
           }}
         >
-          {/* Primary action - Continue */}
+          {/* RTL: first child = RIGHT side */}
+          {/* Secondary action - Back (RIGHT in RTL) */}
+          {currentStep > 1 && (
+            <button
+              onClick={handleBack}
+              className="transition-all"
+              style={{
+                padding: "14px 24px",
+                borderRadius: "8px",
+                fontSize: "16px",
+                fontWeight: "var(--font-weight-semibold)",
+                color: "#141E44",
+                backgroundColor: "transparent",
+                border: "1.5px solid #141E44",
+                cursor: "pointer",
+                height: "48px",
+                minWidth: "160px",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.03)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }}
+            >
+              חזרה לשלב הקודם
+            </button>
+          )}
+
+          {/* Step indicator (CENTER) */}
+          {currentStep > 1 && (
+            <p style={{
+              fontSize: "15px",
+              color: "#6B7280",
+              fontWeight: "var(--font-weight-normal)",
+              flex: 1,
+              textAlign: "center",
+              whiteSpace: "nowrap",
+            }}>
+              {currentStep} / {totalSteps}
+            </p>
+          )}
+
+          {/* Primary action - Continue (LEFT in RTL) */}
           <button
             onClick={handleContinue}
             disabled={isNextDisabled}
@@ -231,48 +274,6 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children }: PurchaseUnits
           >
             {currentStep === totalSteps ? "אישור רכישה" : "המשך"}
           </button>
-
-          {/* Step indicator */}
-          {currentStep > 1 && (
-            <p style={{
-              fontSize: "15px",
-              color: "#6B7280",
-              fontWeight: "var(--font-weight-normal)",
-              flex: 1,
-              textAlign: "center",
-              whiteSpace: "nowrap",
-            }}>
-              {currentStep} / {totalSteps}
-            </p>
-          )}
-
-          {/* Secondary action - Back */}
-          {currentStep > 1 && (
-            <button
-              onClick={handleBack}
-              className="transition-all"
-              style={{
-                padding: "14px 24px",
-                borderRadius: "8px",
-                fontSize: "16px",
-                fontWeight: "var(--font-weight-semibold)",
-                color: "#141E44",
-                backgroundColor: "transparent",
-                border: "1.5px solid #141E44",
-                cursor: "pointer",
-                height: "48px",
-                minWidth: "160px",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.03)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-              }}
-            >
-              חזרה לשלב הקודם
-            </button>
-          )}
         </div>
       </div>
     </div>
@@ -430,7 +431,7 @@ function StepDefineUnits({
         color: "#141E44",
         fontWeight: "var(--font-weight-normal)",
         textAlign: "right",
-        marginBottom: "24px",
+        marginBottom: "12px",
         lineHeight: "20px",
         width: "100%",
       }}>
@@ -657,18 +658,22 @@ function StepDefineUnits({
         </div>
       </div>
 
-      {/* Additional info accordion */}
+      {/* Additional info accordion - RTL: Info icon RIGHT, text, chevron LEFT */}
       <button
         onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-        className="flex items-center gap-2 transition-colors self-center"
+        className="flex items-center gap-2 transition-colors self-end"
         style={{
-          marginTop: "28px",
-          padding: "10px 16px",
+          marginTop: "20px",
+          padding: "10px 0",
           border: "none",
           backgroundColor: "transparent",
           cursor: "pointer",
         }}
       >
+        <Info size={15} style={{ color: "#6B7280" }} />
+        <span style={{ fontSize: "14px", color: "#495157", fontWeight: "var(--font-weight-normal)" }}>
+          מידע נוסף על מסלולי היחידות
+        </span>
         <ChevronDown
           size={15}
           style={{
@@ -677,10 +682,6 @@ function StepDefineUnits({
             transition: "transform 0.2s ease",
           }}
         />
-        <span style={{ fontSize: "14px", color: "#495157", fontWeight: "var(--font-weight-normal)" }}>
-          מידע נוסף על מסלולי היחידות
-        </span>
-        <Info size={15} style={{ color: "#6B7280" }} />
       </button>
 
       {/* Expandable info content */}
