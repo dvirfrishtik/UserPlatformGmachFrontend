@@ -18,7 +18,7 @@ export function AppSidebar() {
   ];
 
   const lowerMenuItems = [
-    { id: "kids", label: "הילדים שלי", icon: <IconKids />, href: "#" },
+    { id: "kids", label: "הילדים שלי", icon: <IconKids />, href: "/kids" },
     { id: "documents", label: "מסמכים ואישורים", icon: <IconDocumentDuplicate />, href: "#" },
     { id: "programs", label: "תכניות הגמ״ח", icon: <IconSquares2X />, external: true, href: "#" },
     { id: "simulator", label: "סימולטור", icon: <IconCubeTransparent />, external: true, href: "#" },
@@ -33,6 +33,7 @@ export function AppSidebar() {
 
   const getActiveItem = () => {
     if (pathname === "/account") return "account";
+    if (pathname === "/kids") return "kids";
     if (pathname === "/" || pathname === "/donation-units") return "donation";
     return "overview";
   };

@@ -39,11 +39,18 @@ export default function DonationUnitsPage() {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [isActionsDropdownOpen, setIsActionsDropdownOpen] = useState(false);
   const [isPurchaseWizardOpen, setIsPurchaseWizardOpen] = useState(false);
-  const actionsDropdownRef = useRef<HTMLDivElement>(null);
+  const actionsDropdownRefXl = useRef<HTMLDivElement>(null);
+  const actionsDropdownRefMd = useRef<HTMLDivElement>(null);
+  const actionsDropdownRefSm = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (actionsDropdownRef.current && !actionsDropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const isInsideAny =
+        (actionsDropdownRefXl.current && actionsDropdownRefXl.current.contains(target)) ||
+        (actionsDropdownRefMd.current && actionsDropdownRefMd.current.contains(target)) ||
+        (actionsDropdownRefSm.current && actionsDropdownRefSm.current.contains(target));
+      if (!isInsideAny) {
         setIsActionsDropdownOpen(false);
       }
     }
@@ -277,7 +284,7 @@ export default function DonationUnitsPage() {
 
       {/* Units Table Section */}
       <div className="mt-4 sm:mt-6">
-        <div className="w-full" style={{ backgroundColor: "white", borderRadius: "12px", boxShadow: "0px 0px 20px 0px rgba(14, 78, 134, 0.04)" }}>
+        <div className="w-full" style={{ backgroundColor: "white", borderRadius: "12px", boxShadow: "0px 0px 24px 0px rgba(14, 78, 134, 0.09)" }}>
           <div className="px-3 sm:px-4 md:px-6 pt-4 sm:pt-6">
             <div className="w-full min-w-0">
               {/* Info Bar - Desktop XL+ (single row) */}
@@ -306,7 +313,7 @@ export default function DonationUnitsPage() {
                     <p style={{ fontSize: "13px", fontWeight: "var(--font-weight-bold)", lineHeight: "18px", whiteSpace: "nowrap" }}>{stats.monthlyCharges} ₪</p>
                   </div>
                 </div>
-                <div className="relative shrink-0" ref={actionsDropdownRef}>
+                <div className="relative shrink-0" ref={actionsDropdownRefXl}>
                   <button onClick={() => setIsActionsDropdownOpen(!isActionsDropdownOpen)} className="flex items-center gap-2 px-3 py-2 shrink-0 transition-colors" style={{ backgroundColor: isActionsDropdownOpen ? "var(--muted)" : "var(--card)", border: "1px solid var(--muted-foreground)", borderRadius: "var(--radius-md)", cursor: "pointer" }}>
                     <p style={{ fontSize: "13px", fontWeight: "var(--font-weight-semibold)", color: "var(--foreground)", whiteSpace: "nowrap" }}>פעולות ומידע</p>
                     <ChevronDown size={16} style={{ color: "var(--foreground)", transform: isActionsDropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }} />
@@ -343,6 +350,16 @@ export default function DonationUnitsPage() {
                     </div>
                   </div>
                 </div>
+                <div style={{ width: "100%", height: "1px", backgroundColor: "var(--border)" }} />
+                <div className="flex justify-end">
+                  <div className="relative" ref={actionsDropdownRefMd}>
+                    <button onClick={() => setIsActionsDropdownOpen(!isActionsDropdownOpen)} className="flex items-center gap-2 px-3 py-2 transition-colors" style={{ backgroundColor: isActionsDropdownOpen ? "var(--muted)" : "var(--card)", border: "1px solid var(--muted-foreground)", borderRadius: "var(--radius-md)", cursor: "pointer" }}>
+                      <p style={{ fontSize: "13px", fontWeight: "var(--font-weight-semibold)", color: "var(--foreground)", whiteSpace: "nowrap" }}>פעולות ומידע</p>
+                      <ChevronDown size={16} style={{ color: "var(--foreground)", transform: isActionsDropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }} />
+                    </button>
+                    {isActionsDropdownOpen && <ActionsDropdown onClose={() => setIsActionsDropdownOpen(false)} onPurchaseUnits={() => setIsPurchaseWizardOpen(true)} />}
+                  </div>
+                </div>
               </div>
 
               {/* Info Bar - Mobile (stacked) */}
@@ -366,6 +383,16 @@ export default function DonationUnitsPage() {
                   <div className="flex flex-col gap-1 text-right">
                     <p style={{ fontSize: "11px", color: "var(--muted-foreground)" }}>מענקים פוטנציאליים</p>
                     <p style={{ fontSize: "14px", fontWeight: "var(--font-weight-bold)" }}>{stats.potentialGrants} ₪</p>
+                  </div>
+                </div>
+                <div style={{ width: "100%", height: "1px", backgroundColor: "var(--border)" }} />
+                <div className="flex justify-end">
+                  <div className="relative" ref={actionsDropdownRefSm}>
+                    <button onClick={() => setIsActionsDropdownOpen(!isActionsDropdownOpen)} className="flex items-center gap-2 px-3 py-2 transition-colors" style={{ backgroundColor: isActionsDropdownOpen ? "var(--muted)" : "var(--card)", border: "1px solid var(--muted-foreground)", borderRadius: "var(--radius-md)", cursor: "pointer" }}>
+                      <p style={{ fontSize: "13px", fontWeight: "var(--font-weight-semibold)", color: "var(--foreground)", whiteSpace: "nowrap" }}>פעולות ומידע</p>
+                      <ChevronDown size={16} style={{ color: "var(--foreground)", transform: isActionsDropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }} />
+                    </button>
+                    {isActionsDropdownOpen && <ActionsDropdown onClose={() => setIsActionsDropdownOpen(false)} onPurchaseUnits={() => setIsPurchaseWizardOpen(true)} />}
                   </div>
                 </div>
               </div>
