@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Plus, Minus, ChevronDown, Info } from 'lucide-react';
 
 interface ChildOption {
   id: string;
@@ -78,6 +78,8 @@ function StepProgressBar({ currentStep, totalSteps }: { currentStep: number; tot
 export function PurchaseUnitsWizard({ isOpen, onClose, children }: PurchaseUnitsWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
+  const [unitCount, setUnitCount] = useState(0);
+  const [selectedTrack, setSelectedTrack] = useState<"קלאסי" | "פרעון מורחב">("קלאסי");
   const totalSteps = 4;
 
   if (!isOpen) return null;
@@ -97,10 +99,14 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children }: PurchaseUnits
   const handleClose = () => {
     setCurrentStep(1);
     setSelectedChildId(null);
+    setUnitCount(0);
+    setSelectedTrack("קלאסי");
     onClose();
   };
 
-  const isNextDisabled = currentStep === 1 && !selectedChildId;
+  const isNextDisabled =
+    (currentStep === 1 && !selectedChildId) ||
+    (currentStep === 2 && unitCount === 0);
 
   return (
     /* Backdrop */
@@ -167,7 +173,12 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children }: PurchaseUnits
             />
           )}
           {currentStep === 2 && (
-            <StepPlaceholder title="הגדרת יחידות" description="בשלב זה תגדיר את מספר היחידות וסוג המסלול" />
+            <StepDefineUnits
+              unitCount={unitCount}
+              onUnitCountChange={setUnitCount}
+              selectedTrack={selectedTrack}
+              onTrackChange={setSelectedTrack}
+            />
           )}
           {currentStep === 3 && (
             <StepPlaceholder title="אמצעי תשלום" description="בשלב זה תבחר את אמצעי התשלום החודשי" />
@@ -185,13 +196,14 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children }: PurchaseUnits
           className="flex items-center shrink-0"
           style={{
             padding: "20px 40px 30px 40px",
+            gap: "12px",
           }}
         >
-          {/* Primary action button - full width like in the Figma reference */}
+          {/* Primary action - Continue */}
           <button
             onClick={handleContinue}
             disabled={isNextDisabled}
-            className="transition-all w-full"
+            className="transition-all"
             style={{
               padding: "14px 24px",
               borderRadius: "8px",
@@ -203,6 +215,8 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children }: PurchaseUnits
               cursor: isNextDisabled ? "not-allowed" : "pointer",
               opacity: isNextDisabled ? 0.6 : 1,
               height: "48px",
+              flex: currentStep === 1 ? 1 : "none",
+              minWidth: currentStep > 1 ? "160px" : undefined,
             }}
             onMouseEnter={(e) => {
               if (!isNextDisabled) {
@@ -217,6 +231,48 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children }: PurchaseUnits
           >
             {currentStep === totalSteps ? "אישור רכישה" : "המשך"}
           </button>
+
+          {/* Step indicator */}
+          {currentStep > 1 && (
+            <p style={{
+              fontSize: "15px",
+              color: "#6B7280",
+              fontWeight: "var(--font-weight-normal)",
+              flex: 1,
+              textAlign: "center",
+              whiteSpace: "nowrap",
+            }}>
+              {currentStep} / {totalSteps}
+            </p>
+          )}
+
+          {/* Secondary action - Back */}
+          {currentStep > 1 && (
+            <button
+              onClick={handleBack}
+              className="transition-all"
+              style={{
+                padding: "14px 24px",
+                borderRadius: "8px",
+                fontSize: "16px",
+                fontWeight: "var(--font-weight-semibold)",
+                color: "#141E44",
+                backgroundColor: "transparent",
+                border: "1.5px solid #141E44",
+                cursor: "pointer",
+                height: "48px",
+                minWidth: "160px",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.03)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }}
+            >
+              חזרה לשלב הקודם
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -339,7 +395,332 @@ function ChildSelectCard({
   );
 }
 
-/* ─── Placeholder for steps 2-4 ─── */
+/* ─── Step 2: Define Units ─── */
+function StepDefineUnits({
+  unitCount,
+  onUnitCountChange,
+  selectedTrack,
+  onTrackChange,
+}: {
+  unitCount: number;
+  onUnitCountChange: (count: number) => void;
+  selectedTrack: "קלאסי" | "פרעון מורחב";
+  onTrackChange: (track: "קלאסי" | "פרעון מורחב") => void;
+}) {
+  const [isTrackDropdownOpen, setIsTrackDropdownOpen] = useState(false);
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false);
+
+  const MONTHLY_PER_UNIT = 40;
+  const LOAN_PER_UNIT = 40000;
+  const GRANT_PER_UNIT = 2400;
+  const TOTAL_MONTHS = 120;
+
+  const monthlyPayment = unitCount * MONTHLY_PER_UNIT;
+  const loanEligibility = unitCount * LOAN_PER_UNIT;
+  const grantEligibility = unitCount * GRANT_PER_UNIT;
+
+  const handleIncrement = () => onUnitCountChange(unitCount + 1);
+  const handleDecrement = () => { if (unitCount > 0) onUnitCountChange(unitCount - 1); };
+
+  return (
+    <div className="flex flex-col items-end w-full">
+      {/* Title */}
+      <p style={{
+        fontSize: "16px",
+        color: "#141E44",
+        fontWeight: "var(--font-weight-normal)",
+        textAlign: "right",
+        marginBottom: "24px",
+        lineHeight: "20px",
+        width: "100%",
+      }}>
+        הגדרת יחידות תרומה לרכישה
+      </p>
+
+      {/* Main card */}
+      <div
+        className="w-full"
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: "8px",
+          boxShadow: "0 0 12px rgba(24, 47, 67, 0.06)",
+          overflow: "hidden",
+        }}
+      >
+        {/* Top row: Quantity + Track (RTL: first child = right) */}
+        <div
+          className="flex items-center justify-between"
+          style={{ padding: "24px 28px" }}
+        >
+          {/* Quantity selector (appears on RIGHT in RTL) */}
+          <div className="flex flex-col items-end gap-2">
+            <p style={{ fontSize: "14px", color: "#6B7280", fontWeight: "var(--font-weight-normal)" }}>
+              כמות יחידות
+            </p>
+            <div className="flex items-center" dir="ltr">
+              <button
+                onClick={handleDecrement}
+                className="flex items-center justify-center transition-colors"
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  border: "1px solid #D1D5DB",
+                  borderRadius: "6px 0 0 6px",
+                  backgroundColor: "#FFFFFF",
+                  cursor: unitCount === 0 ? "not-allowed" : "pointer",
+                  opacity: unitCount === 0 ? 0.4 : 1,
+                }}
+                onMouseEnter={(e) => { if (unitCount > 0) e.currentTarget.style.backgroundColor = "#F9FAFB"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#FFFFFF"; }}
+                disabled={unitCount === 0}
+              >
+                <Minus size={16} style={{ color: "#374151" }} />
+              </button>
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  width: "48px",
+                  height: "36px",
+                  borderTop: "1px solid #D1D5DB",
+                  borderBottom: "1px solid #D1D5DB",
+                  backgroundColor: "#FFFFFF",
+                  fontSize: "16px",
+                  fontWeight: "var(--font-weight-semibold)",
+                  color: "#141E44",
+                }}
+              >
+                {unitCount}
+              </div>
+              <button
+                onClick={handleIncrement}
+                className="flex items-center justify-center transition-colors"
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  border: "1px solid #D1D5DB",
+                  borderRadius: "0 6px 6px 0",
+                  backgroundColor: "#FFFFFF",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#F9FAFB"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#FFFFFF"; }}
+              >
+                <Plus size={16} style={{ color: "#374151" }} />
+              </button>
+            </div>
+          </div>
+
+          {/* Track selector (appears on LEFT in RTL) */}
+          <div className="flex flex-col items-start gap-2">
+            <p style={{ fontSize: "14px", color: "#6B7280", fontWeight: "var(--font-weight-normal)" }}>
+              מסלול יחידה
+            </p>
+            <div className="relative">
+              <button
+                onClick={() => setIsTrackDropdownOpen(!isTrackDropdownOpen)}
+                className="flex items-center gap-2 transition-colors"
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: "6px",
+                  border: "1px solid #D1D5DB",
+                  backgroundColor: "#FFFFFF",
+                  cursor: "pointer",
+                  minWidth: "160px",
+                  justifyContent: "space-between",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#F9FAFB"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#FFFFFF"; }}
+              >
+                <span style={{ fontSize: "15px", color: "#141E44", fontWeight: "var(--font-weight-normal)" }}>
+                  {selectedTrack}
+                </span>
+                <ChevronDown
+                  size={16}
+                  style={{
+                    color: "#6B7280",
+                    transform: isTrackDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s ease",
+                  }}
+                />
+              </button>
+              {isTrackDropdownOpen && (
+                <div
+                  className="absolute z-10 w-full"
+                  style={{
+                    top: "calc(100% + 4px)",
+                    right: 0,
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #E5E9F9",
+                    borderRadius: "6px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                    overflow: "hidden",
+                  }}
+                >
+                  {(["קלאסי", "פרעון מורחב"] as const).map((track) => (
+                    <button
+                      key={track}
+                      onClick={() => {
+                        onTrackChange(track);
+                        setIsTrackDropdownOpen(false);
+                      }}
+                      className="w-full transition-colors"
+                      style={{
+                        padding: "10px 14px",
+                        textAlign: "right",
+                        fontSize: "15px",
+                        color: selectedTrack === track ? "#141E44" : "#495157",
+                        fontWeight: selectedTrack === track ? "var(--font-weight-semibold)" : "var(--font-weight-normal)",
+                        backgroundColor: selectedTrack === track ? "#F0F4FF" : "#FFFFFF",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (selectedTrack !== track) e.currentTarget.style.backgroundColor = "#F9FAFB";
+                      }}
+                      onMouseLeave={(e) => {
+                        if (selectedTrack !== track) e.currentTarget.style.backgroundColor = "#FFFFFF";
+                      }}
+                    >
+                      {track}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ width: "100%", height: "1px", backgroundColor: "#E5E9F9" }} />
+
+        {/* Info row: computed values (RTL: first child = right) */}
+        <div
+          className="flex items-start"
+          style={{ padding: "20px 28px" }}
+        >
+          {/* Payment details (RIGHT in RTL) */}
+          <div className="flex flex-col gap-1 flex-1" style={{ textAlign: "right" }}>
+            <p style={{ fontSize: "13px", color: "#6B7280", fontWeight: "var(--font-weight-normal)" }}>
+              פירוט תשלומים
+            </p>
+            <p style={{
+              fontSize: "14px",
+              color: unitCount > 0 ? "#141E44" : "#9CA3AF",
+              fontWeight: "var(--font-weight-semibold)",
+            }}>
+              {unitCount > 0
+                ? `₪${monthlyPayment.toLocaleString('he-IL')} בחודש למשך ${TOTAL_MONTHS} חודשים`
+                : "-"
+              }
+            </p>
+          </div>
+
+          {/* Divider */}
+          <div className="shrink-0 mx-4" style={{ width: "1px", height: "36px", backgroundColor: "#E5E9F9" }} />
+
+          {/* Loan eligibility (CENTER) */}
+          <div className="flex flex-col gap-1 flex-1" style={{ textAlign: "center" }}>
+            <p style={{ fontSize: "13px", color: "#6B7280", fontWeight: "var(--font-weight-normal)" }}>
+              זכאות להלוואה עתידית
+            </p>
+            <p style={{
+              fontSize: "14px",
+              color: unitCount > 0 ? "#141E44" : "#9CA3AF",
+              fontWeight: "var(--font-weight-semibold)",
+            }}>
+              {unitCount > 0
+                ? `₪${loanEligibility.toLocaleString('he-IL')}`
+                : "-"
+              }
+            </p>
+          </div>
+
+          {/* Divider */}
+          <div className="shrink-0 mx-4" style={{ width: "1px", height: "36px", backgroundColor: "#E5E9F9" }} />
+
+          {/* Grant eligibility (LEFT in RTL) */}
+          <div className="flex flex-col gap-1 flex-1" style={{ textAlign: "left" }}>
+            <p style={{ fontSize: "13px", color: "#6B7280", fontWeight: "var(--font-weight-normal)" }}>
+              זכאות למענק עתידי
+            </p>
+            <p style={{
+              fontSize: "14px",
+              color: unitCount > 0 ? "#141E44" : "#9CA3AF",
+              fontWeight: "var(--font-weight-semibold)",
+            }}>
+              {unitCount > 0
+                ? `₪${grantEligibility.toLocaleString('he-IL')}`
+                : "-"
+              }
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Additional info accordion */}
+      <button
+        onClick={() => setIsInfoExpanded(!isInfoExpanded)}
+        className="flex items-center gap-2 transition-colors self-center"
+        style={{
+          marginTop: "28px",
+          padding: "10px 16px",
+          border: "none",
+          backgroundColor: "transparent",
+          cursor: "pointer",
+        }}
+      >
+        <ChevronDown
+          size={15}
+          style={{
+            color: "#6B7280",
+            transform: isInfoExpanded ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s ease",
+          }}
+        />
+        <span style={{ fontSize: "14px", color: "#495157", fontWeight: "var(--font-weight-normal)" }}>
+          מידע נוסף על מסלולי היחידות
+        </span>
+        <Info size={15} style={{ color: "#6B7280" }} />
+      </button>
+
+      {/* Expandable info content */}
+      {isInfoExpanded && (
+        <div
+          className="w-full"
+          style={{
+            marginTop: "8px",
+            padding: "20px 24px",
+            backgroundColor: "#FFFFFF",
+            borderRadius: "8px",
+            boxShadow: "0 0 12px rgba(24, 47, 67, 0.06)",
+          }}
+        >
+          <div className="flex flex-col gap-4" style={{ textAlign: "right" }}>
+            <div>
+              <p style={{ fontSize: "15px", fontWeight: "var(--font-weight-semibold)", color: "#141E44", marginBottom: "6px" }}>
+                מסלול קלאסי
+              </p>
+              <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: "1.6" }}>
+                תשלום חודשי קבוע של ₪40 ליחידה למשך 120 חודשים (10 שנים). בתום התקופה, זכאות להלוואה בסך ₪40,000 ליחידה ומענק בסך ₪2,400 ליחידה.
+              </p>
+            </div>
+            <div style={{ width: "100%", height: "1px", backgroundColor: "#E5E9F9" }} />
+            <div>
+              <p style={{ fontSize: "15px", fontWeight: "var(--font-weight-semibold)", color: "#141E44", marginBottom: "6px" }}>
+                מסלול פרעון מורחב
+              </p>
+              <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: "1.6" }}>
+                מסלול עם תנאי פרעון גמישים יותר, המותאם למשפחות המעוניינות בפריסה שונה של התשלומים.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Placeholder for steps 3-4 ─── */
 function StepPlaceholder({ title, description }: { title: string; description: string }) {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-4">
