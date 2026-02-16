@@ -1,0 +1,21 @@
+---
+description: Auto push to GitHub after every code change
+globs:
+alwaysApply: true
+---
+
+# Auto Push to GitHub
+
+After completing ANY code change (file edit, new file, deletion), you MUST automatically:
+
+1. Stage all changes: `git add -A`
+2. Create a concise commit message describing the change
+3. Commit: `git commit -m "..."`
+4. Setup auth and push: `/tmp/gh/gh_2.86.0_macOS_arm64/bin/gh auth setup-git && git push`
+
+Do this immediately after every change without asking the user. Use `required_permissions: ["all"]` for the push command.
+
+Commit message style:
+- Use conventional commits format (feat:, fix:, style:, refactor:, docs:, chore:)
+- Keep it short and descriptive in English
+- Example: `fix: resolve responsive layout issue on large screens`

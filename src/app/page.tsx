@@ -62,47 +62,98 @@ export default function DonationUnitsPage() {
     });
   };
 
-  // All units data
-  const allUnits: Unit[] = [
-    { id: "1", childId: "child6", childName: "מיכל שולמית", joinDate: "27.08.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "ויזה 1316", monthlyAmount: "80 ₪", paidPayments: "78/120", remainingDonation: "שולם 3,120 ₪ מתוך 4,500 ₪", paidAmount: 3120, totalAmount: 4500 },
-    { id: "2", childId: "child6", childName: "מיכל שולמית", joinDate: "15.03.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "מסטרכארד 4422", monthlyAmount: "100 ₪", paidPayments: "60/120", remainingDonation: "שולם 6,000 ₪ מתוך 12,000 ₪", paidAmount: 6000, totalAmount: 12000 },
-    { id: "3", childId: "child6", childName: "מיכל שולמית", joinDate: "12.11.2019", designatedYear: "2024", track: "קלאסי", paymentMethod: "ויזה 1316", monthlyAmount: "150 ₪", paidPayments: "95/120", remainingDonation: "שולם 14,250 ₪ מתוך 18,000 ₪", paidAmount: 14250, totalAmount: 18000 },
-    { id: "4", childId: "child6", childName: "מיכל שולמית", joinDate: "08.07.2022", designatedYear: "2027", track: "פרעון מורחב", paymentMethod: "אמריקן אקספרס 9876", monthlyAmount: "90 ₪", paidPayments: "30/120", remainingDonation: "שולם 2,700 ₪ מתוך 10,800 ₪", paidAmount: 2700, totalAmount: 10800 },
-    { id: "5", childId: "child1", childName: "שמחה", joinDate: "10.01.2022", designatedYear: "2027", track: "קלאסי", paymentMethod: "אמריקן אקספרס 9876", monthlyAmount: "120 ₪", paidPayments: "45/120", remainingDonation: "שולם 5,400 ₪ מתוך 14,400 ₪", paidAmount: 5400, totalAmount: 14400 },
-    { id: "6", childId: "child1", childName: "שמחה", joinDate: "05.04.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "ויזה 2244", monthlyAmount: "85 ₪", paidPayments: "50/120", remainingDonation: "שולם 4,250 ₪ מתוך 10,200 ₪", paidAmount: 4250, totalAmount: 10200 },
-    { id: "7", childId: "child1", childName: "שמחה", joinDate: "05.04.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "ויזה 2244", monthlyAmount: "90 ₪", paidPayments: "52/120", remainingDonation: "שולם 4,680 ₪ מתוך 10,800 ₪", paidAmount: 4680, totalAmount: 10800 },
-    { id: "8", childId: "child1", childName: "שמחה", joinDate: "05.04.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "ויזה 2244", monthlyAmount: "95 ₪", paidPayments: "48/120", remainingDonation: "שולם 4,560 ₪ מתוך 11,400 ₪", paidAmount: 4560, totalAmount: 11400 },
-    { id: "9", childId: "child2", childName: "דוד משה", joinDate: "14.06.2020", designatedYear: "2025", track: "קלאסי", paymentMethod: "ויזה 2244", monthlyAmount: "100 ₪", paidPayments: "120/120", remainingDonation: "שולם 12,000 ₪ מתוך 12,000 ₪", paidAmount: 12000, totalAmount: 12000 },
-    { id: "10", childId: "child2", childName: "דוד משה", joinDate: "03.02.2021", designatedYear: "2026", track: "פרעון מורחב", paymentMethod: "אמריקן אקספרס 9876", monthlyAmount: "125 ₪", paidPayments: "120/120", remainingDonation: "שולם 15,000 ₪ מתוך 15,000 ₪", paidAmount: 15000, totalAmount: 15000 },
-    { id: "11", childId: "child2", childName: "דוד משה", joinDate: "29.08.2019", designatedYear: "2024", track: "קלאסי", paymentMethod: "מסטרכארד 4422", monthlyAmount: "80 ₪", paidPayments: "120/120", remainingDonation: "שולם 9,600 ₪ מתוך 9,600 ₪", paidAmount: 9600, totalAmount: 9600 },
-    { id: "12", childId: "child2", childName: "דוד משה", joinDate: "11.11.2022", designatedYear: "2027", track: "פרעון מורחב", paymentMethod: "ויזה 1316", monthlyAmount: "90 ₪", paidPayments: "120/120", remainingDonation: "שולם 10,800 ₪ מתוך 10,800 ₪", paidAmount: 10800, totalAmount: 10800 },
-    { id: "13", childId: "child3", childName: "יוני שמעון", joinDate: "05.09.2019", designatedYear: "2024", track: "קלאסי", paymentMethod: "ויזה 2244", monthlyAmount: "150 ₪", paidPayments: "120/120", remainingDonation: "שולם 18,000 ₪ מתוך 18,000 ₪", paidAmount: 18000, totalAmount: 18000 },
-    { id: "14", childId: "child3", childName: "יוני שמעון", joinDate: "17.03.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "מסטרכארד 5533", monthlyAmount: "130 ₪", paidPayments: "120/120", remainingDonation: "שולם 15,600 ₪ מתוך 15,600 ₪", paidAmount: 15600, totalAmount: 15600 },
-    { id: "15", childId: "child3", childName: "יוני שמעון", joinDate: "23.07.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "אמריקן אקספרס 9876", monthlyAmount: "140 ₪", paidPayments: "120/120", remainingDonation: "שולם 16,800 ₪ מתוך 16,800 ₪", paidAmount: 16800, totalAmount: 16800 },
-    { id: "16", childId: "child4", childName: "חיים יעקב", joinDate: "30.01.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "ויזה 1316", monthlyAmount: "110 ₪", paidPayments: "120/120", remainingDonation: "שולם 13,200 ₪ מתוך 13,200 ₪", paidAmount: 13200, totalAmount: 13200 },
-    { id: "17", childId: "child4", childName: "חיים יעקב", joinDate: "19.10.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "מסטרכארד 4422", monthlyAmount: "100 ₪", paidPayments: "120/120", remainingDonation: "שולם 12,000 ₪ מתוך 12,000 ₪", paidAmount: 12000, totalAmount: 12000 },
-    { id: "18", childId: "child5", childName: "יניב אהרון", joinDate: "20.06.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "מסטרכארד 5533", monthlyAmount: "200 ₪", paidPayments: "80/120", remainingDonation: "שולם 16,000 ₪ מתוך 24,000 ₪", paidAmount: 16000, totalAmount: 24000 },
-    { id: "19", childId: "child5", childName: "יניב אהרון", joinDate: "12.02.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "ויזה 2244", monthlyAmount: "180 ₪", paidPayments: "90/120", remainingDonation: "שולם 16,200 ₪ מתוך 21,600 ₪", paidAmount: 16200, totalAmount: 21600 },
-    { id: "20", childId: "child5", childName: "יניב אהרון", joinDate: "08.08.2019", designatedYear: "2024", track: "קלאסי", paymentMethod: "אמריקן אקספרס 9876", monthlyAmount: "170 ₪", paidPayments: "105/120", remainingDonation: "שולם 17,850 ₪ מתוך 20,400 ₪", paidAmount: 17850, totalAmount: 20400 },
-    { id: "21", childId: "child5", childName: "יניב אהרון", joinDate: "25.11.2022", designatedYear: "2027", track: "פרעון מורחב", paymentMethod: "ויזה 1316", monthlyAmount: "160 ₪", paidPayments: "35/120", remainingDonation: "שולם 5,600 ₪ מתוך 19,200 ₪", paidAmount: 5600, totalAmount: 19200 },
-    { id: "22", childId: "child5", childName: "יניב אהרון", joinDate: "04.04.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "מסטרכארד 4422", monthlyAmount: "150 ₪", paidPayments: "68/120", remainingDonation: "שולם 10,200 ₪ מתוך 18,000 ₪", paidAmount: 10200, totalAmount: 18000 },
-    { id: "23", childId: "child5", childName: "יניב אהרון", joinDate: "16.09.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "ויזה 2244", monthlyAmount: "190 ₪", paidPayments: "75/120", remainingDonation: "שולם 14,250 ₪ מתוך 22,800 ₪", paidAmount: 14250, totalAmount: 22800 },
-    { id: "24", childId: "child5", childName: "יניב אהרון", joinDate: "16.09.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "ויזה 2244", monthlyAmount: "200 ₪", paidPayments: "80/120", remainingDonation: "שולם 16,000 ₪ מתוך 24,000 ₪", paidAmount: 16000, totalAmount: 24000 },
-    { id: "25", childId: "child5", childName: "יניב אהרון", joinDate: "16.09.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "ויזה 2244", monthlyAmount: "170 ₪", paidPayments: "65/120", remainingDonation: "שולם 11,050 ₪ מתוך 20,400 ₪", paidAmount: 11050, totalAmount: 20400 },
+  // Each donation unit is worth 4,000 NIS
+  const UNIT_VALUE = 4000;
+
+  // Helper: compute paid amount from paidPayments ratio
+  const computePaidFromRatio = (paidPayments: string): number => {
+    const [paid, total] = paidPayments.split('/').map(Number);
+    return Math.round((paid / total) * UNIT_VALUE);
+  };
+
+  // Raw units data (paidAmount & totalAmount will be computed from UNIT_VALUE)
+  const rawUnits = [
+    { id: "1", childId: "child6", childName: "מיכל שולמית", joinDate: "27.08.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "ויזה 1316", monthlyAmount: "80 ₪", paidPayments: "78/120" },
+    { id: "2", childId: "child6", childName: "מיכל שולמית", joinDate: "15.03.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "מסטרכארד 4422", monthlyAmount: "100 ₪", paidPayments: "60/120" },
+    { id: "3", childId: "child6", childName: "מיכל שולמית", joinDate: "12.11.2019", designatedYear: "2024", track: "קלאסי", paymentMethod: "ויזה 1316", monthlyAmount: "150 ₪", paidPayments: "95/120" },
+    { id: "4", childId: "child6", childName: "מיכל שולמית", joinDate: "08.07.2022", designatedYear: "2027", track: "פרעון מורחב", paymentMethod: "אמריקן אקספרס 9876", monthlyAmount: "90 ₪", paidPayments: "30/120" },
+    { id: "5", childId: "child1", childName: "שמחה", joinDate: "10.01.2022", designatedYear: "2027", track: "קלאסי", paymentMethod: "אמריקן אקספרס 9876", monthlyAmount: "120 ₪", paidPayments: "45/120" },
+    { id: "6", childId: "child1", childName: "שמחה", joinDate: "05.04.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "ויזה 2244", monthlyAmount: "85 ₪", paidPayments: "50/120" },
+    { id: "7", childId: "child1", childName: "שמחה", joinDate: "05.04.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "ויזה 2244", monthlyAmount: "90 ₪", paidPayments: "52/120" },
+    { id: "8", childId: "child1", childName: "שמחה", joinDate: "05.04.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "ויזה 2244", monthlyAmount: "95 ₪", paidPayments: "48/120" },
+    { id: "9", childId: "child2", childName: "דוד משה", joinDate: "14.06.2020", designatedYear: "2025", track: "קלאסי", paymentMethod: "ויזה 2244", monthlyAmount: "100 ₪", paidPayments: "120/120" },
+    { id: "10", childId: "child2", childName: "דוד משה", joinDate: "03.02.2021", designatedYear: "2026", track: "פרעון מורחב", paymentMethod: "אמריקן אקספרס 9876", monthlyAmount: "125 ₪", paidPayments: "120/120" },
+    { id: "11", childId: "child2", childName: "דוד משה", joinDate: "29.08.2019", designatedYear: "2024", track: "קלאסי", paymentMethod: "מסטרכארד 4422", monthlyAmount: "80 ₪", paidPayments: "120/120" },
+    { id: "12", childId: "child2", childName: "דוד משה", joinDate: "11.11.2022", designatedYear: "2027", track: "פרעון מורחב", paymentMethod: "ויזה 1316", monthlyAmount: "90 ₪", paidPayments: "120/120" },
+    { id: "13", childId: "child3", childName: "יוני שמעון", joinDate: "05.09.2019", designatedYear: "2024", track: "קלאסי", paymentMethod: "ויזה 2244", monthlyAmount: "150 ₪", paidPayments: "120/120" },
+    { id: "14", childId: "child3", childName: "יוני שמעון", joinDate: "17.03.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "מסטרכארד 5533", monthlyAmount: "130 ₪", paidPayments: "120/120" },
+    { id: "15", childId: "child3", childName: "יוני שמעון", joinDate: "23.07.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "אמריקן אקספרס 9876", monthlyAmount: "140 ₪", paidPayments: "120/120" },
+    { id: "16", childId: "child4", childName: "חיים יעקב", joinDate: "30.01.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "ויזה 1316", monthlyAmount: "110 ₪", paidPayments: "120/120" },
+    { id: "17", childId: "child4", childName: "חיים יעקב", joinDate: "19.10.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "מסטרכארד 4422", monthlyAmount: "100 ₪", paidPayments: "120/120" },
+    { id: "18", childId: "child5", childName: "יניב אהרון", joinDate: "20.06.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "מסטרכארד 5533", monthlyAmount: "200 ₪", paidPayments: "80/120" },
+    { id: "19", childId: "child5", childName: "יניב אהרון", joinDate: "12.02.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "ויזה 2244", monthlyAmount: "180 ₪", paidPayments: "90/120" },
+    { id: "20", childId: "child5", childName: "יניב אהרון", joinDate: "08.08.2019", designatedYear: "2024", track: "קלאסי", paymentMethod: "אמריקן אקספרס 9876", monthlyAmount: "170 ₪", paidPayments: "105/120" },
+    { id: "21", childId: "child5", childName: "יניב אהרון", joinDate: "25.11.2022", designatedYear: "2027", track: "פרעון מורחב", paymentMethod: "ויזה 1316", monthlyAmount: "160 ₪", paidPayments: "35/120" },
+    { id: "22", childId: "child5", childName: "יניב אהרון", joinDate: "04.04.2021", designatedYear: "2026", track: "קלאסי", paymentMethod: "מסטרכארד 4422", monthlyAmount: "150 ₪", paidPayments: "68/120" },
+    { id: "23", childId: "child5", childName: "יניב אהרון", joinDate: "16.09.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "ויזה 2244", monthlyAmount: "190 ₪", paidPayments: "75/120" },
+    { id: "24", childId: "child5", childName: "יניב אהרון", joinDate: "16.09.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "ויזה 2244", monthlyAmount: "200 ₪", paidPayments: "80/120" },
+    { id: "25", childId: "child5", childName: "יניב אהרון", joinDate: "16.09.2020", designatedYear: "2025", track: "פרעון מורחב", paymentMethod: "ויזה 2244", monthlyAmount: "170 ₪", paidPayments: "65/120" },
   ];
 
-  const childUnitsCount: Record<string, number> = {};
-  allUnits.forEach(unit => { childUnitsCount[unit.childId] = (childUnitsCount[unit.childId] || 0) + 1; });
+  // Compute paidAmount, totalAmount, and remainingDonation for each unit
+  const allUnits: Unit[] = rawUnits.map(unit => {
+    const paidAmount = computePaidFromRatio(unit.paidPayments);
+    const totalAmount = UNIT_VALUE;
+    return {
+      ...unit,
+      paidAmount,
+      totalAmount,
+      remainingDonation: `שולם ${paidAmount.toLocaleString('he-IL')} ₪ מתוך ${totalAmount.toLocaleString('he-IL')} ₪`,
+    };
+  });
+
+  // Compute child-level aggregated data from units
+  const childAggregated: Record<string, { paidAmount: number; unitsCount: number }> = {};
+  allUnits.forEach(unit => {
+    if (!childAggregated[unit.childId]) {
+      childAggregated[unit.childId] = { paidAmount: 0, unitsCount: 0 };
+    }
+    childAggregated[unit.childId].paidAmount += unit.paidAmount;
+    childAggregated[unit.childId].unitsCount += 1;
+  });
+
   const totalUnitsCount = allUnits.length;
+  const totalPaidAll = Object.values(childAggregated).reduce((sum, d) => sum + d.paidAmount, 0);
+  const totalAmountAll = totalUnitsCount * UNIT_VALUE;
+
+  // Helper to build a child entry from aggregated data
+  const buildChild = (id: string, name: string, gender: "male" | "female") => {
+    const data = childAggregated[id];
+    const paid = data?.paidAmount || 0;
+    const total = (data?.unitsCount || 0) * UNIT_VALUE;
+    return { id, name, paidAmount: paid.toLocaleString('he-IL'), totalAmount: total.toLocaleString('he-IL'), unitsCount: data?.unitsCount || 0, progressPercentage: total > 0 ? Math.round((paid / total) * 100) : 0, gender: gender as const, _remaining: total - paid };
+  };
+
+  // Build child entries and sort: most remaining first, fully paid shuffled randomly
+  const childEntries = [
+    buildChild("child1", "שמחה", "female"),
+    buildChild("child2", "דוד משה", "male"),
+    buildChild("child3", "יוני שמעון", "male"),
+    buildChild("child4", "חיים יעקב", "male"),
+    buildChild("child5", "יניב אהרון", "male"),
+    buildChild("child6", "מיכל שולמית", "female"),
+  ].sort((a, b) => {
+    const aFullyPaid = a._remaining === 0;
+    const bFullyPaid = b._remaining === 0;
+    if (aFullyPaid && bFullyPaid) return Math.random() - 0.5;
+    if (aFullyPaid) return 1;
+    if (bFullyPaid) return -1;
+    return b._remaining - a._remaining;
+  });
 
   const children = [
-    { id: "all", name: "כל הילדים", paidAmount: "4,043", totalAmount: "14,000", unitsCount: totalUnitsCount, progressPercentage: 29, gender: "male" as const },
-    { id: "child1", name: "שמחה", paidAmount: "4,043", totalAmount: "14,000", unitsCount: childUnitsCount["child1"] || 0, progressPercentage: 29, gender: "female" as const },
-    { id: "child2", name: "דוד משה", paidAmount: "14,000", totalAmount: "14,000", unitsCount: childUnitsCount["child2"] || 0, progressPercentage: 100, gender: "male" as const },
-    { id: "child3", name: "יוני שמעון", paidAmount: "14,000", totalAmount: "14,000", unitsCount: childUnitsCount["child3"] || 0, progressPercentage: 100, gender: "male" as const },
-    { id: "child4", name: "חיים יעקב", paidAmount: "8,000", totalAmount: "8,000", unitsCount: childUnitsCount["child4"] || 0, progressPercentage: 100, gender: "male" as const },
-    { id: "child5", name: "יניב אהרון", paidAmount: "22,000", totalAmount: "48,000", unitsCount: childUnitsCount["child5"] || 0, progressPercentage: 46, gender: "male" as const },
-    { id: "child6", name: "מיכל שולמית", paidAmount: "11,043", totalAmount: "32,000", unitsCount: childUnitsCount["child6"] || 0, progressPercentage: 35, gender: "female" as const },
+    { id: "all", name: "כל הילדים", paidAmount: totalPaidAll.toLocaleString('he-IL'), totalAmount: totalAmountAll.toLocaleString('he-IL'), unitsCount: totalUnitsCount, progressPercentage: Math.round((totalPaidAll / totalAmountAll) * 100), gender: "male" as const, _remaining: totalAmountAll - totalPaidAll },
+    ...childEntries,
   ];
 
   const filteredUnits = selectedChild === "all" ? allUnits : allUnits.filter(unit => unit.childId === selectedChild);
