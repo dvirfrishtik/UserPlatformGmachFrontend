@@ -138,7 +138,7 @@ export default function DonationUnitsPage() {
     const data = childAggregated[id];
     const paid = data?.paidAmount || 0;
     const total = (data?.unitsCount || 0) * UNIT_VALUE;
-    return { id, name, paidAmount: paid.toLocaleString('he-IL'), totalAmount: total.toLocaleString('he-IL'), unitsCount: data?.unitsCount || 0, progressPercentage: total > 0 ? Math.round((paid / total) * 100) : 0, gender: gender as const, _remaining: total - paid };
+    return { id, name, paidAmount: paid.toLocaleString('he-IL'), totalAmount: total.toLocaleString('he-IL'), unitsCount: data?.unitsCount || 0, progressPercentage: total > 0 ? Math.round((paid / total) * 100) : 0, gender, _remaining: total - paid };
   };
 
   // Build child entries and sort: most remaining first, fully paid shuffled randomly
