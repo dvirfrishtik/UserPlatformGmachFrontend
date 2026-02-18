@@ -248,7 +248,7 @@ export default function DonationUnitsPage() {
           ref={carouselRef}
         >
           <style>{`.carousel-container::-webkit-scrollbar { display: none; }`}</style>
-          <div className="flex gap-2 md:gap-2.5 pt-1 pb-6" dir="rtl" style={{ paddingLeft: "40px" }}>
+          <div className="flex gap-2 md:gap-2.5 pt-1 pb-2" dir="rtl" style={{ paddingLeft: "40px" }}>
             {children.map((child) => (
               <ChildCard
                 key={child.id}
@@ -283,7 +283,7 @@ export default function DonationUnitsPage() {
       </div>
 
       {/* Units Table Section */}
-      <div className="mt-4 sm:mt-6">
+      <div className="mt-2 sm:mt-3">
         <div className="w-full" style={{ backgroundColor: "white", borderRadius: "12px", boxShadow: "0px 0px 24px 0px rgba(14, 78, 134, 0.09)" }}>
           <div className="px-3 sm:px-4 md:px-6 pt-4 sm:pt-6">
             <div className="w-full min-w-0">
