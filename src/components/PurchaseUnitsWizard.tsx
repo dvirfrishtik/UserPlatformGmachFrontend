@@ -91,7 +91,7 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children, initialSelected
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   const [unitCount, setUnitCount] = useState(0);
-  const [selectedTrack, setSelectedTrack] = useState<"קלאסי" | "פרעון מורחב">("קלאסי");
+  const [selectedTrack, setSelectedTrack] = useState<"קלאסי" | "פריסה מורחבת">("קלאסי");
   const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const totalSteps = 4;
@@ -495,8 +495,8 @@ function UnitsInfoTable() {
 
   return (
     <div className="w-full" dir="rtl">
-      {/* Toggle: מסלול קלאסי | מסלול פריסה מורחבת (same style as page.tsx view toggle) */}
-      <div className="flex justify-end mb-4">
+      {/* Toggle: מסלול קלאסי | מסלול פריסה מורחבת (same style as page.tsx view toggle), aligned right with table */}
+      <div className="flex justify-start mb-4">
         <div
           className="flex p-1 gap-1 rounded-full"
           style={{ backgroundColor: "var(--page-section)", borderRadius: "300px" }}
@@ -637,16 +637,17 @@ function StepDefineUnits({
 }: {
   unitCount: number;
   onUnitCountChange: (count: number) => void;
-  selectedTrack: "קלאסי" | "פרעון מורחב";
-  onTrackChange: (track: "קלאסי" | "פרעון מורחב") => void;
+  selectedTrack: "קלאסי" | "פריסה מורחבת";
+  onTrackChange: (track: "קלאסי" | "פריסה מורחבת") => void;
 }) {
   const [isTrackDropdownOpen, setIsTrackDropdownOpen] = useState(false);
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
 
-  const MONTHLY_PER_UNIT = 40;
-  const LOAN_PER_UNIT = 40000;
-  const GRANT_PER_UNIT = 2400;
-  const TOTAL_MONTHS = 120;
+  const isExtended = selectedTrack === "פריסה מורחבת";
+  const MONTHLY_PER_UNIT = isExtended ? 50 : 40;
+  const LOAN_PER_UNIT = isExtended ? 50000 : 40000;
+  const GRANT_PER_UNIT = isExtended ? 6400 : 2400;
+  const TOTAL_MONTHS = isExtended ? 192 : 120;
 
   const monthlyPayment = unitCount * MONTHLY_PER_UNIT;
   const loanEligibility = unitCount * LOAN_PER_UNIT;
@@ -789,7 +790,7 @@ function StepDefineUnits({
                     overflow: "hidden",
                   }}
                 >
-                  {(["קלאסי", "פרעון מורחב"] as const).map((track) => (
+                  {(["קלאסי", "פריסה מורחבת"] as const).map((track) => (
                     <button
                       key={track}
                       onClick={() => {
@@ -1119,12 +1120,14 @@ function StepSummary({
 }: {
   childName: string;
   unitCount: number;
-  selectedTrack: "קלאסי" | "פרעון מורחב";
+  selectedTrack: "קלאסי" | "פריסה מורחבת";
   paymentMethod: PaymentMethod | null;
 }) {
-  const monthlyAmount = unitCount * 40;
-  const loanEligibility = unitCount * 40000;
-  const grantEligibility = unitCount * 2400;
+  const isExtended = selectedTrack === "פריסה מורחבת";
+  const monthlyAmount = unitCount * (isExtended ? 50 : 40);
+  const loanEligibility = unitCount * (isExtended ? 50000 : 40000);
+  const grantEligibility = unitCount * (isExtended ? 6400 : 2400);
+  const totalMonths = isExtended ? 192 : 120;
   const totalDonation = unitCount * 4000;
   const designationYear = new Date().getFullYear() + 10;
 
@@ -1157,7 +1160,7 @@ function StepSummary({
         <SummaryRow label="מס׳ יחידות תרומה" value={`${unitCount} יחידות`} />
         <SummaryRow label="עבור" value={childName} />
         <SummaryRow label="סכום חודשי לתרומה" value={`₪${monthlyAmount.toLocaleString('he-IL')}`} bold />
-        <SummaryRow label="משך תקופת התרומה" value="120 חודשים" />
+        <SummaryRow label="משך תקופת התרומה" value={`${totalMonths} חודשים`} />
         <SummaryRow label="אמצעי תשלום" value={paymentMethod ? `${paymentMethod.name} ${paymentMethod.accountNumber}` : "-"} isLast />
 
         {/* Spacer between sections */}
