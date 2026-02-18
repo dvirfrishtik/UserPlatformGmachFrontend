@@ -439,18 +439,37 @@ function ChildSelectCard({
 }
 
 /* ─── Units info table (spec: יחידות, תרומה חודשית, תשלומים, סך התרומה, הלוואה, החזר חודשי, מענק) ─── */
-const UNITS_TABLE_ROWS = [
-  { units: 1, monthlyContribution: 40, totalContribution: 4800, loan: 40000, monthlyRepayment: 400, grant: 2400 },
-  { units: 2, monthlyContribution: 80, totalContribution: 9600, loan: 80000, monthlyRepayment: 800, grant: 4800 },
-  { units: 3, monthlyContribution: 120, totalContribution: 14400, loan: 120000, monthlyRepayment: 1200, grant: 7200 },
-  { units: 4, monthlyContribution: 160, totalContribution: 19200, loan: 160000, monthlyRepayment: 1600, grant: 9600 },
-  { units: 5, monthlyContribution: 200, totalContribution: 24000, loan: 200000, monthlyRepayment: 2000, grant: 12000 },
-  { units: 6, monthlyContribution: 240, totalContribution: 28800, loan: 240000, monthlyRepayment: 2400, grant: 14400 },
-  { units: 7, monthlyContribution: 280, totalContribution: 33600, loan: 280000, monthlyRepayment: 2800, grant: 16800 },
-  { units: 8, monthlyContribution: 320, totalContribution: 38400, loan: 320000, monthlyRepayment: 3200, grant: 19200 },
+type UnitsTableTrack = "קלאסי" | "פריסה מורחבת";
+
+const UNITS_TABLE_CLASSIC = [
+  { units: 1, monthlyContribution: 40, paymentsSpan: 120, totalContribution: 4800, loan: 40000, monthlyRepayment: 400, repaymentNote: "X100", grant: 2400 },
+  { units: 2, monthlyContribution: 80, paymentsSpan: 120, totalContribution: 9600, loan: 80000, monthlyRepayment: 800, repaymentNote: "X100", grant: 4800 },
+  { units: 3, monthlyContribution: 120, paymentsSpan: 120, totalContribution: 14400, loan: 120000, monthlyRepayment: 1200, repaymentNote: "X100", grant: 7200 },
+  { units: 4, monthlyContribution: 160, paymentsSpan: 120, totalContribution: 19200, loan: 160000, monthlyRepayment: 1600, repaymentNote: "X100", grant: 9600 },
+  { units: 5, monthlyContribution: 200, paymentsSpan: 120, totalContribution: 24000, loan: 200000, monthlyRepayment: 2000, repaymentNote: "X100", grant: 12000 },
+  { units: 6, monthlyContribution: 240, paymentsSpan: 120, totalContribution: 28800, loan: 240000, monthlyRepayment: 2400, repaymentNote: "X100", grant: 14400 },
+  { units: 7, monthlyContribution: 280, paymentsSpan: 120, totalContribution: 33600, loan: 280000, monthlyRepayment: 2800, repaymentNote: "X100", grant: 16800 },
+  { units: 8, monthlyContribution: 320, paymentsSpan: 120, totalContribution: 38400, loan: 320000, monthlyRepayment: 3200, repaymentNote: "X100", grant: 19200 },
+];
+
+const UNITS_TABLE_EXTENDED = [
+  { units: 1, monthlyContribution: 50, paymentsSpan: 192, totalContribution: 9600, loan: 40000, monthlyRepayment: 260, repaymentNote: "X154", grant: 6400 },
+  { units: 2, monthlyContribution: 100, paymentsSpan: 192, totalContribution: 19200, loan: 80000, monthlyRepayment: 520, repaymentNote: "X154", grant: 12800 },
+  { units: 3, monthlyContribution: 150, paymentsSpan: 192, totalContribution: 28800, loan: 120000, monthlyRepayment: 780, repaymentNote: "X154", grant: 19200 },
+  { units: 4, monthlyContribution: 200, paymentsSpan: 192, totalContribution: 38400, loan: 160000, monthlyRepayment: 1040, repaymentNote: "X154", grant: 25600 },
+  { units: 5, monthlyContribution: 250, paymentsSpan: 192, totalContribution: 48000, loan: 200000, monthlyRepayment: 1300, repaymentNote: "X154", grant: 32000 },
+  { units: 6, monthlyContribution: 300, paymentsSpan: 192, totalContribution: 57600, loan: 240000, monthlyRepayment: 1560, repaymentNote: "X154", grant: 38400 },
+  { units: 7, monthlyContribution: 350, paymentsSpan: 192, totalContribution: 67200, loan: 280000, monthlyRepayment: 1820, repaymentNote: "X154", grant: 44800 },
+  { units: 8, monthlyContribution: 400, paymentsSpan: 192, totalContribution: 76800, loan: 320000, monthlyRepayment: 2080, repaymentNote: "X154", grant: 51200 },
 ];
 
 function UnitsInfoTable() {
+  const [track, setTrack] = useState<UnitsTableTrack>("קלאסי");
+  const rows = track === "קלאסי" ? UNITS_TABLE_CLASSIC : UNITS_TABLE_EXTENDED;
+  const paymentsValue = rows[0]?.paymentsSpan ?? 120;
+  const classicPaymentsRowSpan = 5;
+  const extendedPaymentsRowSpan = 8;
+
   const headerStyle = {
     padding: "10px 12px",
     fontSize: "14px",
@@ -470,8 +489,47 @@ function UnitsInfoTable() {
     textAlign: "center" as const,
   };
 
+  const isClassic = track === "קלאסי";
+  const paymentsRowSpan = isClassic ? classicPaymentsRowSpan : extendedPaymentsRowSpan;
+  const paymentsFirstRowIndex = isClassic ? 3 : 0;
+
   return (
     <div className="w-full" dir="rtl">
+      {/* Toggle: מסלול קלאסי | מסלול פריסה מורחבת (same style as page.tsx view toggle) */}
+      <div className="flex justify-end mb-4">
+        <div
+          className="flex p-1 gap-1 rounded-full"
+          style={{ backgroundColor: "var(--page-section)", borderRadius: "300px" }}
+        >
+          <button
+            type="button"
+            onClick={() => setTrack("קלאסי")}
+            className="px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-colors whitespace-nowrap border-none cursor-pointer"
+            style={{
+              backgroundColor: isClassic ? "#172554" : "transparent",
+              fontSize: "13px",
+              fontWeight: isClassic ? "var(--font-weight-semibold)" : "var(--font-weight-normal)",
+              color: isClassic ? "#FFFFFF" : "var(--muted-foreground)",
+            }}
+          >
+            מסלול קלאסי
+          </button>
+          <button
+            type="button"
+            onClick={() => setTrack("פריסה מורחבת")}
+            className="px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-colors whitespace-nowrap border-none cursor-pointer"
+            style={{
+              backgroundColor: !isClassic ? "#172554" : "transparent",
+              fontSize: "13px",
+              fontWeight: !isClassic ? "var(--font-weight-semibold)" : "var(--font-weight-normal)",
+              color: !isClassic ? "#FFFFFF" : "var(--muted-foreground)",
+            }}
+          >
+            מסלול פריסה מורחבת
+          </button>
+        </div>
+      </div>
+
       {/* Desktop/tablet: full table with horizontal scroll when needed */}
       <div className="hidden sm:block overflow-x-auto -mx-1" style={{ WebkitOverflowScrolling: "touch" }}>
         <table
@@ -490,20 +548,20 @@ function UnitsInfoTable() {
             </tr>
           </thead>
           <tbody>
-            {UNITS_TABLE_ROWS.map((row, index) => (
-              <tr key={row.units}>
+            {rows.map((row, index) => (
+              <tr key={`${track}-${row.units}`}>
                 <td style={cellStyle}>{row.units}</td>
                 <td style={cellStyle}>₪{row.monthlyContribution.toLocaleString("he-IL")}</td>
-                {index < 3 ? (
+                {index < paymentsFirstRowIndex ? (
                   <td style={cellStyle} />
-                ) : index === 3 ? (
-                  <td rowSpan={5} style={{ ...cellStyle, verticalAlign: "middle" }}>
-                    120
+                ) : index === paymentsFirstRowIndex ? (
+                  <td rowSpan={paymentsRowSpan} style={{ ...cellStyle, verticalAlign: "middle" }}>
+                    {paymentsValue}
                   </td>
                 ) : null}
                 <td style={cellStyle}>₪{row.totalContribution.toLocaleString("he-IL")}</td>
                 <td style={cellStyle}>₪{row.loan.toLocaleString("he-IL")}</td>
-                <td style={cellStyle}>(X100) ₪{row.monthlyRepayment.toLocaleString("he-IL")}</td>
+                <td style={cellStyle}>({row.repaymentNote}) ₪{row.monthlyRepayment.toLocaleString("he-IL")}</td>
                 <td style={cellStyle}>₪{row.grant.toLocaleString("he-IL")}</td>
               </tr>
             ))}
@@ -513,9 +571,9 @@ function UnitsInfoTable() {
 
       {/* Mobile: card list (each row = card) */}
       <div className="sm:hidden flex flex-col gap-3">
-        {UNITS_TABLE_ROWS.map((row, index) => (
+        {rows.map((row, index) => (
           <div
-            key={row.units}
+            key={`${track}-${row.units}`}
             className="rounded-lg border overflow-hidden"
             style={{
               borderColor: "#E5E9F9",
@@ -548,7 +606,7 @@ function UnitsInfoTable() {
               </div>
               <div className="flex justify-between">
                 <span style={{ color: "#6B7280" }}>תשלומים</span>
-                <span>{index >= 3 ? "120" : "—"}</span>
+                <span>{paymentsValue}</span>
               </div>
               <div className="flex justify-between">
                 <span style={{ color: "#6B7280" }}>הלוואה</span>
@@ -556,7 +614,7 @@ function UnitsInfoTable() {
               </div>
               <div className="flex justify-between">
                 <span style={{ color: "#6B7280" }}>החזר חודשי</span>
-                <span>(X100) ₪{row.monthlyRepayment.toLocaleString("he-IL")}</span>
+                <span>({row.repaymentNote}) ₪{row.monthlyRepayment.toLocaleString("he-IL")}</span>
               </div>
               <div className="flex justify-between">
                 <span style={{ color: "#6B7280" }}>מענק</span>
