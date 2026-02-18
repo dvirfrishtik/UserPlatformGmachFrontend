@@ -438,6 +438,138 @@ function ChildSelectCard({
   );
 }
 
+/* ─── Units info table (spec: יחידות, תרומה חודשית, תשלומים, סך התרומה, הלוואה, החזר חודשי, מענק) ─── */
+const UNITS_TABLE_ROWS = [
+  { units: 1, monthlyContribution: 40, totalContribution: 4800, loan: 40000, monthlyRepayment: 400, grant: 2400 },
+  { units: 2, monthlyContribution: 80, totalContribution: 9600, loan: 80000, monthlyRepayment: 800, grant: 4800 },
+  { units: 3, monthlyContribution: 120, totalContribution: 14400, loan: 120000, monthlyRepayment: 1200, grant: 7200 },
+  { units: 4, monthlyContribution: 160, totalContribution: 19200, loan: 160000, monthlyRepayment: 1600, grant: 9600 },
+  { units: 5, monthlyContribution: 200, totalContribution: 24000, loan: 200000, monthlyRepayment: 2000, grant: 12000 },
+  { units: 6, monthlyContribution: 240, totalContribution: 28800, loan: 240000, monthlyRepayment: 2400, grant: 14400 },
+  { units: 7, monthlyContribution: 280, totalContribution: 33600, loan: 280000, monthlyRepayment: 2800, grant: 16800 },
+  { units: 8, monthlyContribution: 320, totalContribution: 38400, loan: 320000, monthlyRepayment: 3200, grant: 19200 },
+];
+
+function UnitsInfoTable() {
+  const headerStyle = {
+    padding: "10px 12px",
+    fontSize: "14px",
+    fontWeight: "var(--font-weight-semibold)" as const,
+    color: "#141E44",
+    backgroundColor: "#E8EDF2",
+    border: "1px solid #E5E9F9",
+    textAlign: "center" as const,
+  };
+  const cellStyle = {
+    padding: "10px 12px",
+    fontSize: "14px",
+    fontWeight: "var(--font-weight-normal)" as const,
+    color: "#141E44",
+    backgroundColor: "#FFFFFF",
+    border: "1px solid #E5E9F9",
+    textAlign: "center" as const,
+  };
+
+  return (
+    <div className="w-full" dir="rtl">
+      {/* Desktop/tablet: full table with horizontal scroll when needed */}
+      <div className="hidden sm:block overflow-x-auto -mx-1" style={{ WebkitOverflowScrolling: "touch" }}>
+        <table
+          className="w-full border-collapse"
+          style={{ minWidth: "560px", tableLayout: "fixed" }}
+        >
+          <thead>
+            <tr>
+              <th style={{ ...headerStyle, width: "12%" }}>יחידות</th>
+              <th style={{ ...headerStyle, width: "16%" }}>תרומה חודשית</th>
+              <th style={{ ...headerStyle, width: "12%" }}>תשלומים</th>
+              <th style={{ ...headerStyle, width: "16%" }}>סך התרומה</th>
+              <th style={{ ...headerStyle, width: "16%" }}>הלוואה</th>
+              <th style={{ ...headerStyle, width: "18%" }}>החזר חודשי</th>
+              <th style={{ ...headerStyle, width: "14%" }}>מענק</th>
+            </tr>
+          </thead>
+          <tbody>
+            {UNITS_TABLE_ROWS.map((row, index) => (
+              <tr key={row.units}>
+                <td style={cellStyle}>{row.units}</td>
+                <td style={cellStyle}>₪{row.monthlyContribution.toLocaleString("he-IL")}</td>
+                {index < 3 ? (
+                  <td style={cellStyle} />
+                ) : index === 3 ? (
+                  <td rowSpan={5} style={{ ...cellStyle, verticalAlign: "middle" }}>
+                    120
+                  </td>
+                ) : null}
+                <td style={cellStyle}>₪{row.totalContribution.toLocaleString("he-IL")}</td>
+                <td style={cellStyle}>₪{row.loan.toLocaleString("he-IL")}</td>
+                <td style={cellStyle}>(X100) ₪{row.monthlyRepayment.toLocaleString("he-IL")}</td>
+                <td style={cellStyle}>₪{row.grant.toLocaleString("he-IL")}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile: card list (each row = card) */}
+      <div className="sm:hidden flex flex-col gap-3">
+        {UNITS_TABLE_ROWS.map((row, index) => (
+          <div
+            key={row.units}
+            className="rounded-lg border overflow-hidden"
+            style={{
+              borderColor: "#E5E9F9",
+              backgroundColor: "#FFFFFF",
+            }}
+          >
+            <div
+              style={{
+                padding: "10px 14px",
+                backgroundColor: "#E8EDF2",
+                fontSize: "14px",
+                fontWeight: "var(--font-weight-semibold)",
+                color: "#141E44",
+                textAlign: "center",
+              }}
+            >
+              {row.units} יחידות
+            </div>
+            <div
+              className="grid grid-cols-2 gap-x-4 gap-y-2"
+              style={{ padding: "12px 14px", fontSize: "13px", color: "#141E44" }}
+            >
+              <div className="flex justify-between">
+                <span style={{ color: "#6B7280" }}>תרומה חודשית</span>
+                <span>₪{row.monthlyContribution.toLocaleString("he-IL")}</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: "#6B7280" }}>סך התרומה</span>
+                <span>₪{row.totalContribution.toLocaleString("he-IL")}</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: "#6B7280" }}>תשלומים</span>
+                <span>{index >= 3 ? "120" : "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: "#6B7280" }}>הלוואה</span>
+                <span>₪{row.loan.toLocaleString("he-IL")}</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: "#6B7280" }}>החזר חודשי</span>
+                <span>(X100) ₪{row.monthlyRepayment.toLocaleString("he-IL")}</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: "#6B7280" }}>מענק</span>
+                <span>₪{row.grant.toLocaleString("he-IL")}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Step 2: Define Units ─── */
 function StepDefineUnits({
   unitCount,
@@ -727,7 +859,7 @@ function StepDefineUnits({
         />
       </button>
 
-      {/* Expandable info content */}
+      {/* Expandable info content: units reference table */}
       {isInfoExpanded && (
         <div
           className="w-full"
@@ -739,25 +871,7 @@ function StepDefineUnits({
             boxShadow: "0 0 12px rgba(24, 47, 67, 0.06)",
           }}
         >
-          <div className="flex flex-col gap-4" style={{ textAlign: "right" }}>
-            <div>
-              <p style={{ fontSize: "15px", fontWeight: "var(--font-weight-semibold)", color: "#141E44", marginBottom: "6px" }}>
-                מסלול קלאסי
-              </p>
-              <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: "1.6" }}>
-                תשלום חודשי קבוע של ₪40 ליחידה למשך 120 חודשים (10 שנים). בתום התקופה, זכאות להלוואה בסך ₪40,000 ליחידה ומענק בסך ₪2,400 ליחידה.
-              </p>
-            </div>
-            <div style={{ width: "100%", height: "1px", backgroundColor: "#E5E9F9" }} />
-            <div>
-              <p style={{ fontSize: "15px", fontWeight: "var(--font-weight-semibold)", color: "#141E44", marginBottom: "6px" }}>
-                מסלול פרעון מורחב
-              </p>
-              <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: "1.6" }}>
-                מסלול עם תנאי פרעון גמישים יותר, המותאם למשפחות המעוניינות בפריסה שונה של התשלומים.
-              </p>
-            </div>
-          </div>
+          <UnitsInfoTable />
         </div>
       )}
     </div>
