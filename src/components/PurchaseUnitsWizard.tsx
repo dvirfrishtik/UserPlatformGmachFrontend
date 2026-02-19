@@ -250,9 +250,10 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children, initialSelected
               {currentStep > 1 && (
                 <button
                   onClick={handleBack}
-                  className="transition-all"
+                  className="inline-flex items-center justify-center transition-all"
                   style={{
-                    padding: "14px 24px",
+                    height: "48px",
+                    padding: "0 24px",
                     borderRadius: "8px",
                     fontSize: "16px",
                     fontWeight: "var(--font-weight-semibold)",
@@ -260,7 +261,6 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children, initialSelected
                     backgroundColor: "transparent",
                     border: "1.5px solid #141E44",
                     cursor: "pointer",
-                    height: "48px",
                     minWidth: "160px",
                   }}
                   onMouseEnter={(e) => {
@@ -292,9 +292,10 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children, initialSelected
               <button
                 onClick={handleContinue}
                 disabled={isNextDisabled}
-                className="transition-all"
+                className="inline-flex items-center justify-center transition-all"
                 style={{
-                  padding: "14px 24px",
+                  height: "48px",
+                  padding: "0 24px",
                   borderRadius: "8px",
                   fontSize: "16px",
                   fontWeight: "var(--font-weight-semibold)",
@@ -303,7 +304,6 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children, initialSelected
                   border: "none",
                   cursor: isNextDisabled ? "not-allowed" : "pointer",
                   opacity: isNextDisabled ? 0.6 : 1,
-                  height: "48px",
                   flex: currentStep === 1 ? 1 : "none",
                   minWidth: currentStep > 1 ? "160px" : undefined,
                 }}
@@ -1445,9 +1445,10 @@ function SuccessScreen({ onClose }: { onClose: () => void }) {
       >
         <button
           onClick={onClose}
-          className="transition-all"
+          className="inline-flex items-center justify-center transition-all"
           style={{
-            padding: "14px 48px",
+            height: "48px",
+            padding: "0 48px",
             borderRadius: "8px",
             fontSize: "16px",
             fontWeight: "var(--font-weight-semibold)",
@@ -1455,7 +1456,6 @@ function SuccessScreen({ onClose }: { onClose: () => void }) {
             backgroundColor: "#172554",
             border: "none",
             cursor: "pointer",
-            height: "48px",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = "#0F1A3E";

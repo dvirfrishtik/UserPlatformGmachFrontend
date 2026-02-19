@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Plus, ChevronDown, ShoppingCart, FileText, Eye, Pencil, Clock } from "lucide-react";
 import { PurchaseUnitsWizard } from "@/components/PurchaseUnitsWizard";
+import { AddChildPopup } from "@/components/AddChildPopup";
 
 /* ─── Types ─── */
 interface ChildData {
@@ -112,6 +113,7 @@ export default function KidsPage() {
   const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
   const [isPurchaseWizardOpen, setIsPurchaseWizardOpen] = useState(false);
   const [purchaseWizardChildId, setPurchaseWizardChildId] = useState<string | null>(null);
+  const [isAddChildOpen, setIsAddChildOpen] = useState(false);
   const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
@@ -150,6 +152,7 @@ export default function KidsPage() {
         </h1>
 
         <button
+          onClick={() => setIsAddChildOpen(true)}
           className="flex items-center gap-2 transition-all"
           style={{
             padding: "10px 20px",
@@ -373,6 +376,17 @@ export default function KidsPage() {
           })}
         </div>
       </div>
+
+      {/* ─── Add Child Popup ─── */}
+      <AddChildPopup
+        isOpen={isAddChildOpen}
+        onClose={() => setIsAddChildOpen(false)}
+        onPurchaseUnits={() => {
+          setIsAddChildOpen(false);
+          setIsPurchaseWizardOpen(true);
+          setPurchaseWizardChildId(null);
+        }}
+      />
 
       {/* ─── Purchase Units Wizard ─── */}
       <PurchaseUnitsWizard
