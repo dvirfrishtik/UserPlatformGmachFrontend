@@ -382,8 +382,10 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, onSubmit
         {/* ── Right side: content area + info panel + footer stacked ── */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <div className="flex-1 flex min-w-0 min-h-0 overflow-hidden relative">
-            {/* Center – Form (animated step content), ממורכז בין תפריט הוויזארד לתפריט המידע */}
-            <div className="flex-1 min-w-0 overflow-y-auto py-8 px-6 md:px-12 lg:px-16 flex flex-col items-center">
+            {/* Center – Form: ריווח שמאל = רוחב תפריט המידע (280+24) כשגלוי, כדי שהתוכן יישב בדיוק בין הוויזארד לתפריט */}
+            <div
+              className={`flex-1 min-w-0 overflow-y-auto py-8 px-6 md:px-12 lg:px-16 flex flex-col items-center ${currentStep >= 1 && currentStep <= 3 ? 'lg:pl-[304px]' : ''}`}
+            >
               {/* Mobile step indicator */}
               <div className="md:hidden flex flex-row items-center gap-2 mb-5 w-full" style={{ justifyContent: 'flex-end' }}>
                 <span style={{ fontFamily: 'SimplerPro', fontSize: '12px', color: '#9CA3AF' }}>
