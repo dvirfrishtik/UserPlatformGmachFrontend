@@ -486,21 +486,33 @@ function OtherBorrowerApprovalPopup({
   if (!isOpen) return null;
   return (
     <div
-      className="fixed inset-0 z-[110] flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0, 2, 4, 0.45)', backdropFilter: 'blur(6px)' }}
+      className="fixed inset-0 z-[110] flex items-center justify-center p-4 md:p-6 box-border"
+      style={{
+        backgroundColor: 'rgba(0, 2, 4, 0.45)',
+        backdropFilter: 'blur(6px)',
+        minWidth: '100vw',
+        minHeight: '100vh',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+      }}
       onClick={onClose}
       dir="rtl"
     >
       <div
-        className="relative flex flex-col"
+        className="relative flex flex-col shrink-0"
         style={{
           width: 'min(1100px, 92vw)',
+          maxWidth: '100%',
           height: 'min(900px, 90vh)',
+          maxHeight: '100%',
           background: 'linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)',
           borderRadius: '12px',
           border: '1px solid #E5E9F9',
           boxShadow: '0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)',
           overflow: 'hidden',
+          margin: 'auto',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -642,21 +654,33 @@ function UnitNotForBorrowerPopup({
   if (!isOpen) return null;
   return (
     <div
-      className="fixed inset-0 z-[110] flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0, 2, 4, 0.45)', backdropFilter: 'blur(6px)' }}
+      className="fixed inset-0 z-[110] flex items-center justify-center p-4 md:p-6 box-border"
+      style={{
+        backgroundColor: 'rgba(0, 2, 4, 0.45)',
+        backdropFilter: 'blur(6px)',
+        minWidth: '100vw',
+        minHeight: '100vh',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+      }}
       onClick={onClose}
       dir="rtl"
     >
       <div
-        className="relative flex flex-col"
+        className="relative flex flex-col shrink-0"
         style={{
           width: 'min(1100px, 92vw)',
+          maxWidth: '100%',
           height: 'min(900px, 90vh)',
+          maxHeight: '100%',
           background: 'linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)',
           borderRadius: '12px',
           border: '1px solid #E5E9F9',
           boxShadow: '0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)',
           overflow: 'hidden',
+          margin: 'auto',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -809,21 +833,33 @@ function UnderAgeApprovalPopup({
   if (!isOpen) return null;
   return (
     <div
-      className="fixed inset-0 z-[110] flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0, 2, 4, 0.45)', backdropFilter: 'blur(6px)' }}
+      className="fixed inset-0 z-[110] flex items-center justify-center p-4 md:p-6 box-border"
+      style={{
+        backgroundColor: 'rgba(0, 2, 4, 0.45)',
+        backdropFilter: 'blur(6px)',
+        minWidth: '100vw',
+        minHeight: '100vh',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+      }}
       onClick={onClose}
       dir="rtl"
     >
       <div
-        className="relative flex flex-col"
+        className="relative flex flex-col shrink-0"
         style={{
           width: 'min(1100px, 92vw)',
+          maxWidth: '100%',
           height: 'min(900px, 90vh)',
+          maxHeight: '100%',
           background: 'linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)',
           borderRadius: '12px',
           border: '1px solid #E5E9F9',
           boxShadow: '0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)',
           overflow: 'hidden',
+          margin: 'auto',
         }}
         onClick={(e) => e.stopPropagation()}
       >
