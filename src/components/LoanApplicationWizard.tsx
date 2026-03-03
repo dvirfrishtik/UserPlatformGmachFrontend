@@ -118,71 +118,73 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
 
       {/* ─── Body: sidebar + content + info panel ─── */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
-        {/* ── Wizard Sidebar (ימין) ── */}
+        {/* ── Wizard Sidebar (ימין) – כחול כהה ── */}
         <aside
           className="hidden md:flex flex-col shrink-0 py-10 px-8"
           style={{
             width: '240px',
-            background: '#FFFFFF',
-            borderLeft: '1px solid #E5E9F9',
+            background: '#172554',
+            borderLeft: '1px solid rgba(255,255,255,0.08)',
           }}
         >
-          {WIZARD_STEPS.map((step, index) => {
-            const active = step.id === currentStep;
-            const completed = completedSteps.includes(step.id);
-            const clickable = canNavigateToStep(step.id);
-            const filled = active || completed;
-            const isLast = index === WIZARD_STEPS.length - 1;
+          <div className="flex flex-col gap-6">
+            {WIZARD_STEPS.map((step, index) => {
+              const active = step.id === currentStep;
+              const completed = completedSteps.includes(step.id);
+              const clickable = canNavigateToStep(step.id);
+              const filled = active || completed;
+              const isLast = index === WIZARD_STEPS.length - 1;
 
-            return (
-              <div key={step.id} className="flex flex-col items-end">
-                <div className="flex flex-row-reverse items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => clickable && setCurrentStep(step.id)}
-                    disabled={!clickable}
-                    className="flex items-center justify-center w-10 h-10 rounded-full shrink-0 border-0 transition-colors"
-                    style={{
-                      background: filled ? '#172554' : '#F1F5F9',
-                      color: filled ? '#FFFFFF' : '#9CA3AF',
-                      fontWeight: 700,
-                      fontSize: '14px',
-                      fontFamily: 'SimplerPro',
-                      cursor: clickable ? 'pointer' : 'default',
-                    }}
-                  >
-                    {String(step.id).padStart(2, '0')}
-                  </button>
-                  <span
-                    style={{
-                      fontFamily: 'SimplerPro',
-                      fontWeight: active ? 700 : 400,
-                      fontSize: '14px',
-                      lineHeight: '20px',
-                      color: active ? '#172554' : '#6B7280',
-                      cursor: clickable ? 'pointer' : 'default',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {step.label}
-                  </span>
+              return (
+                <div key={step.id} className="flex flex-col">
+                  {/* Step row: מספר בימין, טקסט אחריו */}
+                  <div className="flex flex-row items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => clickable && setCurrentStep(step.id)}
+                      disabled={!clickable}
+                      className="flex items-center justify-center w-10 h-10 rounded-full shrink-0 border-0 transition-colors"
+                      style={{
+                        background: filled ? '#CCA559' : 'rgba(255,255,255,0.1)',
+                        color: filled ? '#172554' : 'rgba(255,255,255,0.4)',
+                        fontWeight: 700,
+                        fontSize: '14px',
+                        fontFamily: 'SimplerPro',
+                        cursor: clickable ? 'pointer' : 'default',
+                      }}
+                    >
+                      {String(step.id).padStart(2, '0')}
+                    </button>
+                    <span
+                      style={{
+                        fontFamily: 'SimplerPro',
+                        fontWeight: active ? 700 : 400,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: active ? '#FFFFFF' : 'rgba(255,255,255,0.5)',
+                        cursor: clickable ? 'pointer' : 'default',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {step.label}
+                    </span>
+                  </div>
+                  {/* קו מחבר בין המספרים */}
+                  {!isLast && (
+                    <div
+                      style={{
+                        width: 0,
+                        height: 16,
+                        marginRight: 19,
+                        marginTop: 4,
+                        borderRight: `2px dashed ${completed ? '#CCA559' : 'rgba(255,255,255,0.15)'}`,
+                      }}
+                    />
+                  )}
                 </div>
-                {!isLast && (
-                  <div
-                    style={{
-                      width: 0,
-                      height: 20,
-                      marginLeft: 'auto',
-                      marginRight: 19,
-                      marginTop: 4,
-                      marginBottom: 4,
-                      borderRight: `2px dashed ${filled && completedSteps.includes(step.id) ? '#172554' : '#D9DDEC'}`,
-                    }}
-                  />
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </aside>
 
         {/* ── Main Area ── */}
@@ -259,11 +261,12 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
         </div>
       </div>
 
-      {/* ─── Footer ─── */}
+      {/* ─── Footer – בהיר ─── */}
       <footer
         className="flex flex-row items-center justify-between shrink-0 px-6 md:px-10 py-4"
         style={{
-          background: '#172554',
+          background: '#FFFFFF',
+          borderTop: '1px solid #E5E9F9',
           minHeight: '72px',
         }}
       >
@@ -271,13 +274,13 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
         <button
           type="button"
           onClick={handleExitAndSave}
-          className="inline-flex items-center justify-center h-11 px-6 rounded-lg font-semibold cursor-pointer transition-opacity hover:opacity-80"
+          className="inline-flex items-center justify-center h-11 px-6 rounded-lg font-semibold cursor-pointer transition-all hover:bg-[rgba(0,0,0,0.03)]"
           style={{
             fontFamily: 'SimplerPro',
             fontSize: '15px',
-            color: '#FFFFFF',
+            color: '#172554',
             background: 'transparent',
-            border: '1.5px solid rgba(255,255,255,0.4)',
+            border: '1.5px solid #172554',
           }}
         >
           יציאה ושמירה
@@ -291,8 +294,8 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
           style={{
             fontFamily: 'SimplerPro',
             fontSize: '15px',
-            color: '#172554',
-            background: '#FFFFFF',
+            color: '#FFFFFF',
+            background: '#172554',
           }}
         >
           המשך
