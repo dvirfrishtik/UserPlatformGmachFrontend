@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { X, ChevronDown, AlertTriangle, Home, Heart, Building2 } from 'lucide-react';
+import { X, ChevronDown, AlertTriangle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const MARITAL_OPTIONS = [
@@ -66,9 +66,9 @@ export interface LoanWizardStep2Data {
 }
 
 const LOAN_PURPOSE_OPTIONS = [
-  { value: 'wedding' as const, label: 'חתונה', Icon: Heart },
-  { value: 'apartment' as const, label: 'רכישת דירה', Icon: Home },
-  { value: 'other' as const, label: 'אחר', Icon: Building2 },
+  { value: 'wedding' as const, label: 'חתונה', icon: '/icons/wedding.svg' },
+  { value: 'apartment' as const, label: 'רכישת דירה', icon: '/icons/apartment.svg' },
+  { value: 'other' as const, label: 'אחר', icon: '/icons/other.svg' },
 ];
 
 const emptyStep2: LoanWizardStep2Data = {
@@ -1069,18 +1069,14 @@ function Step2Form({
                     : '0 1px 3px rgba(0,0,0,0.04)',
                 }}
               >
-                <div
-                  className="flex items-center justify-center w-12 h-12 rounded-full"
-                  style={{
-                    background: selected ? 'rgba(23, 37, 84, 0.08)' : 'rgba(0,0,0,0.04)',
-                  }}
-                >
-                  <opt.Icon
-                    size={24}
-                    style={{ color: selected ? '#172554' : '#9CA3AF' }}
-                    strokeWidth={1.8}
-                  />
-                </div>
+                <Image
+                  src={opt.icon}
+                  alt={opt.label}
+                  width={50}
+                  height={50}
+                  unoptimized
+                  style={{ opacity: selected ? 1 : 0.5 }}
+                />
                 <span
                   style={{
                     fontFamily: 'var(--font-family-base)',
