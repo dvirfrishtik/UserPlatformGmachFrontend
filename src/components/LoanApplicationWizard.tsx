@@ -148,7 +148,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
             borderLeft: '1px solid rgba(255,255,255,0.08)',
           }}
         >
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col">
             {WIZARD_STEPS.map((step, index) => {
               const active = step.id === currentStep;
               const completed = completedSteps.includes(step.id);
@@ -193,9 +193,10 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
                     <div
                       style={{
                         width: 0,
-                        height: 16,
+                        height: 32,
                         marginRight: 19,
-                        marginTop: 4,
+                        marginTop: 6,
+                        marginBottom: 6,
                         borderRight: `2px dashed ${completed ? '#CCA559' : 'rgba(255,255,255,0.15)'}`,
                       }}
                     />
@@ -208,7 +209,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
 
         {/* ── Right side: content area + info panel + footer stacked ── */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <div className="flex-1 flex min-w-0 min-h-0 overflow-hidden">
+          <div className="flex-1 flex min-w-0 min-h-0 overflow-hidden relative">
             {/* Center – Form */}
             <div className="flex-1 min-w-0 overflow-y-auto py-8 px-6 md:px-12 lg:px-16">
               {/* Mobile step indicator */}
@@ -234,50 +235,70 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
               )}
             </div>
 
-            {/* ── Info Panel (שמאל) ── */}
-            <aside
-              className="hidden lg:flex flex-col shrink-0 w-[280px] xl:w-[320px] py-8 px-6 overflow-y-auto"
-              style={{
-                background: '#F1F5F9',
-                borderRight: '1px solid #E5E9F9',
-              }}
+            {/* ── Info Panel – קופסה צפה דבוקה לשמאל, בגובה הכותרת ── */}
+            <div
+              className="hidden lg:block absolute top-8"
+              style={{ left: 24 }}
             >
-              <div className="flex flex-row items-center gap-2 mb-2">
-                <Image src="/icons/lamp.svg" alt="" width={20} height={20} unoptimized className="shrink-0" />
-                <span
-                  style={{
-                    fontFamily: 'SimplerPro',
-                    fontWeight: 700,
-                    fontSize: '16px',
-                    color: '#172554',
-                  }}
-                >
-                  תנאים לזכאות לווה
-                </span>
-              </div>
-              <span
-                className="mb-5"
+              <div
+                className="rounded-xl overflow-hidden"
                 style={{
-                  fontFamily: 'SimplerPro',
-                  fontSize: 'var(--text-xs)',
-                  color: 'var(--muted-foreground)',
+                  width: '280px',
+                  background: '#FFFFFF',
+                  border: '1px solid #E5E9F9',
+                  boxShadow: '0 4px 24px rgba(14, 78, 134, 0.08)',
                 }}
               >
-                תנאים לזכאות לווה
-              </span>
-
-              <div className="flex flex-col gap-3">
-                <InfoCard>
-                  אם נמצאו במערכת מספר תיקים אפשריים לאותו לווה, הבקשה תועבר לבדיקה לפני המשך התהליך.
-                </InfoCard>
-                <InfoCard>
-                  אם היו ללווה שלוש החזרות לחיוב בשנה האחרונה, הבקשה תועבר לאישור מיוחד.
-                </InfoCard>
-                <InfoCard>
-                  אם ללווה יש הלוואות פעילות מאותו תורם, והסכום הכולל לאחר ההלוואה החדשה עולה על: 160,000 ₪ (הלוואה רגילה) – 240,000 ₪ (הלוואה למטרת דירה) – הבקשה תועבר לאישור מיוחד.
-                </InfoCard>
+                {/* כותרת הקופסה */}
+                <div
+                  className="flex flex-row items-center gap-2 px-5 py-3"
+                  style={{
+                    borderBottom: '1px solid #E5E9F9',
+                  }}
+                >
+                  <Image src="/icons/lamp.svg" alt="" width={20} height={20} unoptimized className="shrink-0" />
+                  <span
+                    style={{
+                      fontFamily: 'SimplerPro',
+                      fontWeight: 700,
+                      fontSize: '15px',
+                      color: '#172554',
+                    }}
+                  >
+                    תנאים לזכאות לווה
+                  </span>
+                </div>
+                {/* תוכן */}
+                <div
+                  className="px-5 py-4"
+                  style={{ background: '#F8FAFC' }}
+                >
+                  <p
+                    className="mb-3"
+                    style={{
+                      fontFamily: 'SimplerPro',
+                      fontSize: '12px',
+                      color: 'var(--muted-foreground)',
+                      margin: 0,
+                      marginBottom: 12,
+                    }}
+                  >
+                    תנאים לזכאות לווה
+                  </p>
+                  <div className="flex flex-col gap-2.5">
+                    <InfoCard>
+                      אם נמצאו במערכת מספר תיקים אפשריים לאותו לווה, הבקשה תועבר לבדיקה לפני המשך התהליך.
+                    </InfoCard>
+                    <InfoCard>
+                      אם היו ללווה שלוש החזרות לחיוב בשנה האחרונה, הבקשה תועבר לאישור מיוחד.
+                    </InfoCard>
+                    <InfoCard>
+                      אם ללווה יש הלוואות פעילות מאותו תורם, והסכום הכולל לאחר ההלוואה החדשה עולה על: 160,000 ₪ (הלוואה רגילה) – 240,000 ₪ (הלוואה למטרת דירה) – הבקשה תועבר לאישור מיוחד.
+                    </InfoCard>
+                  </div>
+                </div>
               </div>
-            </aside>
+            </div>
           </div>
 
           {/* ─── Footer – בתוך אזור התוכן, לא חוצה את ה-sidebar ─── */}
@@ -418,33 +439,39 @@ function Step1Form({
           >
             מצב אישי של הלווה
           </label>
-          <div className="flex flex-row flex-wrap gap-3">
-            {MARITAL_OPTIONS.map((opt) => {
+          <div className="grid grid-cols-5 gap-0">
+            {MARITAL_OPTIONS.map((opt, i) => {
               const selected = step1.maritalStatus === opt.value;
+              const isFirst = i === 0;
+              const isLast = i === MARITAL_OPTIONS.length - 1;
               return (
                 <button
                   key={opt.value}
                   type="button"
                   onClick={() => setStep1((p) => ({ ...p, maritalStatus: opt.value }))}
-                  className="inline-flex items-center gap-2 px-4 h-10 rounded-lg cursor-pointer transition-all border"
+                  className="inline-flex items-center justify-center gap-2 h-11 cursor-pointer transition-all border"
                   style={{
                     fontFamily: 'var(--font-family-base)',
                     fontSize: 'var(--text-sm)',
                     fontWeight: selected ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
                     color: selected ? 'var(--primary)' : 'var(--muted-foreground)',
-                    background: selected ? '#F0F4FF' : 'var(--card)',
+                    background: selected ? '#EFF6FF' : 'var(--card)',
                     borderColor: selected ? 'var(--primary)' : 'var(--border)',
+                    borderRadius: isFirst ? '0 8px 8px 0' : isLast ? '8px 0 0 8px' : '0',
+                    marginRight: isFirst ? 0 : -1,
+                    position: 'relative',
+                    zIndex: selected ? 1 : 0,
                   }}
                 >
                   <span
-                    className="flex items-center justify-center w-4 h-4 rounded-full border-2 shrink-0"
+                    className="flex items-center justify-center w-[18px] h-[18px] rounded-full shrink-0"
                     style={{
-                      borderColor: selected ? 'var(--primary)' : 'var(--border)',
+                      border: `2px solid ${selected ? 'var(--primary)' : 'var(--border)'}`,
                     }}
                   >
                     {selected && (
                       <span
-                        className="w-2 h-2 rounded-full"
+                        className="w-2.5 h-2.5 rounded-full"
                         style={{ background: 'var(--primary)' }}
                       />
                     )}
