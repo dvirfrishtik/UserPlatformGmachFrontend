@@ -357,7 +357,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
   );
 }
 
-/* ─── פופאפ: בחירת לווה אחר – אישור מיוחד ─── */
+/* ─── פופאפ: בחירת לווה אחר – אישור מיוחד (גודל וסגנון כמו שאר הפופאפים) ─── */
 function OtherBorrowerApprovalPopup({
   isOpen,
   onClose,
@@ -376,21 +376,24 @@ function OtherBorrowerApprovalPopup({
       dir="rtl"
     >
       <div
-        className="relative flex flex-col max-h-[90vh] overflow-hidden"
+        className="relative flex flex-col"
         style={{
-          width: 'min(520px, 92vw)',
+          width: 'min(1100px, 92vw)',
+          height: 'min(900px, 90vh)',
           background: 'linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)',
           borderRadius: '12px',
           border: '1px solid #E5E9F9',
           boxShadow: '0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)',
+          overflow: 'hidden',
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Header – זהה להוספת ילד/ה ורכישת יחידות */}
         <div
           className="flex items-center justify-between shrink-0"
           style={{
-            padding: '20px 24px',
-            borderBottom: '1px solid var(--border)',
+            padding: '20px 32px',
+            borderBottom: '1px solid #E5E9F9',
           }}
         >
           <div style={{ width: '36px' }} />
@@ -398,7 +401,7 @@ function OtherBorrowerApprovalPopup({
             style={{
               fontSize: '20px',
               fontWeight: 'var(--font-weight-bold)',
-              color: 'var(--foreground)',
+              color: '#141E44',
               lineHeight: '1.3',
               textAlign: 'center',
             }}
@@ -411,61 +414,71 @@ function OtherBorrowerApprovalPopup({
             style={{ border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }}
             aria-label="סגור"
           >
-            <X size={20} style={{ color: 'var(--muted-foreground)' }} />
+            <X size={20} style={{ color: '#495157' }} />
           </button>
         </div>
-        <div className="flex flex-col items-center px-6 py-8 overflow-y-auto">
-          <div className="flex justify-center mb-4">
-            <div
-              className="flex items-center justify-center w-14 h-14 rounded-full"
-              style={{ background: 'rgba(0,0,0,0.06)' }}
-            >
-              <AlertTriangle size={28} style={{ color: 'var(--foreground)' }} strokeWidth={2} />
-            </div>
-          </div>
-          <h3
-            className="text-center mb-3"
-            style={{
-              fontFamily: 'var(--font-family-base)',
-              fontSize: 'var(--text-lg)',
-              fontWeight: 'var(--font-weight-bold)',
-              color: 'var(--foreground)',
-              lineHeight: 1.4,
-            }}
-          >
-            הוספת לווה שלא נתרמו עבורו יחידות דורשת אישור מיוחד
-          </h3>
-          <p
-            className="text-center mb-2"
-            style={{
-              fontFamily: 'var(--font-family-base)',
-              fontSize: 'var(--text-sm)',
-              color: 'var(--muted-foreground)',
-              lineHeight: 1.5,
-            }}
-          >
-            בקשת הלוואה עבור לווה עבורו לא נתרמו יחידות, מחייבת בדיקה ואישור מיוחד של הגמ"ח.
-          </p>
-          <p
-            className="text-center mb-6"
-            style={{
-              fontFamily: 'var(--font-family-base)',
-              fontSize: 'var(--text-sm)',
-              color: 'var(--muted-foreground)',
-              lineHeight: 1.5,
-            }}
-          >
-            המשך התהליך תלוי באישור הגמ"ח ועשוי להאריך משמעותית את זמן הטיפול בבקשה.
-          </p>
-        </div>
+
+        {/* תוכן ממורכז */}
         <div
-          className="flex flex-row-reverse gap-3 shrink-0 px-6 pb-6"
-          style={{ borderTop: '1px solid var(--border)', paddingTop: 20 }}
+          className="flex-1 flex flex-col items-center justify-center overflow-y-auto"
+          style={{ padding: '32px 40px' }}
+        >
+          <div className="flex flex-col items-center text-center max-w-[560px]">
+            <div
+              className="flex items-center justify-center w-16 h-16 rounded-full shrink-0 mb-6"
+              style={{ background: 'rgba(23, 37, 84, 0.08)' }}
+            >
+              <AlertTriangle size={32} style={{ color: 'var(--primary)' }} strokeWidth={2} />
+            </div>
+            <h3
+              className="mb-4"
+              style={{
+                fontFamily: 'var(--font-family-base)',
+                fontSize: 'var(--text-xl)',
+                fontWeight: 'var(--font-weight-bold)',
+                color: '#141E44',
+                lineHeight: 1.35,
+              }}
+            >
+              הוספת לווה שלא נתרמו עבורו יחידות דורשת אישור מיוחד
+            </h3>
+            <p
+              className="mb-3"
+              style={{
+                fontFamily: 'var(--font-family-base)',
+                fontSize: 'var(--text-base)',
+                color: '#495157',
+                lineHeight: 1.6,
+              }}
+            >
+              בקשת הלוואה עבור לווה עבורו לא נתרמו יחידות, מחייבת בדיקה ואישור מיוחד של הגמ"ח.
+            </p>
+            <p
+              className="mb-8"
+              style={{
+                fontFamily: 'var(--font-family-base)',
+                fontSize: 'var(--text-base)',
+                color: '#495157',
+                lineHeight: 1.6,
+              }}
+            >
+              המשך התהליך תלוי באישור הגמ"ח ועשוי להאריך משמעותית את זמן הטיפול בבקשה.
+            </p>
+          </div>
+        </div>
+
+        {/* פוטר כפתורים – כמו בפופאפים אחרים */}
+        <div
+          className="flex flex-row-reverse gap-3 shrink-0"
+          style={{
+            padding: '20px 32px 24px',
+            borderTop: '1px solid #E5E9F9',
+          }}
         >
           <button
             type="button"
             onClick={onProceed}
-            className="px-5 py-2.5 rounded-lg font-medium transition-colors"
+            className="px-6 py-3 rounded-lg font-semibold transition-colors hover:opacity-95"
             style={{
               fontFamily: 'var(--font-family-base)',
               fontSize: 'var(--text-sm)',
@@ -473,6 +486,7 @@ function OtherBorrowerApprovalPopup({
               color: '#fff',
               border: 'none',
               cursor: 'pointer',
+              borderRadius: 'var(--radius-button)',
             }}
           >
             הבנתי, ואני רוצה להמשיך
@@ -480,14 +494,15 @@ function OtherBorrowerApprovalPopup({
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-lg font-medium transition-colors border"
+            className="px-6 py-3 rounded-lg font-medium transition-colors border hover:bg-[rgba(0,0,0,0.02)]"
             style={{
               fontFamily: 'var(--font-family-base)',
               fontSize: 'var(--text-sm)',
-              backgroundColor: 'var(--card)',
-              color: 'var(--foreground)',
-              borderColor: 'var(--border)',
+              backgroundColor: '#fff',
+              color: '#141E44',
+              borderColor: '#E5E9F9',
               cursor: 'pointer',
+              borderRadius: 'var(--radius-button)',
             }}
           >
             חזרה אחורה
@@ -509,6 +524,7 @@ function Step1Form({
   childrenForLoan: ChildForLoan[];
 }) {
   const [showOtherBorrowerPopup, setShowOtherBorrowerPopup] = useState(false);
+  const [otherBorrowerApproved, setOtherBorrowerApproved] = useState(false);
 
   const handleFullNameChange = (v: string) => {
     const match = childrenForLoan.find((c) => c.name === v.trim());
@@ -521,9 +537,14 @@ function Step1Form({
 
   const isNameInList = step1.fullName.trim() && childrenForLoan.some((c) => c.name === step1.fullName.trim());
   const handleIdNumberFocus = () => {
-    if (step1.fullName.trim() && !isNameInList) {
+    if (step1.fullName.trim() && !isNameInList && !otherBorrowerApproved) {
       setShowOtherBorrowerPopup(true);
     }
+  };
+
+  const handleOtherBorrowerProceed = () => {
+    setShowOtherBorrowerPopup(false);
+    setOtherBorrowerApproved(true);
   };
 
   return (
@@ -531,7 +552,7 @@ function Step1Form({
       <OtherBorrowerApprovalPopup
         isOpen={showOtherBorrowerPopup}
         onClose={() => setShowOtherBorrowerPopup(false)}
-        onProceed={() => setShowOtherBorrowerPopup(false)}
+        onProceed={handleOtherBorrowerProceed}
       />
       <h2
         style={{
