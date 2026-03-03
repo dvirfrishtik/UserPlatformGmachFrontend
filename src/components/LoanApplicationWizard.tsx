@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { X, ChevronDown, AlertTriangle } from 'lucide-react';
+import { X, ChevronDown, ChevronLeft, AlertTriangle, Lock, Info, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const MARITAL_OPTIONS = [
@@ -61,8 +61,33 @@ export interface LoanWizardStep1Data {
   spouseEmail: string;
 }
 
+export interface DonationUnit {
+  id: string;
+  unitNumber: number;
+  year: number;
+  loanEntitlement: number;
+  forName: string;
+  fullyDonated: boolean;
+  /** קבוצה: 'borrower' – יחידות שנתרמו עבור הלווה, 'additional' – יחידות נוספות */
+  group: 'borrower' | 'additional';
+}
+
+const DEFAULT_DONATION_UNITS: DonationUnit[] = [
+  { id: 'u5', unitNumber: 5, year: 2024, loanEntitlement: 40000, forName: 'שולמית אביה', fullyDonated: true, group: 'borrower' },
+  { id: 'u6', unitNumber: 6, year: 2024, loanEntitlement: 40000, forName: 'שולמית אביה', fullyDonated: true, group: 'borrower' },
+  { id: 'u7', unitNumber: 7, year: 2024, loanEntitlement: 40000, forName: 'שולמית אביה', fullyDonated: true, group: 'borrower' },
+  { id: 'u8', unitNumber: 8, year: 2024, loanEntitlement: 40000, forName: 'שולמית אביה', fullyDonated: true, group: 'borrower' },
+  { id: 'u9', unitNumber: 9, year: 2024, loanEntitlement: 40000, forName: 'שולמית אביה', fullyDonated: true, group: 'borrower' },
+  { id: 'u10', unitNumber: 10, year: 2024, loanEntitlement: 40000, forName: 'שולמית אביה', fullyDonated: true, group: 'borrower' },
+  { id: 'u11', unitNumber: 11, year: 2024, loanEntitlement: 40000, forName: 'דוד משה', fullyDonated: true, group: 'additional' },
+  { id: 'u12', unitNumber: 12, year: 2024, loanEntitlement: 40000, forName: 'דוד משה', fullyDonated: true, group: 'additional' },
+  { id: 'u13', unitNumber: 13, year: 2024, loanEntitlement: 40000, forName: 'יוני שמעון', fullyDonated: true, group: 'additional' },
+  { id: 'u14', unitNumber: 14, year: 2024, loanEntitlement: 40000, forName: 'חיים יעקב', fullyDonated: true, group: 'additional' },
+];
+
 export interface LoanWizardStep2Data {
   loanPurpose: 'wedding' | 'apartment' | 'other' | '';
+  selectedUnitIds: string[];
 }
 
 const LOAN_PURPOSE_OPTIONS = [
@@ -73,6 +98,7 @@ const LOAN_PURPOSE_OPTIONS = [
 
 const emptyStep2: LoanWizardStep2Data = {
   loanPurpose: '',
+  selectedUnitIds: [],
 };
 
 interface LoanApplicationWizardProps {
@@ -1030,12 +1056,37 @@ function Step2InfoPanelContent() {
 function Step2Form({
   step2,
   setStep2,
+  donationUnits = DEFAULT_DONATION_UNITS,
+  borrowerName = 'אברהם צבי',
 }: {
   step2: LoanWizardStep2Data;
   setStep2: React.Dispatch<React.SetStateAction<LoanWizardStep2Data>>;
+  donationUnits?: DonationUnit[];
+  borrowerName?: string;
 }) {
+  const [showAdditional, setShowAdditional] = useState(false);
+
+  const borrowerUnits = donationUnits.filter((u) => u.group === 'borrower');
+  const additionalUnits = donationUnits.filter((u) => u.group === 'additional');
+
+  const toggleUnit = (id: string) => {
+    setStep2((p) => ({
+      ...p,
+      selectedUnitIds: p.selectedUnitIds.includes(id)
+        ? p.selectedUnitIds.filter((uid) => uid !== id)
+        : [...p.selectedUnitIds, id],
+    }));
+  };
+
+  const totalSelected = step2.selectedUnitIds.length;
+  const totalLoanAmount = donationUnits
+    .filter((u) => step2.selectedUnitIds.includes(u.id))
+    .reduce((sum, u) => sum + u.loanEntitlement, 0);
+  const monthlyPayment = totalSelected > 0 ? Math.round(totalLoanAmount / 120) : 0;
+
   return (
     <>
+      {/* ─── מטרת ההלוואה ─── */}
       <h2
         style={{
           fontFamily: 'var(--font-family-base)',
@@ -1092,7 +1143,212 @@ function Step2Form({
           })}
         </div>
       </div>
+
+      {/* ─── יחידות תרומה עבורן תבוקש ההלוואה ─── */}
+      <h2
+        style={{
+          fontFamily: 'var(--font-family-base)',
+          fontWeight: 'var(--font-weight-bold)',
+          fontSize: 'var(--text-xl)',
+          color: 'var(--primary)',
+          lineHeight: 1.3,
+          textAlign: 'right',
+          marginTop: 48,
+          marginBottom: 24,
+        }}
+      >
+        יחידות תרומה עבורן תבוקש ההלוואה:
+      </h2>
+
+      <div className="flex flex-col gap-6 max-w-[720px] w-full">
+        {/* קבוצה 1 – יחידות שנתרמו עבור הלווה */}
+        <div>
+          <p
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: 'var(--text-sm)',
+              color: '#6B7280',
+              textAlign: 'right',
+              marginBottom: 12,
+            }}
+          >
+            יחידות שנתרמו במלואן עבור {borrowerName} ({borrowerUnits.length})
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {borrowerUnits.map((unit) => (
+              <UnitCard
+                key={unit.id}
+                unit={unit}
+                selected={step2.selectedUnitIds.includes(unit.id)}
+                onToggle={() => toggleUnit(unit.id)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* קבוצה 2 – יחידות נוספות (מתקפלת) */}
+        {additionalUnits.length > 0 && (
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowAdditional((v) => !v)}
+              className="flex flex-row items-center gap-2 cursor-pointer mb-3"
+              style={{
+                fontFamily: 'var(--font-family-base)',
+                fontSize: 'var(--text-sm)',
+                color: '#6B7280',
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                marginRight: 'auto',
+              }}
+              dir="rtl"
+            >
+              <ChevronLeft
+                size={16}
+                style={{
+                  color: '#6B7280',
+                  transform: showAdditional ? 'rotate(-90deg)' : 'rotate(0)',
+                  transition: 'transform 0.2s',
+                }}
+              />
+              <span>יחידות נוספות שנתרמו במלואן ({additionalUnits.length})</span>
+            </button>
+            {showAdditional && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {additionalUnits.map((unit) => (
+                  <UnitCard
+                    key={unit.id}
+                    unit={unit}
+                    selected={step2.selectedUnitIds.includes(unit.id)}
+                    onToggle={() => toggleUnit(unit.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ─── Summary bar (sticky bottom) ─── */}
+      {totalSelected > 0 && (
+        <div
+          className="fixed left-0 right-0 bottom-[72px] z-[101] flex flex-row items-center justify-between px-6 md:px-10"
+          style={{
+            background: '#172554',
+            height: '56px',
+            direction: 'rtl',
+          }}
+        >
+          <div className="flex flex-row items-center gap-6">
+            <span
+              style={{
+                fontFamily: 'var(--font-family-base)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-semibold)',
+                color: '#fff',
+              }}
+            >
+              סה״כ נבחרו: {totalSelected} יחידות
+              <span style={{ margin: '0 8px', opacity: 0.5 }}>|</span>
+              סכום להלוואה: {totalLoanAmount.toLocaleString('he-IL')}₪
+            </span>
+          </div>
+          <div className="flex flex-row items-center gap-2">
+            <Info size={14} style={{ color: 'rgba(255,255,255,0.5)' }} />
+            <span
+              style={{
+                fontFamily: 'var(--font-family-base)',
+                fontSize: 'var(--text-sm)',
+                color: 'rgba(255,255,255,0.7)',
+              }}
+            >
+              החזר חודשי צפוי: ~{monthlyPayment.toLocaleString('he-IL')}₪
+            </span>
+          </div>
+        </div>
+      )}
     </>
+  );
+}
+
+/* ─── כרטיס יחידת תרומה ─── */
+function UnitCard({
+  unit,
+  selected,
+  onToggle,
+}: {
+  unit: DonationUnit;
+  selected: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="flex flex-col rounded-xl cursor-pointer transition-all text-right"
+      style={{
+        background: selected ? '#F8FAFC' : '#FFFFFF',
+        border: selected ? '2px solid var(--primary)' : '1.5px solid #E5E9F9',
+        padding: '14px 16px',
+        position: 'relative',
+      }}
+    >
+      {/* Top row: checkbox + unit title + lock */}
+      <div className="flex flex-row items-center justify-between w-full mb-3">
+        <div
+          className="flex items-center justify-center w-5 h-5 rounded shrink-0"
+          style={{
+            background: selected ? 'var(--primary)' : '#fff',
+            border: selected ? '2px solid var(--primary)' : '2px solid #D1D5DB',
+            transition: 'all 0.15s',
+          }}
+        >
+          {selected && <Check size={13} style={{ color: '#fff' }} strokeWidth={3} />}
+        </div>
+        <div className="flex flex-row items-center gap-1.5">
+          <Lock size={13} style={{ color: '#9CA3AF' }} />
+          <span
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontWeight: 'var(--font-weight-semibold)',
+              fontSize: '14px',
+              color: '#172554',
+            }}
+          >
+            יחידה #{unit.unitNumber}
+          </span>
+        </div>
+      </div>
+
+      {/* Data row */}
+      <div className="flex flex-row items-start justify-between w-full gap-2" dir="rtl">
+        <div className="flex flex-col items-center flex-1">
+          <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '11px', color: '#9CA3AF' }}>
+            זכאות הלוואה
+          </span>
+          <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '13px', fontWeight: 600, color: '#172554' }}>
+            ₪{unit.loanEntitlement.toLocaleString('he-IL')}
+          </span>
+        </div>
+        <div className="flex flex-col items-center flex-1">
+          <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '11px', color: '#9CA3AF' }}>
+            שנת ייעוד
+          </span>
+          <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '13px', fontWeight: 600, color: '#172554' }}>
+            {unit.year}
+          </span>
+        </div>
+        <div className="flex flex-col items-center flex-1">
+          <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '11px', color: '#9CA3AF' }}>
+            עבור
+          </span>
+          <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '13px', fontWeight: 600, color: '#172554' }}>
+            {unit.forName}
+          </span>
+        </div>
+      </div>
+    </button>
   );
 }
 
