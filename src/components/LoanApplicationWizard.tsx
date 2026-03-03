@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { X, ChevronDown, ChevronLeft, AlertTriangle, Lock, Info, Check } from 'lucide-react';
+import { X, ChevronDown, ChevronLeft, AlertTriangle, Info, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const MARITAL_OPTIONS = [
@@ -1192,7 +1192,7 @@ function Step2Form({
             <button
               type="button"
               onClick={() => setShowAdditional((v) => !v)}
-              className="flex flex-row items-center gap-2 cursor-pointer mb-3"
+              className="flex flex-row items-center gap-2 cursor-pointer mb-3 w-full justify-end"
               style={{
                 fontFamily: 'var(--font-family-base)',
                 fontSize: 'var(--text-sm)',
@@ -1200,10 +1200,10 @@ function Step2Form({
                 background: 'none',
                 border: 'none',
                 padding: 0,
-                marginRight: 'auto',
               }}
               dir="rtl"
             >
+              <span>יחידות נוספות שנתרמו במלואן ({additionalUnits.length})</span>
               <ChevronLeft
                 size={16}
                 style={{
@@ -1212,7 +1212,6 @@ function Step2Form({
                   transition: 'transform 0.2s',
                 }}
               />
-              <span>יחידות נוספות שנתרמו במלואן ({additionalUnits.length})</span>
             </button>
             {showAdditional && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -1230,37 +1229,36 @@ function Step2Form({
         )}
       </div>
 
-      {/* ─── Summary bar (sticky bottom) ─── */}
+      {/* ─── Summary bar ─── */}
       {totalSelected > 0 && (
         <div
-          className="fixed left-0 right-0 bottom-[72px] z-[101] flex flex-row items-center justify-between px-6 md:px-10"
+          className="flex flex-row items-center justify-between max-w-[720px] w-full rounded-xl mt-6 px-5 py-3.5"
+          dir="rtl"
           style={{
-            background: '#172554',
-            height: '56px',
-            direction: 'rtl',
+            background: '#FFFFFF',
+            border: '1.5px solid #CCA559',
+            boxShadow: '0 2px 12px rgba(204, 165, 89, 0.1)',
           }}
         >
-          <div className="flex flex-row items-center gap-6">
-            <span
-              style={{
-                fontFamily: 'var(--font-family-base)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-semibold)',
-                color: '#fff',
-              }}
-            >
-              סה״כ נבחרו: {totalSelected} יחידות
-              <span style={{ margin: '0 8px', opacity: 0.5 }}>|</span>
-              סכום להלוואה: {totalLoanAmount.toLocaleString('he-IL')}₪
-            </span>
-          </div>
+          <span
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-semibold)',
+              color: '#172554',
+            }}
+          >
+            סה״כ נבחרו: {totalSelected} יחידות
+            <span style={{ margin: '0 8px', color: '#CCA559' }}>|</span>
+            סכום להלוואה: {totalLoanAmount.toLocaleString('he-IL')}₪
+          </span>
           <div className="flex flex-row items-center gap-2">
-            <Info size={14} style={{ color: 'rgba(255,255,255,0.5)' }} />
+            <Info size={14} style={{ color: '#CCA559' }} />
             <span
               style={{
                 fontFamily: 'var(--font-family-base)',
                 fontSize: 'var(--text-sm)',
-                color: 'rgba(255,255,255,0.7)',
+                color: '#6B7280',
               }}
             >
               החזר חודשי צפוי: ~{monthlyPayment.toLocaleString('he-IL')}₪
@@ -1286,6 +1284,7 @@ function UnitCard({
     <button
       type="button"
       onClick={onToggle}
+      dir="rtl"
       className="flex flex-col rounded-xl cursor-pointer transition-all text-right"
       style={{
         background: selected ? '#F8FAFC' : '#FFFFFF',
@@ -1294,20 +1293,10 @@ function UnitCard({
         position: 'relative',
       }}
     >
-      {/* Top row: checkbox + unit title + lock */}
+      {/* Top row: icon+title on the right, checkbox on the left (RTL) */}
       <div className="flex flex-row items-center justify-between w-full mb-3">
-        <div
-          className="flex items-center justify-center w-5 h-5 rounded shrink-0"
-          style={{
-            background: selected ? 'var(--primary)' : '#fff',
-            border: selected ? '2px solid var(--primary)' : '2px solid #D1D5DB',
-            transition: 'all 0.15s',
-          }}
-        >
-          {selected && <Check size={13} style={{ color: '#fff' }} strokeWidth={3} />}
-        </div>
         <div className="flex flex-row items-center gap-1.5">
-          <Lock size={13} style={{ color: '#9CA3AF' }} />
+          <Image src="/icons/units.svg" alt="" width={16} height={16} unoptimized className="shrink-0" />
           <span
             style={{
               fontFamily: 'var(--font-family-base)',
@@ -1319,16 +1308,26 @@ function UnitCard({
             יחידה #{unit.unitNumber}
           </span>
         </div>
+        <div
+          className="flex items-center justify-center w-5 h-5 rounded shrink-0"
+          style={{
+            background: selected ? 'var(--primary)' : '#fff',
+            border: selected ? '2px solid var(--primary)' : '2px solid #D1D5DB',
+            transition: 'all 0.15s',
+          }}
+        >
+          {selected && <Check size={13} style={{ color: '#fff' }} strokeWidth={3} />}
+        </div>
       </div>
 
-      {/* Data row */}
-      <div className="flex flex-row items-start justify-between w-full gap-2" dir="rtl">
+      {/* Data row – RTL: עבור, שנת ייעוד, זכאות הלוואה */}
+      <div className="flex flex-row items-start justify-between w-full gap-2">
         <div className="flex flex-col items-center flex-1">
           <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '11px', color: '#9CA3AF' }}>
-            זכאות הלוואה
+            עבור
           </span>
           <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '13px', fontWeight: 600, color: '#172554' }}>
-            ₪{unit.loanEntitlement.toLocaleString('he-IL')}
+            {unit.forName}
           </span>
         </div>
         <div className="flex flex-col items-center flex-1">
@@ -1341,10 +1340,10 @@ function UnitCard({
         </div>
         <div className="flex flex-col items-center flex-1">
           <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '11px', color: '#9CA3AF' }}>
-            עבור
+            זכאות הלוואה
           </span>
           <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '13px', fontWeight: 600, color: '#172554' }}>
-            {unit.forName}
+            ₪{unit.loanEntitlement.toLocaleString('he-IL')}
           </span>
         </div>
       </div>
