@@ -1,8 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { X, ChevronDown, Settings } from 'lucide-react';
+import Image from 'next/image';
+import { X, ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+
+const MARITAL_OPTIONS = [
+  { value: 'married', label: 'נשוי' },
+  { value: 'engaged', label: 'מאורס' },
+  { value: 'single', label: 'רווק' },
+  { value: 'divorced', label: 'גרוש' },
+  { value: 'widowed', label: 'אלמן' },
+] as const;
 
 const WIZARD_STEPS = [
   { id: 1, label: 'פרטי הלווה' },
@@ -34,6 +43,12 @@ export interface LoanWizardStep1Data {
   phone: string;
   email: string;
   relationship: string;
+  maritalStatus: string;
+  spouseFullName: string;
+  spouseIdNumber: string;
+  spouseBirthDate: string;
+  spousePhone: string;
+  spouseEmail: string;
 }
 
 interface LoanApplicationWizardProps {
@@ -50,6 +65,12 @@ const emptyStep1: LoanWizardStep1Data = {
   phone: '',
   email: '',
   relationship: '',
+  maritalStatus: '',
+  spouseFullName: '',
+  spouseIdNumber: '',
+  spouseBirthDate: '',
+  spousePhone: '',
+  spouseEmail: '',
 };
 
 export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanApplicationWizardProps) {
@@ -127,7 +148,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
             borderLeft: '1px solid rgba(255,255,255,0.08)',
           }}
         >
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-8">
             {WIZARD_STEPS.map((step, index) => {
               const active = step.id === currentStep;
               const completed = completedSteps.includes(step.id);
@@ -222,7 +243,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
               }}
             >
               <div className="flex flex-row items-center gap-2 mb-2">
-                <Settings size={18} style={{ color: '#6B7280', flexShrink: 0 }} />
+                <Image src="/icons/lamp.svg" alt="" width={20} height={20} unoptimized className="shrink-0" />
                 <span
                   style={{
                     fontFamily: 'SimplerPro',
@@ -382,6 +403,121 @@ function Step1Form({
             options={RELATIONSHIP_OPTIONS}
           />
         </div>
+
+        {/* ─── מצב אישי של הלווה ─── */}
+        <div className="mt-4">
+          <label
+            className="block mb-3"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-normal)',
+              color: 'var(--muted-foreground)',
+              textAlign: 'right',
+            }}
+          >
+            מצב אישי של הלווה
+          </label>
+          <div className="flex flex-row flex-wrap gap-3">
+            {MARITAL_OPTIONS.map((opt) => {
+              const selected = step1.maritalStatus === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setStep1((p) => ({ ...p, maritalStatus: opt.value }))}
+                  className="inline-flex items-center gap-2 px-4 h-10 rounded-lg cursor-pointer transition-all border"
+                  style={{
+                    fontFamily: 'var(--font-family-base)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: selected ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
+                    color: selected ? 'var(--primary)' : 'var(--muted-foreground)',
+                    background: selected ? '#F0F4FF' : 'var(--card)',
+                    borderColor: selected ? 'var(--primary)' : 'var(--border)',
+                  }}
+                >
+                  <span
+                    className="flex items-center justify-center w-4 h-4 rounded-full border-2 shrink-0"
+                    style={{
+                      borderColor: selected ? 'var(--primary)' : 'var(--border)',
+                    }}
+                  >
+                    {selected && (
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ background: 'var(--primary)' }}
+                      />
+                    )}
+                  </span>
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ─── פרטי בת הזוג של הלווה (מוצג רק כשנשוי) ─── */}
+        {step1.maritalStatus === 'married' && (
+          <div
+            className="rounded-xl px-6 py-6 mt-2"
+            style={{
+              background: '#F1F5F9',
+              border: '1px solid var(--border)',
+            }}
+          >
+            <h3
+              className="mb-5"
+              style={{
+                fontFamily: 'var(--font-family-base)',
+                fontWeight: 'var(--font-weight-bold)',
+                fontSize: 'var(--text-base)',
+                color: 'var(--primary)',
+                textAlign: 'right',
+              }}
+            >
+              פרטי בת הזוג של הלווה
+            </h3>
+            <div className="flex flex-col gap-4">
+              {/* Row: שם מלא | ת.ז. | תאריך לידה */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <WizardInput
+                  label="שם מלא"
+                  value={step1.spouseFullName}
+                  onChange={(v) => setStep1((p) => ({ ...p, spouseFullName: v }))}
+                  placeholder="שם מלא"
+                />
+                <WizardInput
+                  label="ת.ז."
+                  value={step1.spouseIdNumber}
+                  onChange={(v) => setStep1((p) => ({ ...p, spouseIdNumber: v }))}
+                  placeholder="מספר ת.ז."
+                />
+                <WizardInput
+                  label="תאריך לידה"
+                  type="date"
+                  value={step1.spouseBirthDate}
+                  onChange={(v) => setStep1((p) => ({ ...p, spouseBirthDate: v }))}
+                />
+              </div>
+              {/* Row: טלפון | אימייל */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <WizardInput
+                  label="טלפון"
+                  value={step1.spousePhone}
+                  onChange={(v) => setStep1((p) => ({ ...p, spousePhone: v }))}
+                  placeholder="מס׳ טלפון"
+                />
+                <WizardInput
+                  label="אימייל"
+                  type="email"
+                  value={step1.spouseEmail}
+                  onChange={(v) => setStep1((p) => ({ ...p, spouseEmail: v }))}
+                  placeholder="דוא״ל"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
