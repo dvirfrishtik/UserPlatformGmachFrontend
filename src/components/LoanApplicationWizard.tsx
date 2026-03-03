@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { X, ChevronDown } from 'lucide-react';
+import { X, ChevronDown, AlertTriangle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const MARITAL_OPTIONS = [
@@ -357,6 +357,147 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
   );
 }
 
+/* ─── פופאפ: בחירת לווה אחר – אישור מיוחד ─── */
+function OtherBorrowerApprovalPopup({
+  isOpen,
+  onClose,
+  onProceed,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onProceed: () => void;
+}) {
+  if (!isOpen) return null;
+  return (
+    <div
+      className="fixed inset-0 z-[110] flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0, 2, 4, 0.45)', backdropFilter: 'blur(6px)' }}
+      onClick={onClose}
+      dir="rtl"
+    >
+      <div
+        className="relative flex flex-col max-h-[90vh] overflow-hidden"
+        style={{
+          width: 'min(520px, 92vw)',
+          background: 'linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)',
+          borderRadius: '12px',
+          border: '1px solid #E5E9F9',
+          boxShadow: '0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className="flex items-center justify-between shrink-0"
+          style={{
+            padding: '20px 24px',
+            borderBottom: '1px solid var(--border)',
+          }}
+        >
+          <div style={{ width: '36px' }} />
+          <h2
+            style={{
+              fontSize: '20px',
+              fontWeight: 'var(--font-weight-bold)',
+              color: 'var(--foreground)',
+              lineHeight: '1.3',
+              textAlign: 'center',
+            }}
+          >
+            הוספת לווה אחר
+          </h2>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors hover:bg-[rgba(0,0,0,0.04)]"
+            style={{ border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }}
+            aria-label="סגור"
+          >
+            <X size={20} style={{ color: 'var(--muted-foreground)' }} />
+          </button>
+        </div>
+        <div className="flex flex-col items-center px-6 py-8 overflow-y-auto">
+          <div className="flex justify-center mb-4">
+            <div
+              className="flex items-center justify-center w-14 h-14 rounded-full"
+              style={{ background: 'rgba(0,0,0,0.06)' }}
+            >
+              <AlertTriangle size={28} style={{ color: 'var(--foreground)' }} strokeWidth={2} />
+            </div>
+          </div>
+          <h3
+            className="text-center mb-3"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: 'var(--text-lg)',
+              fontWeight: 'var(--font-weight-bold)',
+              color: 'var(--foreground)',
+              lineHeight: 1.4,
+            }}
+          >
+            הוספת לווה שלא נתרמו עבורו יחידות דורשת אישור מיוחד
+          </h3>
+          <p
+            className="text-center mb-2"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: 'var(--text-sm)',
+              color: 'var(--muted-foreground)',
+              lineHeight: 1.5,
+            }}
+          >
+            בקשת הלוואה עבור לווה עבורו לא נתרמו יחידות, מחייבת בדיקה ואישור מיוחד של הגמ"ח.
+          </p>
+          <p
+            className="text-center mb-6"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: 'var(--text-sm)',
+              color: 'var(--muted-foreground)',
+              lineHeight: 1.5,
+            }}
+          >
+            המשך התהליך תלוי באישור הגמ"ח ועשוי להאריך משמעותית את זמן הטיפול בבקשה.
+          </p>
+        </div>
+        <div
+          className="flex flex-row-reverse gap-3 shrink-0 px-6 pb-6"
+          style={{ borderTop: '1px solid var(--border)', paddingTop: 20 }}
+        >
+          <button
+            type="button"
+            onClick={onProceed}
+            className="px-5 py-2.5 rounded-lg font-medium transition-colors"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: 'var(--text-sm)',
+              backgroundColor: 'var(--primary)',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            הבנתי, ואני רוצה להמשיך
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-5 py-2.5 rounded-lg font-medium transition-colors border"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: 'var(--text-sm)',
+              backgroundColor: 'var(--card)',
+              color: 'var(--foreground)',
+              borderColor: 'var(--border)',
+              cursor: 'pointer',
+            }}
+          >
+            חזרה אחורה
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Step 1: פרטי הלווה ─── */
 function Step1Form({
   step1,
@@ -367,8 +508,31 @@ function Step1Form({
   setStep1: React.Dispatch<React.SetStateAction<LoanWizardStep1Data>>;
   childrenForLoan: ChildForLoan[];
 }) {
+  const [showOtherBorrowerPopup, setShowOtherBorrowerPopup] = useState(false);
+
+  const handleFullNameChange = (v: string) => {
+    const match = childrenForLoan.find((c) => c.name === v.trim());
+    setStep1((p) => ({
+      ...p,
+      fullName: v,
+      selectedChildId: match ? match.id : '',
+    }));
+  };
+
+  const isNameInList = step1.fullName.trim() && childrenForLoan.some((c) => c.name === step1.fullName.trim());
+  const handleIdNumberFocus = () => {
+    if (step1.fullName.trim() && !isNameInList) {
+      setShowOtherBorrowerPopup(true);
+    }
+  };
+
   return (
     <>
+      <OtherBorrowerApprovalPopup
+        isOpen={showOtherBorrowerPopup}
+        onClose={() => setShowOtherBorrowerPopup(false)}
+        onProceed={() => setShowOtherBorrowerPopup(false)}
+      />
       <h2
         style={{
           fontFamily: 'var(--font-family-base)',
@@ -390,7 +554,7 @@ function Step1Form({
             label="שם מלא"
             value={step1.fullName}
             selectedChildId={step1.selectedChildId}
-            onChange={(v) => setStep1((p) => ({ ...p, fullName: v }))}
+            onChange={handleFullNameChange}
             onSelectChild={(id) => setStep1((p) => ({ ...p, selectedChildId: id }))}
             childrenForLoan={childrenForLoan}
             placeholder="הזן שם מלא"
@@ -399,6 +563,7 @@ function Step1Form({
             label="ת.ז."
             value={step1.idNumber}
             onChange={(v) => setStep1((p) => ({ ...p, idNumber: v }))}
+            onFocus={handleIdNumberFocus}
             placeholder="מספר ת.ז."
           />
           <WizardInput
@@ -557,7 +722,7 @@ function Step1Form({
   );
 }
 
-/* ─── שם מלא + דרופדאון ילדים (בפוקוס) ─── */
+/* ─── שם מלא + אוטוקומפליט ילדים ─── */
 function FullNameWithChildDropdown({
   label,
   value,
@@ -577,6 +742,12 @@ function FullNameWithChildDropdown({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const query = value.trim();
+  const filteredOptions = query
+    ? childrenForLoan.filter((c) => c.name.includes(query))
+    : childrenForLoan;
+  const showDropdown = isOpen && filteredOptions.length > 0;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -626,7 +797,7 @@ function FullNameWithChildDropdown({
           color: 'var(--foreground)',
         }}
       />
-      {isOpen && childrenForLoan.length > 0 && (
+      {showDropdown && (
         <div
           className="absolute w-full z-50 rounded-lg border overflow-hidden"
           style={{
@@ -638,7 +809,7 @@ function FullNameWithChildDropdown({
           }}
         >
           <ul className="list-none m-0 p-1 max-h-[220px] overflow-y-auto">
-            {childrenForLoan.map((child) => (
+            {filteredOptions.map((child) => (
               <li key={child.id}>
                 <button
                   type="button"
@@ -672,12 +843,14 @@ function WizardInput({
   onChange,
   placeholder,
   type = 'text',
+  onFocus,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   type?: 'text' | 'date' | 'email';
+  onFocus?: () => void;
 }) {
   return (
     <div className="w-full" dir="rtl">
@@ -699,6 +872,7 @@ function WizardInput({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onFocus={onFocus}
         placeholder={placeholder}
         dir="rtl"
         className="w-full h-9 rounded-md border border-border bg-input-background text-right px-3 text-sm"
