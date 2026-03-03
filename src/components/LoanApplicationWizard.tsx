@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { X, ChevronDown, ChevronLeft, AlertTriangle, Info, Check, ExternalLink, User, Minus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { LoanRepaymentTable } from '@/components/LoanRepaymentTable';
 
 const MARITAL_OPTIONS = [
   { value: 'married', label: 'נשוי' },
@@ -2088,6 +2089,7 @@ function Step5Form({
   step5: LoanWizardStep5Data;
   setStep5: React.Dispatch<React.SetStateAction<LoanWizardStep5Data>>;
 }) {
+  const [showPaymentDetailTable, setShowPaymentDetailTable] = useState(false);
   const totalUnits = step2.selectedUnitIds.length;
   const totalLoanAmount = DEFAULT_DONATION_UNITS
     .filter((u) => step2.selectedUnitIds.includes(u.id))
@@ -2151,16 +2153,17 @@ function Step5Form({
         </div>
       </div>
 
-      {/* החזר חודשי צפוי + כפתור פירוט */}
+      {/* החזר חודשי צפוי + כפתור פירוט – רקע לבן, מיושר לימין */}
       <div
         className="rounded-xl w-full flex flex-col gap-3"
         style={{
-          background: '#F1F5F9',
+          background: '#FFFFFF',
           border: '1px solid #E2E8F0',
           padding: '20px',
+          textAlign: 'right',
         }}
       >
-        <div className="flex flex-row items-center gap-2" style={{ justifyContent: 'flex-end' }}>
+        <div className="flex flex-row items-center gap-2" style={{ justifyContent: 'flex-end', direction: 'rtl' }}>
           <span
             style={{
               fontFamily: 'var(--font-family-base)',
@@ -2175,17 +2178,21 @@ function Step5Form({
         </div>
         <button
           type="button"
+          onClick={() => setShowPaymentDetailTable((v) => !v)}
           className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[rgba(0,0,0,0.04)]"
-          style={{ alignSelf: 'flex-start' }}
           style={{
             fontFamily: 'var(--font-family-base)',
             color: 'var(--muted-foreground)',
             background: '#F8FAFC',
             borderColor: 'var(--border)',
+            alignSelf: 'flex-start',
           }}
         >
-          הצגת פירוט תשלומים צפוי
+          {showPaymentDetailTable ? 'צמצום תצוגה' : 'הצגת פירוט תשלומים צפוי'}
         </button>
+        {showPaymentDetailTable && totalLoanAmount > 0 && (
+          <LoanRepaymentTable principal={totalLoanAmount} months={120} />
+        )}
       </div>
 
       {/* תנאים ואישור */}

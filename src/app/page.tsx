@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { ActionsDropdown } from "@/components/ActionsDropdown";
+import { LoanRepaymentTable } from "@/components/LoanRepaymentTable";
 import { PurchaseUnitsWizard } from "@/components/PurchaseUnitsWizard";
 import { ChevronDown, Info, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -400,7 +401,7 @@ export default function DonationUnitsPage() {
 
               {/* טבלת החזרי הלוואה (נפתחת מ"הפקת ק״ח ייחודית") */}
               {isLoanScheduleOpen && (
-                <LoanRepaymentTable onClose={() => setIsLoanScheduleOpen(false)} />
+                <LoanRepaymentTable principal={LOAN_PRINCIPAL} months={LOAN_MONTHS} onClose={() => setIsLoanScheduleOpen(false)} />
               )}
 
               {/* Title + View Toggle */}
@@ -710,100 +711,5 @@ function TableCell({ children, className, style }: { children: React.ReactNode; 
   );
 }
 
-/* ─── Loan repayment schedule (240k NIS, 120 months, no interest) – same visual style as UnitsInfoTable ─── */
 const LOAN_PRINCIPAL = 240_000;
 const LOAN_MONTHS = 120;
-const MONTHLY_PAYMENT = LOAN_PRINCIPAL / LOAN_MONTHS; // 2,000 ₪
-
-function getLoanSchedule(): { month: number; date: string; payment: number; principal: number; balance: number }[] {
-  const rows: { month: number; date: string; payment: number; principal: number; balance: number }[] = [];
-  const start = new Date();
-  start.setMonth(start.getMonth() + 1);
-  for (let i = 1; i <= LOAN_MONTHS; i++) {
-    const principal = i < LOAN_MONTHS ? MONTHLY_PAYMENT : LOAN_PRINCIPAL - (LOAN_MONTHS - 1) * MONTHLY_PAYMENT; // last month: remainder
-    const balance = Math.max(0, LOAN_PRINCIPAL - i * MONTHLY_PAYMENT);
-    const d = new Date(start.getFullYear(), start.getMonth() + i - 1, 1);
-    const dateStr = `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
-    rows.push({ month: i, date: dateStr, payment: MONTHLY_PAYMENT, principal, balance });
-  }
-  return rows;
-}
-
-const loanScheduleRows = getLoanSchedule();
-
-const loanTableHeaderStyle: React.CSSProperties = {
-  padding: "10px 12px",
-  fontSize: "14px",
-  fontWeight: "var(--font-weight-semibold)",
-  color: "#141E44",
-  backgroundColor: "#E8EDF2",
-  border: "1px solid #E5E9F9",
-  textAlign: "center",
-};
-const loanTableCellStyle: React.CSSProperties = {
-  padding: "10px 12px",
-  fontSize: "14px",
-  fontWeight: "var(--font-weight-normal)",
-  color: "#141E44",
-  backgroundColor: "#FFFFFF",
-  border: "1px solid #E5E9F9",
-  textAlign: "center",
-};
-
-function LoanRepaymentTable({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="w-full" dir="rtl" style={{ marginTop: "8px", marginBottom: "16px" }}>
-      <div
-        style={{
-          padding: "20px 24px",
-          backgroundColor: "#FFFFFF",
-          borderRadius: "8px",
-          boxShadow: "0 0 12px rgba(24, 47, 67, 0.06)",
-          border: "1px solid #E5E9F9",
-        }}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h3 style={{ fontSize: "16px", fontWeight: "var(--font-weight-semibold)", color: "#141E44" }}>
-            תצוגת החזרי הלוואה — ₪{LOAN_PRINCIPAL.toLocaleString("he-IL")} ל־{LOAN_MONTHS} חודשים
-          </h3>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-[rgba(0,0,0,0.06)] transition-colors"
-            style={{ border: "none", cursor: "pointer", backgroundColor: "transparent" }}
-            aria-label="סגור"
-          >
-            <span style={{ fontSize: "18px", color: "#6B7280", lineHeight: 1 }}>×</span>
-          </button>
-        </div>
-        <p style={{ fontSize: "13px", color: "#6B7280", marginBottom: "12px", textAlign: "right" }}>
-          הלוואה ללא ריבית. תשלום חודשי קבוע — ₪{Math.round(MONTHLY_PAYMENT).toLocaleString("he-IL")}.
-        </p>
-        <div style={{ maxHeight: "400px", overflowY: "auto", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
-          <table className="w-full border-collapse" style={{ minWidth: "560px", tableLayout: "fixed" }}>
-            <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>
-              <tr>
-                <th style={{ ...loanTableHeaderStyle, width: "12%" }}>מס׳ חודש</th>
-                <th style={{ ...loanTableHeaderStyle, width: "22%" }}>תאריך תשלום</th>
-                <th style={{ ...loanTableHeaderStyle, width: "22%" }}>תשלום חודשי</th>
-                <th style={{ ...loanTableHeaderStyle, width: "22%" }}>קרן</th>
-                <th style={{ ...loanTableHeaderStyle, width: "22%" }}>יתרת קרן</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loanScheduleRows.map((row) => (
-                <tr key={row.month}>
-                  <td style={loanTableCellStyle}>{row.month}</td>
-                  <td style={loanTableCellStyle}>{row.date}</td>
-                  <td style={loanTableCellStyle}>₪{Math.round(row.payment).toLocaleString("he-IL")}</td>
-                  <td style={loanTableCellStyle}>₪{Math.round(row.principal).toLocaleString("he-IL")}</td>
-                  <td style={loanTableCellStyle}>₪{Math.round(row.balance).toLocaleString("he-IL")}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
