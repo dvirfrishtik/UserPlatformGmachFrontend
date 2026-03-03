@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, ChevronRight, Lightbulb, Calendar } from 'lucide-react';
+import { X, ChevronDown, Settings } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const WIZARD_STEPS = [
@@ -12,12 +12,6 @@ const WIZARD_STEPS = [
   { id: 5, label: 'סיכום והגשה' },
 ] as const;
 
-// Mock – במקור יגיע מרשימת הילדים/קרובים
-const CHILD_OPTIONS = [
-  { value: '', label: 'בחירת ילד/ה או קרוב/ה' },
-  { value: '1', label: 'ילד א' },
-  { value: '2', label: 'ילד ב' },
-];
 const RELATIONSHIP_OPTIONS = [
   { value: '', label: 'בחירת קרבה' },
   { value: 'parent', label: 'הורה' },
@@ -26,14 +20,20 @@ const RELATIONSHIP_OPTIONS = [
   { value: 'other', label: 'אחר' },
 ];
 
+const CHILD_OPTIONS = [
+  { value: '', label: 'בחירת ילד/ה או קרוב/ה' },
+  { value: '1', label: 'ילד א' },
+  { value: '2', label: 'ילד ב' },
+];
+
 export interface LoanWizardStep1Data {
   fullName: string;
   idNumber: string;
   birthDate: string;
   selectedChildId: string;
+  phone: string;
   email: string;
   relationship: string;
-  phone: string;
 }
 
 interface LoanApplicationWizardProps {
@@ -47,9 +47,9 @@ const emptyStep1: LoanWizardStep1Data = {
   idNumber: '',
   birthDate: '',
   selectedChildId: '',
+  phone: '',
   email: '',
   relationship: '',
-  phone: '',
 };
 
 export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanApplicationWizardProps) {
@@ -59,12 +59,14 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
 
   if (!isOpen) return null;
 
-  const canNavigateToStep = (stepId: number) => stepId <= currentStep || completedSteps.includes(stepId);
-  const isStepActive = (stepId: number) => stepId === currentStep;
+  const canNavigateToStep = (stepId: number) =>
+    stepId <= currentStep || completedSteps.includes(stepId);
 
   const handleContinue = () => {
     if (currentStep < 5) {
-      setCompletedSteps((prev) => (prev.includes(currentStep) ? prev : [...prev, currentStep]));
+      setCompletedSteps((prev) =>
+        prev.includes(currentStep) ? prev : [...prev, currentStep]
+      );
       setCurrentStep((s) => s + 1);
     }
   };
@@ -76,11 +78,11 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex flex-col overflow-hidden"
+      className="fixed inset-0 z-[100] flex flex-col"
       style={{ backgroundColor: '#FAFAFA', direction: 'rtl' }}
       dir="rtl"
     >
-      {/* ─── Header ─── */}
+      {/* ─── Header – זהה למסך המקדים ─── */}
       <header
         className="flex flex-row justify-between items-center shrink-0 px-4 py-3 min-h-[56px] md:min-h-[72px] md:px-[38px] md:py-4"
         style={{
@@ -89,21 +91,24 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
           boxShadow: '9.53704px 7.80303px 43.3502px rgba(33, 132, 213, 0.1)',
         }}
       >
-        <div className="flex flex-col items-end gap-0.5 min-w-0 flex-1" style={{ textAlign: 'right' }}>
-          <div className="flex flex-row items-center gap-2" style={{ justifyContent: 'flex-end' }}>
-            <span className="text-base md:text-xl font-bold truncate max-w-[85vw] md:max-w-none" style={{ fontFamily: 'SimplerPro', color: '#172554' }}>
-              תהליך בקשת הלוואה
-            </span>
-            <ChevronRight size={20} className="shrink-0" style={{ color: '#172554' }} />
-          </div>
-          <span className="text-xs md:text-sm" style={{ fontFamily: 'SimplerPro', fontWeight: 400, color: '#495157' }}>
+        <div className="flex flex-col items-start gap-0.5 min-w-0 flex-1" style={{ textAlign: 'right' }}>
+          <span
+            className="text-base md:text-xl font-bold truncate"
+            style={{ fontFamily: 'SimplerPro', color: '#172554' }}
+          >
+            תהליך בקשת הלוואה
+          </span>
+          <span
+            className="text-xs md:text-sm"
+            style={{ fontFamily: 'SimplerPro', fontWeight: 400, color: '#495157' }}
+          >
             עבור ילד/ה או קרוב/ה
           </span>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors hover:bg-[rgba(0,0,0,0.06)] shrink-0"
+          className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors hover:bg-[rgba(0,0,0,0.06)]"
           style={{ border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }}
           aria-label="סגור"
         >
@@ -111,309 +116,326 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
         </button>
       </header>
 
+      {/* ─── Body: sidebar + content + info panel ─── */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
-        {/* ─── Right: Wizard steps sidebar ─── */}
+        {/* ── Wizard Sidebar (ימין) ── */}
         <aside
-          className="hidden md:flex flex-col shrink-0 border-l border-[#E8EDF2] py-6 pl-6 pr-5"
-          style={{ width: '220px', background: '#FFFFFF' }}
+          className="hidden md:flex flex-col shrink-0 py-10 px-8"
+          style={{
+            width: '240px',
+            background: '#FFFFFF',
+            borderLeft: '1px solid #E5E9F9',
+          }}
         >
           {WIZARD_STEPS.map((step, index) => {
-            const active = isStepActive(step.id);
+            const active = step.id === currentStep;
             const completed = completedSteps.includes(step.id);
             const clickable = canNavigateToStep(step.id);
+            const filled = active || completed;
             const isLast = index === WIZARD_STEPS.length - 1;
+
             return (
-              <div key={step.id} className="flex flex-row items-center gap-3" style={{ alignSelf: 'flex-end' }}>
-                <div className="flex flex-col items-center">
+              <div key={step.id} className="flex flex-col items-end">
+                <div className="flex flex-row-reverse items-center gap-3">
                   <button
                     type="button"
                     onClick={() => clickable && setCurrentStep(step.id)}
                     disabled={!clickable}
-                    className="flex items-center justify-center w-8 h-8 rounded-full shrink-0 border-0 cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-100"
+                    className="flex items-center justify-center w-10 h-10 rounded-full shrink-0 border-0 transition-colors"
                     style={{
-                      background: active ? '#172554' : completed ? '#172554' : '#E5E9F0',
-                      color: active || completed ? '#FFFFFF' : '#9CA3AF',
+                      background: filled ? '#172554' : '#F1F5F9',
+                      color: filled ? '#FFFFFF' : '#9CA3AF',
                       fontWeight: 700,
-                      fontSize: '13px',
+                      fontSize: '14px',
                       fontFamily: 'SimplerPro',
+                      cursor: clickable ? 'pointer' : 'default',
                     }}
                   >
                     {String(step.id).padStart(2, '0')}
                   </button>
-                  {!isLast && (
-                    <div
-                      className="mt-2"
-                      style={{
-                        width: 0,
-                        height: '24px',
-                        borderRight: '2px dashed #E5E9F0',
-                        marginRight: '15px',
-                      }}
-                    />
-                  )}
+                  <span
+                    style={{
+                      fontFamily: 'SimplerPro',
+                      fontWeight: active ? 700 : 400,
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      color: active ? '#172554' : '#6B7280',
+                      cursor: clickable ? 'pointer' : 'default',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {step.label}
+                  </span>
                 </div>
-                <span
-                  className="text-right"
-                  style={{
-                    fontFamily: 'SimplerPro',
-                    fontWeight: active ? 700 : 400,
-                    fontSize: '14px',
-                    color: active ? '#172554' : '#6B7280',
-                    cursor: clickable ? 'pointer' : 'default',
-                  }}
-                >
-                  {step.label}
-                </span>
+                {!isLast && (
+                  <div
+                    style={{
+                      width: 0,
+                      height: 20,
+                      marginLeft: 'auto',
+                      marginRight: 19,
+                      marginTop: 4,
+                      marginBottom: 4,
+                      borderRight: `2px dashed ${filled && completedSteps.includes(step.id) ? '#172554' : '#D9DDEC'}`,
+                    }}
+                  />
+                )}
               </div>
             );
           })}
         </aside>
 
-        {/* ─── Center: Main content ─── */}
-        <main className="flex-1 flex min-w-0 overflow-auto">
-          <div className="flex-1 flex min-w-0">
-            {/* Form area – grows in center */}
-            <div
-              className="flex-1 min-w-0 flex flex-col py-6 px-4 md:px-8"
-              style={{ background: '#FAFAFA' }}
-            >
-              {/* מובייל: אינדיקציה לשלב נוכחי */}
-              <div className="md:hidden flex flex-row items-center gap-2 mb-4" style={{ justifyContent: 'flex-end' }}>
-                <span style={{ fontFamily: 'SimplerPro', fontSize: '13px', color: '#6B7280' }}>
-                  שלב {currentStep} מתוך 5
-                </span>
-                <span
-                  style={{
-                    fontFamily: 'SimplerPro',
-                    fontWeight: 600,
-                    fontSize: '14px',
-                    color: '#172554',
-                  }}
-                >
-                  {WIZARD_STEPS[currentStep - 1]?.label}
-                </span>
-              </div>
-              {currentStep === 1 && (
-                <>
-                  <h2
-                    className="text-right mb-6"
-                    style={{
-                      fontFamily: 'SimplerPro',
-                      fontWeight: 600,
-                      fontSize: 'clamp(18px, 2vw, 22px)',
-                      color: '#172554',
-                      lineHeight: 1.3,
-                    }}
-                  >
-                    פרטי הלווה
-                  </h2>
-                  <div className="flex flex-col gap-4 max-w-2xl" style={{ marginRight: 0, marginLeft: 'auto' }}>
-                    {/* Row 1: שם מלא, ת.ז., תאריך לידה */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <FormField
-                        label="שם מלא"
-                        value={step1.fullName}
-                        onChange={(v) => setStep1((p) => ({ ...p, fullName: v }))}
-                        placeholder="הזן שם מלא"
-                      />
-                      <FormField
-                        label="ת.ז."
-                        value={step1.idNumber}
-                        onChange={(v) => setStep1((p) => ({ ...p, idNumber: v }))}
-                        placeholder="מספר ת.ז."
-                      />
-                      <FormField
-                        label="תאריך לידה"
-                        type="date"
-                        value={step1.birthDate}
-                        onChange={(v) => setStep1((p) => ({ ...p, birthDate: v }))}
-                        dir="rtl"
-                        withCalendarIcon
-                      />
-                    </div>
-                    {/* Row 2: בחירת ילד/ה, אימייל, הקשר */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <SelectField
-                        label="בחירת ילד/ה או קרוב/ה"
-                        value={step1.selectedChildId}
-                        onChange={(v) => setStep1((p) => ({ ...p, selectedChildId: v }))}
-                        options={CHILD_OPTIONS}
-                      />
-                      <FormField
-                        label="אימייל"
-                        type="email"
-                        value={step1.email}
-                        onChange={(v) => setStep1((p) => ({ ...p, email: v }))}
-                        placeholder="דוא״ל"
-                      />
-                      <SelectField
-                        label="הקשר שלי ללווה"
-                        value={step1.relationship}
-                        onChange={(v) => setStep1((p) => ({ ...p, relationship: v }))}
-                        options={RELATIONSHIP_OPTIONS}
-                      />
-                    </div>
-                    {/* Row 3: טלפון – ימין */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="sm:col-start-3">
-                        <FormField
-                          label="טלפון"
-                          value={step1.phone}
-                          onChange={(v) => setStep1((p) => ({ ...p, phone: v }))}
-                          placeholder="מס׳ טלפון"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-              {currentStep > 1 && (
-                <div className="flex-1 flex items-center justify-center text-right" style={{ color: 'var(--muted-foreground)' }}>
-                  שלב {currentStep} – בהמשך יוטמע
-                </div>
-              )}
+        {/* ── Main Area ── */}
+        <div className="flex-1 flex min-w-0 overflow-hidden">
+          {/* Center – Form */}
+          <div className="flex-1 min-w-0 overflow-y-auto py-8 px-6 md:px-12 lg:px-16">
+            {/* Mobile step indicator */}
+            <div className="md:hidden flex flex-row items-center gap-2 mb-5" style={{ justifyContent: 'flex-end' }}>
+              <span style={{ fontFamily: 'SimplerPro', fontSize: '12px', color: '#9CA3AF' }}>
+                שלב {currentStep} מתוך 5
+              </span>
+              <span style={{ fontFamily: 'SimplerPro', fontWeight: 600, fontSize: '14px', color: '#172554' }}>
+                {WIZARD_STEPS[currentStep - 1]?.label}
+              </span>
             </div>
 
-            {/* ─── Left: Info sidebar (תנאים לזכאות) ─── */}
-            <aside
-              className="hidden lg:flex flex-col shrink-0 w-[280px] xl:w-[320px] py-6 pr-6 pl-4 border-r border-[#E8EDF2] overflow-auto"
-              style={{ background: '#F1F5F9' }}
-            >
-              <div className="flex flex-row items-center gap-2 mb-4" style={{ justifyContent: 'flex-end' }}>
-                <Lightbulb size={20} style={{ color: '#64748B' }} />
-                <h3
-                  style={{
-                    fontFamily: 'SimplerPro',
-                    fontWeight: 600,
-                    fontSize: '16px',
-                    color: '#172554',
-                    margin: 0,
-                    textAlign: 'right',
-                  }}
-                >
-                  תנאים לזכאות לווה
-                </h3>
+            {currentStep === 1 && (
+              <Step1Form step1={step1} setStep1={setStep1} />
+            )}
+            {currentStep > 1 && (
+              <div
+                className="flex-1 flex items-center justify-center h-full"
+                style={{ color: '#9CA3AF', fontFamily: 'SimplerPro' }}
+              >
+                שלב {currentStep} – בהמשך יוטמע
               </div>
-              <ul className="list-none m-0 p-0 space-y-3" style={{ textAlign: 'right', paddingRight: '0' }}>
-                <li
-                  className="text-sm leading-relaxed"
-                  style={{ fontFamily: 'SimplerPro', color: '#475569', paddingRight: '8px', position: 'relative' }}
-                >
-                  <span style={{ position: 'absolute', right: 0, top: '0.35em', width: '6px', height: '6px', borderRadius: '50%', background: '#94A3B8' }} />
-                  אם נמצאו במערכת מספר תיקים אפשריים לאותו לווה, הבקשה תועבר לבדיקה לפני המשך התהליך.
-                </li>
-                <li
-                  className="text-sm leading-relaxed"
-                  style={{ fontFamily: 'SimplerPro', color: '#475569', paddingRight: '8px', position: 'relative' }}
-                >
-                  <span style={{ position: 'absolute', right: 0, top: '0.35em', width: '6px', height: '6px', borderRadius: '50%', background: '#94A3B8' }} />
-                  אם היו ללווה שלוש החזרות לחיוב בשנה האחרונה, הבקשה תועבר לאישור מיוחד.
-                </li>
-                <li
-                  className="text-sm leading-relaxed"
-                  style={{ fontFamily: 'SimplerPro', color: '#475569', paddingRight: '8px', position: 'relative' }}
-                >
-                  <span style={{ position: 'absolute', right: 0, top: '0.35em', width: '6px', height: '6px', borderRadius: '50%', background: '#94A3B8' }} />
-                  אם ללווה יש הלוואות פעילות מאותו תורם, והסכום הכולל לאחר ההלוואה החדשה עולה על: 160,000 ₪ (הלוואה רגילה) – 240,000 ₪ (הלוואה למטרת דירה) – הבקשה תועבר לאישור מיוחד.
-                </li>
-              </ul>
-            </aside>
+            )}
           </div>
-        </main>
+
+          {/* ── Info Panel (שמאל) ── */}
+          <aside
+            className="hidden lg:flex flex-col shrink-0 w-[280px] xl:w-[320px] py-8 px-6 overflow-y-auto"
+            style={{
+              background: '#F1F5F9',
+              borderRight: '1px solid #E5E9F9',
+            }}
+          >
+            <div className="flex flex-row items-center gap-2 mb-2">
+              <Settings size={18} style={{ color: '#6B7280', flexShrink: 0 }} />
+              <span
+                style={{
+                  fontFamily: 'SimplerPro',
+                  fontWeight: 700,
+                  fontSize: '16px',
+                  color: '#172554',
+                }}
+              >
+                תנאים לזכאות לווה
+              </span>
+            </div>
+            <span
+              className="mb-5"
+              style={{
+                fontFamily: 'SimplerPro',
+                fontSize: '13px',
+                color: '#6B7280',
+              }}
+            >
+              תנאים לזכאות לווה
+            </span>
+
+            <div className="flex flex-col gap-3">
+              <InfoCard>
+                אם נמצאו במערכת מספר תיקים אפשריים לאותו לווה, הבקשה תועבר לבדיקה לפני המשך התהליך.
+              </InfoCard>
+              <InfoCard>
+                אם היו ללווה שלוש החזרות לחיוב בשנה האחרונה, הבקשה תועבר לאישור מיוחד.
+              </InfoCard>
+              <InfoCard>
+                אם ללווה יש הלוואות פעילות מאותו תורם, והסכום הכולל לאחר ההלוואה החדשה עולה על: 160,000 ₪ (הלוואה רגילה) – 240,000 ₪ (הלוואה למטרת דירה) – הבקשה תועבר לאישור מיוחד.
+              </InfoCard>
+            </div>
+          </aside>
+        </div>
       </div>
 
       {/* ─── Footer ─── */}
       <footer
-        className="flex flex-row items-center justify-end gap-3 shrink-0 px-4 md:px-8 py-4"
+        className="flex flex-row items-center justify-between shrink-0 px-6 md:px-10 py-4"
         style={{
-          background: '#2C3E50',
-          borderTop: '1px solid #E8EDF2',
+          background: '#172554',
+          minHeight: '72px',
         }}
       >
-        <button
-          type="button"
-          onClick={handleContinue}
-          className="inline-flex items-center justify-center h-12 px-6 rounded-lg font-semibold transition-colors cursor-pointer border-0"
-          style={{
-            fontFamily: 'SimplerPro',
-            fontSize: '16px',
-            color: '#FFFFFF',
-            background: '#172554',
-          }}
-        >
-          המשך
-        </button>
+        {/* ימין (RTL) – יציאה ושמירה */}
         <button
           type="button"
           onClick={handleExitAndSave}
-          className="inline-flex items-center justify-center h-12 px-6 rounded-lg font-semibold transition-colors cursor-pointer border"
+          className="inline-flex items-center justify-center h-11 px-6 rounded-lg font-semibold cursor-pointer transition-opacity hover:opacity-80"
           style={{
             fontFamily: 'SimplerPro',
-            fontSize: '16px',
-            color: '#172554',
-            background: '#FFFFFF',
-            borderColor: '#172554',
+            fontSize: '15px',
+            color: '#FFFFFF',
+            background: 'transparent',
+            border: '1.5px solid rgba(255,255,255,0.4)',
           }}
         >
           יציאה ושמירה
+        </button>
+
+        {/* שמאל (RTL) – המשך */}
+        <button
+          type="button"
+          onClick={handleContinue}
+          className="inline-flex items-center justify-center h-11 px-8 rounded-lg font-semibold border-0 cursor-pointer transition-opacity hover:opacity-90"
+          style={{
+            fontFamily: 'SimplerPro',
+            fontSize: '15px',
+            color: '#172554',
+            background: '#FFFFFF',
+          }}
+        >
+          המשך
         </button>
       </footer>
     </div>
   );
 }
 
-function FormField({
+/* ─── Step 1: פרטי הלווה ─── */
+function Step1Form({
+  step1,
+  setStep1,
+}: {
+  step1: LoanWizardStep1Data;
+  setStep1: React.Dispatch<React.SetStateAction<LoanWizardStep1Data>>;
+}) {
+  return (
+    <>
+      <h2
+        style={{
+          fontFamily: 'SimplerPro',
+          fontWeight: 700,
+          fontSize: '22px',
+          color: '#172554',
+          lineHeight: 1.3,
+          textAlign: 'center',
+          marginBottom: 32,
+        }}
+      >
+        פרטי הלווה
+      </h2>
+
+      <div className="flex flex-col gap-5 max-w-[720px] mx-auto w-full">
+        {/* Row 1: שם מלא | ת.ז. | תאריך לידה */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <WizardInput
+            label="שם מלא"
+            value={step1.fullName}
+            onChange={(v) => setStep1((p) => ({ ...p, fullName: v }))}
+            placeholder="הזן שם מלא"
+          />
+          <WizardInput
+            label="ת.ז."
+            value={step1.idNumber}
+            onChange={(v) => setStep1((p) => ({ ...p, idNumber: v }))}
+            placeholder="מספר ת.ז."
+          />
+          <WizardInput
+            label="תאריך לידה"
+            type="date"
+            value={step1.birthDate}
+            onChange={(v) => setStep1((p) => ({ ...p, birthDate: v }))}
+          />
+        </div>
+
+        {/* Row 1.5: בחירת ילד/ה (שדה בודד) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <WizardSelect
+            label=""
+            value={step1.selectedChildId}
+            onChange={(v) => setStep1((p) => ({ ...p, selectedChildId: v }))}
+            options={CHILD_OPTIONS}
+          />
+        </div>
+
+        {/* Row 2: טלפון | אימייל | הקשר שלי ללווה */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <WizardInput
+            label="טלפון"
+            value={step1.phone}
+            onChange={(v) => setStep1((p) => ({ ...p, phone: v }))}
+            placeholder="מס׳ טלפון"
+          />
+          <WizardInput
+            label="אימייל"
+            type="email"
+            value={step1.email}
+            onChange={(v) => setStep1((p) => ({ ...p, email: v }))}
+            placeholder="דוא״ל"
+          />
+          <WizardSelect
+            label="הקשר שלי ללווה"
+            value={step1.relationship}
+            onChange={(v) => setStep1((p) => ({ ...p, relationship: v }))}
+            options={RELATIONSHIP_OPTIONS}
+          />
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ─── Form Field ─── */
+function WizardInput({
   label,
   value,
   onChange,
   placeholder,
   type = 'text',
-  dir,
-  withCalendarIcon,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   type?: 'text' | 'date' | 'email';
-  dir?: 'rtl' | 'ltr';
-  withCalendarIcon?: boolean;
 }) {
   return (
-    <div dir={dir ?? 'rtl'} className="w-full">
-      <label
+    <div className="w-full" dir="rtl">
+      {label && (
+        <label
+          className="block mb-2"
+          style={{
+            fontFamily: 'SimplerPro',
+            fontSize: '14px',
+            fontWeight: 400,
+            color: '#495157',
+            textAlign: 'right',
+          }}
+        >
+          {label}
+        </label>
+      )}
+      <Input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        dir="rtl"
+        className="w-full h-[42px] rounded-md border bg-white text-right px-3"
         style={{
-          display: 'block',
-          fontSize: 'var(--text-sm)',
-          fontWeight: 'var(--font-weight-normal)',
-          color: 'var(--muted-foreground)',
-          marginBottom: '8px',
-          textAlign: 'right',
+          fontFamily: 'SimplerPro',
+          fontSize: '14px',
+          color: '#141E44',
+          borderColor: '#D9DDEC',
         }}
-      >
-        {label}
-      </label>
-      <div className="relative flex items-center">
-        {withCalendarIcon && (
-          <span className="absolute right-3 pointer-events-none flex items-center" style={{ color: 'var(--muted-foreground)' }}>
-            <Calendar size={18} />
-          </span>
-        )}
-        <Input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          className="h-10 w-full text-right rounded-[6px] px-3.5 py-2 border-border bg-input-background text-foreground pr-10"
-          dir={dir}
-          style={dir === 'rtl' ? { direction: 'rtl', textAlign: 'right' } : undefined}
-        />
-      </div>
+      />
     </div>
   );
 }
 
-function SelectField({
+/* ─── Select Field ─── */
+function WizardSelect({
   label,
   value,
   onChange,
@@ -425,35 +447,79 @@ function SelectField({
   options: { value: string; label: string }[];
 }) {
   return (
-    <div dir="rtl" className="w-full">
-      <label
-        style={{
-          display: 'block',
-          fontSize: 'var(--text-sm)',
-          fontWeight: 'var(--font-weight-normal)',
-          color: 'var(--muted-foreground)',
-          marginBottom: '8px',
-          textAlign: 'right',
-        }}
-      >
-        {label}
-      </label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full h-10 rounded-[6px] px-3.5 py-2 border border-[var(--border)] bg-[var(--input-background)] text-foreground text-right cursor-pointer appearance-none pr-10"
+    <div className="w-full" dir="rtl">
+      {label && (
+        <label
+          className="block mb-2"
+          style={{
+            fontFamily: 'SimplerPro',
+            fontSize: '14px',
+            fontWeight: 400,
+            color: '#495157',
+            textAlign: 'right',
+          }}
+        >
+          {label}
+        </label>
+      )}
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          dir="rtl"
+          className="w-full h-[42px] rounded-md border bg-white text-right cursor-pointer appearance-none pr-3 pl-9"
+          style={{
+            fontFamily: 'SimplerPro',
+            fontSize: '14px',
+            color: value ? '#141E44' : '#9CA3AF',
+            borderColor: '#D9DDEC',
+          }}
+        >
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          size={18}
+          className="absolute pointer-events-none"
+          style={{
+            left: 12,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: '#9CA3AF',
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Info Card (sidebar) ─── */
+function InfoCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="rounded-lg px-4 py-3"
+      style={{
+        background: '#E8EDF2',
+        border: '1px solid #D9DDEC',
+      }}
+    >
+      <p
+        className="m-0 leading-relaxed"
         style={{
           fontFamily: 'SimplerPro',
-          fontSize: 'var(--text-sm)',
-          direction: 'rtl',
+          fontSize: '13px',
+          fontWeight: 400,
+          color: '#495157',
+          textAlign: 'right',
+          lineHeight: 1.6,
         }}
       >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        <span style={{ color: '#172554', fontWeight: 600 }}>• </span>
+        {children}
+      </p>
     </div>
   );
 }
