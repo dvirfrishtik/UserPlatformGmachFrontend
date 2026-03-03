@@ -1095,7 +1095,7 @@ function Step2Form({
           color: 'var(--primary)',
           lineHeight: 1.3,
           textAlign: 'right',
-          marginBottom: 40,
+          marginBottom: 24,
         }}
       >
         מטרת ההלוואה
@@ -1225,7 +1225,7 @@ function Step2Form({
                     />
                   ))}
                 </div>
-                <div className="flex justify-end mt-4" dir="rtl">
+                <div className="flex justify-start mt-4" dir="rtl">
                 <a
                   href="/donation-units?filter=unused"
                   className="inline-flex flex-row-reverse items-center justify-center gap-2 rounded-lg px-4 py-2.5 w-full sm:w-auto"
@@ -1249,7 +1249,7 @@ function Step2Form({
                   }}
                 >
                   <ExternalLink size={16} style={{ color: '#374151', flexShrink: 0 }} />
-                  <span>לצפייה בשאר יחידות התרומה שלך, אשר טרם ניתנו למימוש</span>
+                  <span>לצפייה בשאר יחידות התרומה שלך, אשר טרם ניתנות למימוש</span>
                 </a>
                 </div>
               </>
