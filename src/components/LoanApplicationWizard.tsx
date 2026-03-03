@@ -2153,44 +2153,47 @@ function Step5Form({
         </div>
       </div>
 
-      {/* החזר חודשי צפוי + כפתור פירוט – רקע לבן, מיושר לימין */}
+      {/* החזר חודשי צפוי + כפתור פירוט – רקע לבן; מימין: הטקסט, משמאל: הכפתור */}
       <div
         className="rounded-xl w-full flex flex-col gap-3"
         style={{
           background: '#FFFFFF',
           border: '1px solid #E2E8F0',
           padding: '20px',
-          textAlign: 'right',
         }}
       >
-        <div className="flex flex-row items-center gap-2" style={{ justifyContent: 'flex-end', direction: 'rtl' }}>
-          <span
+        <div
+          className="flex flex-row items-center gap-4"
+          style={{ direction: 'rtl', justifyContent: 'space-between', flexWrap: 'wrap' }}
+        >
+          <div className="flex flex-row items-center gap-2" style={{ direction: 'rtl' }}>
+            <span
+              style={{
+                fontFamily: 'var(--font-family-base)',
+                fontSize: 'var(--text-base)',
+                fontWeight: 600,
+                color: 'var(--foreground)',
+              }}
+            >
+              החזר חודשי צפוי: ~₪{monthlyPayment.toLocaleString('he-IL')}
+            </span>
+            <Info size={18} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} aria-hidden />
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowPaymentDetailTable((v) => !v)}
+            className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[rgba(0,0,0,0.04)] shrink-0"
             style={{
               fontFamily: 'var(--font-family-base)',
-              fontSize: 'var(--text-base)',
-              fontWeight: 600,
-              color: 'var(--foreground)',
+              color: 'var(--muted-foreground)',
+              background: '#F8FAFC',
+              borderColor: 'var(--border)',
             }}
           >
-            החזר חודשי צפוי: ~₪{monthlyPayment.toLocaleString('he-IL')}
-          </span>
-          <Info size={18} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} aria-hidden />
+            {showPaymentDetailTable ? 'צמצום תצוגה' : 'הצגת פירוט תשלומים צפוי'}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowPaymentDetailTable((v) => !v)}
-          className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[rgba(0,0,0,0.04)]"
-          style={{
-            fontFamily: 'var(--font-family-base)',
-            color: 'var(--muted-foreground)',
-            background: '#F8FAFC',
-            borderColor: 'var(--border)',
-            alignSelf: 'flex-start',
-          }}
-        >
-          {showPaymentDetailTable ? 'צמצום תצוגה' : 'הצגת פירוט תשלומים צפוי'}
-        </button>
-        {showPaymentDetailTable && totalLoanAmount > 0 && (
+        {showPaymentDetailTable && (
           <LoanRepaymentTable principal={totalLoanAmount} months={120} />
         )}
       </div>
