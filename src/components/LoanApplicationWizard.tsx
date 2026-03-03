@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { X, ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -29,10 +29,20 @@ const RELATIONSHIP_OPTIONS = [
   { value: 'other', label: 'אחר' },
 ];
 
-const CHILD_OPTIONS = [
-  { value: '', label: 'בחירת ילד/ה או קרוב/ה' },
-  { value: '1', label: 'ילד א' },
-  { value: '2', label: 'ילד ב' },
+/** ילדים + יחידות תרומה למימוש – תואם לנתוני דף יחידות תרומה */
+export interface ChildForLoan {
+  id: string;
+  name: string;
+  unitsCount: number;
+}
+
+const DEFAULT_CHILDREN_FOR_LOAN: ChildForLoan[] = [
+  { id: 'child1', name: 'שמחה', unitsCount: 4 },
+  { id: 'child2', name: 'דוד משה', unitsCount: 4 },
+  { id: 'child3', name: 'יוני שמעון', unitsCount: 3 },
+  { id: 'child4', name: 'חיים יעקב', unitsCount: 2 },
+  { id: 'child5', name: 'יניב אהרון', unitsCount: 8 },
+  { id: 'child6', name: 'מיכל שולמית', unitsCount: 4 },
 ];
 
 export interface LoanWizardStep1Data {
@@ -55,6 +65,8 @@ interface LoanApplicationWizardProps {
   isOpen: boolean;
   onClose: () => void;
   onExitAndSave?: () => void;
+  /** רשימת ילדים + יחידות למימוש (מתאימה לדף יחידות תרומה). אם לא מועבר – משתמשים ברשימה ברירת מחדל. */
+  childrenForLoan?: ChildForLoan[];
 }
 
 const emptyStep1: LoanWizardStep1Data = {
@@ -73,7 +85,7 @@ const emptyStep1: LoanWizardStep1Data = {
   spouseEmail: '',
 };
 
-export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanApplicationWizardProps) {
+export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, childrenForLoan = DEFAULT_CHILDREN_FOR_LOAN }: LoanApplicationWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [step1, setStep1] = useState<LoanWizardStep1Data>(emptyStep1);
@@ -223,7 +235,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
               </div>
 
               {currentStep === 1 && (
-                <Step1Form step1={step1} setStep1={setStep1} />
+                <Step1Form step1={step1} setStep1={setStep1} childrenForLoan={childrenForLoan} />
               )}
               {currentStep > 1 && (
                 <div
@@ -349,9 +361,11 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
 function Step1Form({
   step1,
   setStep1,
+  childrenForLoan,
 }: {
   step1: LoanWizardStep1Data;
   setStep1: React.Dispatch<React.SetStateAction<LoanWizardStep1Data>>;
+  childrenForLoan: ChildForLoan[];
 }) {
   return (
     <>
@@ -370,12 +384,15 @@ function Step1Form({
       </h2>
 
       <div className="flex flex-col gap-5 max-w-[720px] w-full">
-        {/* Row 1: שם מלא | ת.ז. | תאריך לידה */}
+        {/* Row 1: שם מלא (עם דרופדאון ילדים) | ת.ז. | תאריך לידה */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <WizardInput
+          <FullNameWithChildDropdown
             label="שם מלא"
             value={step1.fullName}
+            selectedChildId={step1.selectedChildId}
             onChange={(v) => setStep1((p) => ({ ...p, fullName: v }))}
+            onSelectChild={(id) => setStep1((p) => ({ ...p, selectedChildId: id }))}
+            childrenForLoan={childrenForLoan}
             placeholder="הזן שם מלא"
           />
           <WizardInput
@@ -389,16 +406,6 @@ function Step1Form({
             type="date"
             value={step1.birthDate}
             onChange={(v) => setStep1((p) => ({ ...p, birthDate: v }))}
-          />
-        </div>
-
-        {/* Row 1.5: בחירת ילד/ה (שדה בודד) */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <WizardSelect
-            label=""
-            value={step1.selectedChildId}
-            onChange={(v) => setStep1((p) => ({ ...p, selectedChildId: v }))}
-            options={CHILD_OPTIONS}
           />
         </div>
 
@@ -547,6 +554,114 @@ function Step1Form({
         )}
       </div>
     </>
+  );
+}
+
+/* ─── שם מלא + דרופדאון ילדים (בפוקוס) ─── */
+function FullNameWithChildDropdown({
+  label,
+  value,
+  selectedChildId,
+  onChange,
+  onSelectChild,
+  childrenForLoan,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  selectedChildId: string;
+  onChange: (v: string) => void;
+  onSelectChild: (id: string) => void;
+  childrenForLoan: ChildForLoan[];
+  placeholder?: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen]);
+
+  const handleFocus = () => setIsOpen(true);
+  const handleSelect = (child: ChildForLoan) => {
+    onChange(child.name);
+    onSelectChild(child.id);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="w-full relative" dir="rtl" ref={containerRef}>
+      {label && (
+        <label
+          className="block mb-2"
+          style={{
+            fontFamily: 'var(--font-family-base)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--font-weight-normal)',
+            color: 'var(--muted-foreground)',
+            textAlign: 'right',
+          }}
+        >
+          {label}
+        </label>
+      )}
+      <Input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={handleFocus}
+        placeholder={placeholder}
+        dir="rtl"
+        className="w-full h-9 rounded-md border border-border bg-input-background text-right px-3 text-sm"
+        style={{
+          fontFamily: 'var(--font-family-base)',
+          color: 'var(--foreground)',
+        }}
+      />
+      {isOpen && childrenForLoan.length > 0 && (
+        <div
+          className="absolute w-full z-50 rounded-lg border overflow-hidden"
+          style={{
+            top: '100%',
+            marginTop: 4,
+            background: 'var(--card)',
+            borderColor: 'var(--border)',
+            boxShadow: 'var(--elevation-sm)',
+          }}
+        >
+          <ul className="list-none m-0 p-1 max-h-[220px] overflow-y-auto">
+            {childrenForLoan.map((child) => (
+              <li key={child.id}>
+                <button
+                  type="button"
+                  onClick={() => handleSelect(child)}
+                  className="w-full text-right px-3 py-2.5 rounded-md cursor-pointer transition-colors hover:bg-[var(--muted)]/50"
+                  style={{
+                    fontFamily: 'var(--font-family-base)',
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--foreground)',
+                  }}
+                >
+                  <span style={{ fontWeight: 'var(--font-weight-medium)' }}>{child.name}</span>
+                  <span style={{ color: 'var(--muted-foreground)', marginRight: 6 }}>
+                    {' '}
+                    – {child.unitsCount} יחידות למימוש
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }
 
