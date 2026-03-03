@@ -3,12 +3,13 @@
 interface ActionsDropdownProps {
   onClose?: () => void;
   onPurchaseUnits?: () => void;
+  onShowLoanSchedule?: () => void;
 }
 
-export function ActionsDropdown({ onClose, onPurchaseUnits }: ActionsDropdownProps) {
+export function ActionsDropdown({ onClose, onPurchaseUnits, onShowLoanSchedule }: ActionsDropdownProps) {
   const actions = [
     { id: "1", label: "רכישת יחידות", onClick: () => onPurchaseUnits?.() },
-    { id: "2", label: 'הפקת ק"ח ייחודית', onClick: () => console.log('הפקת ק"ח ייחודית') },
+    { id: "2", label: 'הפקת ק"ח ייחודית', onClick: () => onShowLoanSchedule?.() },
     { id: "3", label: "לצפייה בהיסטוריית תשלום", onClick: () => console.log("לצפייה בהיסטוריית תשלום") },
     { id: "4", label: "לצפייה בתנועות עתידיות", onClick: () => console.log("לצפייה בתנועות עתידיות") },
   ];

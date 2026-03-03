@@ -11,7 +11,7 @@ export function AppSidebar() {
     { id: "overview", label: "תמונת מצב", icon: <IconOverview />, href: "#" },
     { id: "history", label: "לוח תנועות", icon: <IconHistory />, href: "#" },
     { id: "donation", label: "יחידות תרומה", icon: <IconDonation />, href: "/" },
-    { id: "loan-requests", label: "בקשות הלוואה", icon: <IconLoan />, hasNotification: true, href: "#" },
+    { id: "loan-requests", label: "בקשות הלוואה", icon: <IconLoan />, hasNotification: true, href: "/loan-requests" },
     { id: "loans", label: "הלוואות", icon: <IconLoan />, href: "#" },
     { id: "deposits", label: "פקדונות", icon: <IconSafeBox />, href: "#" },
     { id: "guarantees", label: "הערבויות שלי", icon: <IconShieldCheck />, href: "#" },
@@ -34,6 +34,7 @@ export function AppSidebar() {
   const getActiveItem = () => {
     if (pathname === "/account") return "account";
     if (pathname === "/kids") return "kids";
+    if (pathname === "/loan-requests") return "loan-requests";
     if (pathname === "/" || pathname === "/donation-units") return "donation";
     return "overview";
   };
