@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { X, ChevronDown, ChevronLeft, AlertTriangle, Info, Check, ExternalLink } from 'lucide-react';
+import { X, ChevronDown, ChevronLeft, AlertTriangle, Info, Check, ExternalLink, User, CheckCircle2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const MARITAL_OPTIONS = [
@@ -101,6 +101,60 @@ const emptyStep2: LoanWizardStep2Data = {
   selectedUnitIds: [],
 };
 
+export interface GuarantorData {
+  firstName: string;
+  lastName: string;
+  idNumber: string;
+  city: string;
+  street: string;
+  buildingNumber: string;
+  workplace: string;
+  role: string;
+  relationship: string;
+  phone: string;
+  email: string;
+  maritalStatus: string;
+  isSaved: boolean;
+}
+
+const MARITAL_STATUS_OPTIONS = [
+  { value: '', label: 'בחירה' },
+  { value: 'single', label: 'רווק' },
+  { value: 'married', label: 'נשוי' },
+  { value: 'divorced', label: 'גרוש' },
+  { value: 'widowed', label: 'אלמן' },
+];
+
+const CITY_OPTIONS = [
+  { value: '', label: 'בחירת עיר' },
+  { value: 'jerusalem', label: 'ירושלים' },
+  { value: 'tel-aviv', label: 'תל אביב' },
+  { value: 'haifa', label: 'חיפה' },
+  { value: 'beer-sheva', label: 'באר שבע' },
+  { value: 'bnei-brak', label: 'בני ברק' },
+  { value: 'other', label: 'אחר' },
+];
+
+const emptyGuarantor: GuarantorData = {
+  firstName: '',
+  lastName: '',
+  idNumber: '',
+  city: '',
+  street: '',
+  buildingNumber: '',
+  workplace: '',
+  role: '',
+  relationship: '',
+  phone: '',
+  email: '',
+  maritalStatus: '',
+  isSaved: false,
+};
+
+function createEmptyGuarantors(count: number): GuarantorData[] {
+  return Array.from({ length: count }, () => ({ ...emptyGuarantor }));
+}
+
 interface LoanApplicationWizardProps {
   isOpen: boolean;
   onClose: () => void;
@@ -130,6 +184,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [step1, setStep1] = useState<LoanWizardStep1Data>(emptyStep1);
   const [step2, setStep2] = useState<LoanWizardStep2Data>(emptyStep2);
+  const [guarantors, setGuarantors] = useState<GuarantorData[]>(() => createEmptyGuarantors(5));
 
   if (!isOpen) return null;
 
@@ -281,7 +336,10 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
               {currentStep === 2 && (
                 <Step2Form step2={step2} setStep2={setStep2} />
               )}
-              {currentStep > 2 && (
+              {currentStep === 3 && (
+                <Step3Form guarantors={guarantors} setGuarantors={setGuarantors} />
+              )}
+              {currentStep > 3 && (
                 <div
                   className="flex-1 flex items-center justify-center h-full"
                   style={{ color: '#9CA3AF', fontFamily: 'SimplerPro' }}
@@ -307,7 +365,8 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
               >
                 {currentStep === 1 && <Step1InfoPanelContent />}
                 {currentStep === 2 && <Step2InfoPanelContent />}
-                {currentStep > 2 && <Step1InfoPanelContent />}
+                {currentStep === 3 && <Step3InfoPanelContent />}
+                {currentStep > 3 && <Step1InfoPanelContent />}
               </div>
             </div>
           </div>
@@ -467,6 +526,161 @@ function OtherBorrowerApprovalPopup({
         </div>
 
         {/* פוטר כפתורים – ממורכזים */}
+        <div
+          className="flex flex-row-reverse justify-center gap-3 shrink-0"
+          style={{
+            padding: '20px 32px 24px',
+            borderTop: '1px solid #E5E9F9',
+          }}
+        >
+          <button
+            type="button"
+            onClick={onProceed}
+            className="px-6 py-3 rounded-lg font-semibold transition-colors hover:opacity-95"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: 'var(--text-sm)',
+              backgroundColor: 'var(--primary)',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer',
+              borderRadius: 'var(--radius-button)',
+            }}
+          >
+            הבנתי, ואני רוצה להמשיך
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-6 py-3 rounded-lg font-medium transition-colors border hover:bg-[rgba(0,0,0,0.02)]"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: 'var(--text-sm)',
+              backgroundColor: '#fff',
+              color: '#141E44',
+              borderColor: '#E5E9F9',
+              cursor: 'pointer',
+              borderRadius: 'var(--radius-button)',
+            }}
+          >
+            חזרה אחורה
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── פופאפ: מימוש יחידות תרומה שלא נועדו עבור הלווה ─── */
+function UnitNotForBorrowerPopup({
+  isOpen,
+  onClose,
+  onProceed,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onProceed: () => void;
+}) {
+  if (!isOpen) return null;
+  return (
+    <div
+      className="fixed inset-0 z-[110] flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0, 2, 4, 0.45)', backdropFilter: 'blur(6px)' }}
+      onClick={onClose}
+      dir="rtl"
+    >
+      <div
+        className="relative flex flex-col"
+        style={{
+          width: 'min(1100px, 92vw)',
+          height: 'min(900px, 90vh)',
+          background: 'linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)',
+          borderRadius: '12px',
+          border: '1px solid #E5E9F9',
+          boxShadow: '0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)',
+          overflow: 'hidden',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className="flex items-center justify-between shrink-0"
+          style={{
+            padding: '20px 32px',
+            borderBottom: '1px solid #E5E9F9',
+          }}
+        >
+          <div style={{ width: '36px' }} />
+          <h2
+            style={{
+              fontSize: '20px',
+              fontWeight: 'var(--font-weight-bold)',
+              color: '#141E44',
+              lineHeight: '1.3',
+              textAlign: 'center',
+            }}
+          >
+            מימוש יחידות תרומה שלא נועדו עבור הלווה
+          </h2>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors hover:bg-[rgba(0,0,0,0.04)]"
+            style={{ border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }}
+            aria-label="סגור"
+          >
+            <X size={20} style={{ color: '#495157' }} />
+          </button>
+        </div>
+
+        <div
+          className="flex-1 flex flex-col items-center justify-center overflow-y-auto"
+          style={{ padding: '32px 40px' }}
+        >
+          <div className="flex flex-col items-center text-center max-w-[560px]">
+            <div
+              className="flex items-center justify-center w-16 h-16 rounded-full shrink-0 mb-6"
+              style={{ background: 'rgba(23, 37, 84, 0.08)' }}
+            >
+              <AlertTriangle size={32} style={{ color: 'var(--primary)' }} strokeWidth={2} />
+            </div>
+            <h3
+              className="mb-4 text-right w-full"
+              style={{
+                fontFamily: 'var(--font-family-base)',
+                fontSize: 'var(--text-2xl)',
+                fontWeight: 'var(--font-weight-bold)',
+                color: '#141E44',
+                lineHeight: 1.35,
+              }}
+            >
+              מימוש יחידות תרומה שלא נועדו עבור הלווה
+              <br />
+              דורשות אישור מיוחד
+            </h3>
+            <p
+              className="mb-3 text-right w-full"
+              style={{
+                fontFamily: 'var(--font-family-base)',
+                fontSize: 'var(--text-base)',
+                color: '#495157',
+                lineHeight: 1.6,
+              }}
+            >
+              בקשת הלוואה מכוח תרומת יחידה שלא נועדה עבור הלווה המבוקש מחייבת בדיקה ואישור מיוחד של הגמ"ח.
+            </p>
+            <p
+              className="mb-8 text-right w-full"
+              style={{
+                fontFamily: 'var(--font-family-base)',
+                fontSize: 'var(--text-base)',
+                color: '#495157',
+                lineHeight: 1.6,
+              }}
+            >
+              המשך התהליך תלוי באישור הגמ"ח ועשוי להאריך משמעותית את זמן הטיפול בבקשה.
+            </p>
+          </div>
+        </div>
+
         <div
           className="flex flex-row-reverse justify-center gap-3 shrink-0"
           style={{
@@ -1065,6 +1279,8 @@ function Step2Form({
   borrowerName?: string;
 }) {
   const [showAdditional, setShowAdditional] = useState(false);
+  const [showUnitNotForBorrowerPopup, setShowUnitNotForBorrowerPopup] = useState(false);
+  const [pendingAdditionalUnitId, setPendingAdditionalUnitId] = useState<string | null>(null);
 
   const borrowerUnits = donationUnits.filter((u) => u.group === 'borrower');
   const additionalUnits = donationUnits.filter((u) => u.group === 'additional');
@@ -1084,8 +1300,38 @@ function Step2Form({
     .reduce((sum, u) => sum + u.loanEntitlement, 0);
   const monthlyPayment = totalSelected > 0 ? Math.round(totalLoanAmount / 120) : 0;
 
+  const handleAdditionalUnitClick = (unit: DonationUnit) => {
+    if (step2.selectedUnitIds.includes(unit.id)) {
+      toggleUnit(unit.id);
+    } else {
+      setPendingAdditionalUnitId(unit.id);
+      setShowUnitNotForBorrowerPopup(true);
+    }
+  };
+
+  const handleUnitNotForBorrowerProceed = () => {
+    if (pendingAdditionalUnitId) {
+      setStep2((p) => ({
+        ...p,
+        selectedUnitIds: p.selectedUnitIds.includes(pendingAdditionalUnitId)
+          ? p.selectedUnitIds
+          : [...p.selectedUnitIds, pendingAdditionalUnitId],
+      }));
+      setPendingAdditionalUnitId(null);
+    }
+    setShowUnitNotForBorrowerPopup(false);
+  };
+
   return (
     <>
+      <UnitNotForBorrowerPopup
+        isOpen={showUnitNotForBorrowerPopup}
+        onClose={() => {
+          setShowUnitNotForBorrowerPopup(false);
+          setPendingAdditionalUnitId(null);
+        }}
+        onProceed={handleUnitNotForBorrowerProceed}
+      />
       {/* ─── מטרת ההלוואה ─── */}
       <h2
         style={{
@@ -1221,7 +1467,7 @@ function Step2Form({
                       key={unit.id}
                       unit={unit}
                       selected={step2.selectedUnitIds.includes(unit.id)}
-                      onToggle={() => toggleUnit(unit.id)}
+                      onToggle={() => handleAdditionalUnitClick(unit)}
                     />
                   ))}
                 </div>
@@ -1377,6 +1623,232 @@ function UnitCard({
         </div>
       </div>
     </button>
+  );
+}
+
+/* ─── Info Panel תוכן – שלב 3 ─── */
+function Step3InfoPanelContent() {
+  return (
+    <>
+      <div
+        className="flex flex-row items-center gap-2 px-5 py-3 shrink-0"
+        style={{ borderBottom: '1px solid #E5E9F9' }}
+      >
+        <Image src="/icons/lamp.svg" alt="" width={20} height={20} unoptimized className="shrink-0" />
+        <span style={{ fontFamily: 'SimplerPro', fontWeight: 700, fontSize: '15px', color: '#172554' }}>
+          מידע נוסף על ערבים
+        </span>
+      </div>
+      <div className="px-5 py-4 flex-1 overflow-y-auto min-h-0" style={{ background: '#F8FAFC' }}>
+        <p className="mb-3" style={{ fontFamily: 'SimplerPro', fontSize: '12px', color: 'var(--muted-foreground)', margin: 0, marginBottom: 12 }}>
+          כמות ערבים נדרשים
+        </p>
+        <div className="flex flex-col gap-2.5">
+          <InfoCard>
+            לכל סכום הלוואה נדרשת כמות ערבים מסויימת. עבור הסכום המבוקש (₪240,000) נדרשים לפחות 5 ערבים.
+          </InfoCard>
+          <InfoCard>
+            הוספת ערבים נוספים, מעבר לנדרש, עשויה לסייע בקידום הבקשה במקרה שאחד הערבים לא יאושר.
+          </InfoCard>
+        </div>
+        <p className="mt-5 mb-3" style={{ fontFamily: 'SimplerPro', fontSize: '12px', color: 'var(--muted-foreground)', margin: 0, marginTop: 16, marginBottom: 12 }}>
+          תנאים לקבלת ערב
+        </p>
+        <div className="flex flex-col gap-2.5">
+          <InfoCard>
+            ערב לא יכול להיות ערב לאותו לווה על הלוואה מצטברת בסכום כולל של יותר מ-80,000 ₪ (חישוב נעשה לפי סכום ההלוואות כולל בקשות שנמצאות בתהליך).
+          </InfoCard>
+          <InfoCard>
+            ערב לא יכול להיות ערב לאותו תורם בסכום כולל העולה על ₪480,000 (חישוב נעשה לפי יתרת ההלוואות, כולל בקשות שנמצאות בתהליך).
+          </InfoCard>
+          <InfoCard>
+            למפעת מנויים מהערבים לא יכולים להיות חובות על ערבויות, בתנאי כולל של מעל ₪640,000 ₪ ביתרת הלוואות מפעילות.
+          </InfoCard>
+          <InfoCard>
+            ערבויות מקבלים רק אם אינם חתומים על יותר מ-12 ערבויות שטרם שהרו בהן האחרונות.
+          </InfoCard>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ─── Step 3: הגדרת ערבים ─── */
+function Step3Form({
+  guarantors,
+  setGuarantors,
+}: {
+  guarantors: GuarantorData[];
+  setGuarantors: React.Dispatch<React.SetStateAction<GuarantorData[]>>;
+}) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const requiredCount = 5;
+
+  const updateGuarantor = (index: number, field: keyof GuarantorData, value: string | boolean) => {
+    setGuarantors((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  };
+
+  const handleSave = (index: number) => {
+    updateGuarantor(index, 'isSaved', true);
+    setOpenIndex(null);
+  };
+
+  const handleSaveAndNext = (index: number) => {
+    updateGuarantor(index, 'isSaved', true);
+    if (index < guarantors.length - 1) {
+      setOpenIndex(index + 1);
+    } else {
+      setOpenIndex(null);
+    }
+  };
+
+  const getDisplayName = (g: GuarantorData) => {
+    const name = [g.firstName, g.lastName].filter(Boolean).join(' ');
+    return name || '';
+  };
+
+  return (
+    <>
+      <h2
+        style={{
+          fontFamily: 'var(--font-family-base)',
+          fontWeight: 'var(--font-weight-bold)',
+          fontSize: 'var(--text-xl)',
+          color: 'var(--primary)',
+          lineHeight: 1.3,
+          textAlign: 'right',
+          marginBottom: 24,
+        }}
+      >
+        הגדרת ערבים
+      </h2>
+
+      <div className="flex flex-col gap-3 max-w-[720px] w-full">
+        {guarantors.map((g, i) => {
+          const isOpen = openIndex === i;
+          const displayName = getDisplayName(g);
+
+          return (
+            <div
+              key={i}
+              className="rounded-xl overflow-hidden transition-all"
+              style={{
+                border: isOpen ? '2px solid var(--primary)' : '1.5px solid #E5E9F9',
+                background: isOpen ? '#FFFFFF' : g.isSaved ? '#FFFFFF' : '#F3F4F6',
+              }}
+              dir="rtl"
+            >
+              {/* Header */}
+              <button
+                type="button"
+                onClick={() => setOpenIndex(isOpen ? null : i)}
+                className="flex flex-row items-center justify-between w-full px-5 py-3.5 cursor-pointer transition-colors hover:bg-[rgba(0,0,0,0.02)]"
+                style={{ background: 'transparent', border: 'none' }}
+              >
+                <div className="flex flex-row items-center gap-3">
+                  {g.isSaved && displayName ? (
+                    <CheckCircle2 size={20} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                  ) : (
+                    <User size={18} style={{ color: '#9CA3AF', flexShrink: 0 }} />
+                  )}
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-family-base)',
+                      fontSize: 'var(--text-base)',
+                      fontWeight: g.isSaved ? 600 : 400,
+                      color: g.isSaved ? '#172554' : '#6B7280',
+                    }}
+                  >
+                    {g.isSaved && displayName ? displayName : `ערב ${i + 1}#`}
+                  </span>
+                </div>
+                <div className="flex flex-row items-center gap-2">
+                  <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '13px', color: '#9CA3AF' }}>
+                    {i + 1}.
+                  </span>
+                  <ChevronDown
+                    size={18}
+                    style={{
+                      color: '#9CA3AF',
+                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0)',
+                      transition: 'transform 0.2s',
+                    }}
+                  />
+                </div>
+              </button>
+
+              {/* Form content */}
+              {isOpen && (
+                <div className="px-5 pb-5 pt-2 border-t" style={{ borderColor: '#E5E9F9' }}>
+                  <div className="flex flex-col gap-4">
+                    {/* Row 1: שם פרטי, שם משפחה, ת.ז. */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <WizardInput label="שם פרטי" value={g.firstName} onChange={(v) => updateGuarantor(i, 'firstName', v)} placeholder="שם פרטי" />
+                      <WizardInput label="שם משפחה" value={g.lastName} onChange={(v) => updateGuarantor(i, 'lastName', v)} placeholder="שם משפחה" />
+                      <WizardInput label="ת.ז." value={g.idNumber} onChange={(v) => updateGuarantor(i, 'idNumber', v)} placeholder="מספר ת.ז." />
+                    </div>
+                    {/* Row 2: עיר, רחוב, מספר בניין */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <WizardSelect label="עיר" value={g.city} onChange={(v) => updateGuarantor(i, 'city', v)} options={CITY_OPTIONS} />
+                      <WizardInput label="רחוב" value={g.street} onChange={(v) => updateGuarantor(i, 'street', v)} placeholder="שם רחוב" />
+                      <WizardInput label="מספר בניין" value={g.buildingNumber} onChange={(v) => updateGuarantor(i, 'buildingNumber', v)} placeholder="מספר" />
+                    </div>
+                    {/* Row 3: מקום עבודה, תפקיד, קשר ללווה */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <WizardInput label="מקום עבודה" value={g.workplace} onChange={(v) => updateGuarantor(i, 'workplace', v)} placeholder="מקום עבודה" />
+                      <WizardInput label="תפקיד" value={g.role} onChange={(v) => updateGuarantor(i, 'role', v)} placeholder="תפקיד" />
+                      <WizardSelect label="קשר ללווה" value={g.relationship} onChange={(v) => updateGuarantor(i, 'relationship', v)} options={RELATIONSHIP_OPTIONS} />
+                    </div>
+                    {/* Row 4: טלפון, אימייל, מצב אישי */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <WizardInput label="טלפון" value={g.phone} onChange={(v) => updateGuarantor(i, 'phone', v)} placeholder="מס׳ טלפון" />
+                      <WizardInput label="אימייל" type="email" value={g.email} onChange={(v) => updateGuarantor(i, 'email', v)} placeholder="דוא״ל" />
+                      <WizardSelect label="מצב אישי" value={g.maritalStatus} onChange={(v) => updateGuarantor(i, 'maritalStatus', v)} options={MARITAL_STATUS_OPTIONS} />
+                    </div>
+                  </div>
+                  {/* Buttons */}
+                  <div className="flex flex-row items-center gap-3 mt-6" dir="rtl">
+                    {i < guarantors.length - 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleSaveAndNext(i)}
+                        className="inline-flex items-center justify-center h-10 px-5 rounded-lg font-semibold border-0 cursor-pointer transition-opacity hover:opacity-90"
+                        style={{
+                          fontFamily: 'var(--font-family-base)',
+                          fontSize: 'var(--text-sm)',
+                          color: '#fff',
+                          background: 'var(--primary)',
+                        }}
+                      >
+                        שמירה והמשך לערב הבא
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleSave(i)}
+                      className="inline-flex items-center justify-center h-10 px-5 rounded-lg font-medium cursor-pointer transition-colors border hover:bg-[rgba(0,0,0,0.02)]"
+                      style={{
+                        fontFamily: 'var(--font-family-base)',
+                        fontSize: 'var(--text-sm)',
+                        color: '#141E44',
+                        background: '#fff',
+                        borderColor: '#E5E9F9',
+                      }}
+                    >
+                      שמירה
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
 
