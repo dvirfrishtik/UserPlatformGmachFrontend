@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { X, ChevronDown, AlertTriangle } from 'lucide-react';
+import { X, ChevronDown, AlertTriangle, Home, Heart, Building2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const MARITAL_OPTIONS = [
@@ -61,6 +61,20 @@ export interface LoanWizardStep1Data {
   spouseEmail: string;
 }
 
+export interface LoanWizardStep2Data {
+  loanPurpose: 'wedding' | 'apartment' | 'other' | '';
+}
+
+const LOAN_PURPOSE_OPTIONS = [
+  { value: 'wedding' as const, label: 'חתונה', Icon: Heart },
+  { value: 'apartment' as const, label: 'רכישת דירה', Icon: Home },
+  { value: 'other' as const, label: 'אחר', Icon: Building2 },
+];
+
+const emptyStep2: LoanWizardStep2Data = {
+  loanPurpose: '',
+};
+
 interface LoanApplicationWizardProps {
   isOpen: boolean;
   onClose: () => void;
@@ -89,6 +103,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [step1, setStep1] = useState<LoanWizardStep1Data>(emptyStep1);
+  const [step2, setStep2] = useState<LoanWizardStep2Data>(emptyStep2);
 
   if (!isOpen) return null;
 
@@ -237,7 +252,10 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
               {currentStep === 1 && (
                 <Step1Form step1={step1} setStep1={setStep1} childrenForLoan={childrenForLoan} />
               )}
-              {currentStep > 1 && (
+              {currentStep === 2 && (
+                <Step2Form step2={step2} setStep2={setStep2} />
+              )}
+              {currentStep > 2 && (
                 <div
                   className="flex-1 flex items-center justify-center h-full"
                   style={{ color: '#9CA3AF', fontFamily: 'SimplerPro' }}
@@ -247,7 +265,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
               )}
             </div>
 
-            {/* ── Info Panel – קופסה צפה דבוקה לשמאל, לאורך כל הגובה (margin זהה למעלה ולמטה) ── */}
+            {/* ── Info Panel – קופסה צפה דבוקה לשמאל, לאורך כל הגובה ── */}
             <div
               className="hidden lg:block absolute top-8 bottom-8"
               style={{ left: 24 }}
@@ -261,54 +279,9 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
                   boxShadow: '0 4px 24px rgba(14, 78, 134, 0.08)',
                 }}
               >
-                {/* כותרת הקופסה */}
-                <div
-                  className="flex flex-row items-center gap-2 px-5 py-3 shrink-0"
-                  style={{
-                    borderBottom: '1px solid #E5E9F9',
-                  }}
-                >
-                  <Image src="/icons/lamp.svg" alt="" width={20} height={20} unoptimized className="shrink-0" />
-                  <span
-                    style={{
-                      fontFamily: 'SimplerPro',
-                      fontWeight: 700,
-                      fontSize: '15px',
-                      color: '#172554',
-                    }}
-                  >
-                    תנאים לזכאות לווה
-                  </span>
-                </div>
-                {/* תוכן – גלילה אם צריך */}
-                <div
-                  className="px-5 py-4 flex-1 overflow-y-auto min-h-0"
-                  style={{ background: '#F8FAFC' }}
-                >
-                  <p
-                    className="mb-3"
-                    style={{
-                      fontFamily: 'SimplerPro',
-                      fontSize: '12px',
-                      color: 'var(--muted-foreground)',
-                      margin: 0,
-                      marginBottom: 12,
-                    }}
-                  >
-                    תנאים לזכאות לווה
-                  </p>
-                  <div className="flex flex-col gap-2.5">
-                    <InfoCard>
-                      אם נמצאו במערכת מספר תיקים אפשריים לאותו לווה, הבקשה תועבר לבדיקה לפני המשך התהליך.
-                    </InfoCard>
-                    <InfoCard>
-                      אם היו ללווה שלוש החזרות לחיוב בשנה האחרונה, הבקשה תועבר לאישור מיוחד.
-                    </InfoCard>
-                    <InfoCard>
-                      אם ללווה יש הלוואות פעילות מאותו תורם, והסכום הכולל לאחר ההלוואה החדשה עולה על: 160,000 ₪ (הלוואה רגילה) – 240,000 ₪ (הלוואה למטרת דירה) – הבקשה תועבר לאישור מיוחד.
-                    </InfoCard>
-                  </div>
-                </div>
+                {currentStep === 1 && <Step1InfoPanelContent />}
+                {currentStep === 2 && <Step2InfoPanelContent />}
+                {currentStep > 2 && <Step1InfoPanelContent />}
               </div>
             </div>
           </div>
@@ -967,6 +940,166 @@ function WizardSelect({
 }
 
 /* ─── Info Card (sidebar) ─── */
+/* ─── Info Panel תוכן – שלב 1 ─── */
+function Step1InfoPanelContent() {
+  return (
+    <>
+      <div
+        className="flex flex-row items-center gap-2 px-5 py-3 shrink-0"
+        style={{ borderBottom: '1px solid #E5E9F9' }}
+      >
+        <Image src="/icons/lamp.svg" alt="" width={20} height={20} unoptimized className="shrink-0" />
+        <span style={{ fontFamily: 'SimplerPro', fontWeight: 700, fontSize: '15px', color: '#172554' }}>
+          תנאים לזכאות לווה
+        </span>
+      </div>
+      <div className="px-5 py-4 flex-1 overflow-y-auto min-h-0" style={{ background: '#F8FAFC' }}>
+        <p
+          className="mb-3"
+          style={{ fontFamily: 'SimplerPro', fontSize: '12px', color: 'var(--muted-foreground)', margin: 0, marginBottom: 12 }}
+        >
+          תנאים לזכאות לווה
+        </p>
+        <div className="flex flex-col gap-2.5">
+          <InfoCard>
+            אם נמצאו במערכת מספר תיקים אפשריים לאותו לווה, הבקשה תועבר לבדיקה לפני המשך התהליך.
+          </InfoCard>
+          <InfoCard>
+            אם היו ללווה שלוש החזרות לחיוב בשנה האחרונה, הבקשה תועבר לאישור מיוחד.
+          </InfoCard>
+          <InfoCard>
+            אם ללווה יש הלוואות פעילות מאותו תורם, והסכום הכולל לאחר ההלוואה החדשה עולה על: 160,000 ₪ (הלוואה רגילה) – 240,000 ₪ (הלוואה למטרת דירה) – הבקשה תועבר לאישור מיוחד.
+          </InfoCard>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ─── Info Panel תוכן – שלב 2 ─── */
+function Step2InfoPanelContent() {
+  return (
+    <>
+      <div
+        className="flex flex-row items-center gap-2 px-5 py-3 shrink-0"
+        style={{ borderBottom: '1px solid #E5E9F9' }}
+      >
+        <Image src="/icons/lamp.svg" alt="" width={20} height={20} unoptimized className="shrink-0" />
+        <span style={{ fontFamily: 'SimplerPro', fontWeight: 700, fontSize: '15px', color: '#172554' }}>
+          פירוט תנאי ההלוואה
+        </span>
+      </div>
+      <div className="px-5 py-4 flex-1 overflow-y-auto min-h-0" style={{ background: '#F8FAFC' }}>
+        <p
+          className="mb-3"
+          style={{ fontFamily: 'SimplerPro', fontSize: '12px', color: 'var(--muted-foreground)', margin: 0, marginBottom: 12 }}
+        >
+          בקשת ההלוואה
+        </p>
+        <div className="flex flex-col gap-2.5">
+          <InfoCard>
+            ההלוואה ניתנת אך ורק לילדיו של התורם (או לאדם אחר שיאושר ע״י הגמ״ח ע״פ בקשת התורם), אלא בשום אופן לא להורים עצמם.
+          </InfoCard>
+          <InfoCard>
+            הגמ״ח מתכוון לתת את ההלוואה אך אינו מתחייב על כך ע״פ חוקי המדינה כמפורט בפרוספקט והצטרפות.
+          </InfoCard>
+          <InfoCard>
+            ניתן להעביר את זכות ההלוואה מאת בגיר לאחר (בתנאי הלא ניצול את הסכסומות ההלוואות ללווה אחר), אך לא לזוכר.
+          </InfoCard>
+        </div>
+        <p
+          className="mt-5 mb-3"
+          style={{ fontFamily: 'SimplerPro', fontSize: '12px', color: 'var(--muted-foreground)', margin: 0, marginTop: 16, marginBottom: 12 }}
+        >
+          הערות
+        </p>
+        <div className="flex flex-col gap-2.5">
+          <InfoCard>
+            הגמ״ח מתכוון לתת מענק בניכוי ההלוואה, אך יידעו כי המענק אינו מובטח לכל אירוע, אלא הוסכם אנ״ש נתן לראיים לכל, ואין ההתרמה על כדי כמפורט בפרוספקט והצטרפות.
+          </InfoCard>
+          <InfoCard>
+            זכות בקשת ההלוואה היא של התורם, והתורם לבקש עבור עצמו או עבור הלווה.
+          </InfoCard>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ─── Step 2: מטרת ההלוואה ─── */
+function Step2Form({
+  step2,
+  setStep2,
+}: {
+  step2: LoanWizardStep2Data;
+  setStep2: React.Dispatch<React.SetStateAction<LoanWizardStep2Data>>;
+}) {
+  return (
+    <>
+      <h2
+        style={{
+          fontFamily: 'var(--font-family-base)',
+          fontWeight: 'var(--font-weight-bold)',
+          fontSize: 'var(--text-xl)',
+          color: 'var(--primary)',
+          lineHeight: 1.3,
+          textAlign: 'right',
+          marginBottom: 40,
+        }}
+      >
+        מטרת ההלוואה
+      </h2>
+
+      <div className="flex flex-col gap-5 max-w-[720px] w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {LOAN_PURPOSE_OPTIONS.map((opt) => {
+            const selected = step2.loanPurpose === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setStep2((p) => ({ ...p, loanPurpose: opt.value }))}
+                className="flex flex-col items-center justify-center gap-3 rounded-xl cursor-pointer transition-all"
+                style={{
+                  height: '160px',
+                  background: selected ? '#F8FAFC' : '#FAFAFA',
+                  border: selected ? '2px solid var(--primary)' : '1.5px solid #E5E9F9',
+                  boxShadow: selected
+                    ? '0 0 0 3px rgba(23, 37, 84, 0.08)'
+                    : '0 1px 3px rgba(0,0,0,0.04)',
+                }}
+              >
+                <div
+                  className="flex items-center justify-center w-12 h-12 rounded-full"
+                  style={{
+                    background: selected ? 'rgba(23, 37, 84, 0.08)' : 'rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <opt.Icon
+                    size={24}
+                    style={{ color: selected ? '#172554' : '#9CA3AF' }}
+                    strokeWidth={1.8}
+                  />
+                </div>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-family-base)',
+                    fontSize: 'var(--text-base)',
+                    fontWeight: selected ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
+                    color: selected ? '#172554' : '#6B7280',
+                  }}
+                >
+                  {opt.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+}
+
 function InfoCard({ children }: { children: React.ReactNode }) {
   return (
     <div
