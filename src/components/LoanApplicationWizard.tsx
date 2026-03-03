@@ -116,9 +116,9 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
         </button>
       </header>
 
-      {/* ─── Body: sidebar + content + info panel ─── */}
+      {/* ─── Body: sidebar נמשך עד למטה, תוכן + פוטר לצידו ─── */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
-        {/* ── Wizard Sidebar (ימין) – כחול כהה ── */}
+        {/* ── Wizard Sidebar – כחול כהה, full height ── */}
         <aside
           className="hidden md:flex flex-col shrink-0 py-10 px-8"
           style={{
@@ -137,7 +137,6 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
 
               return (
                 <div key={step.id} className="flex flex-col">
-                  {/* Step row: מספר בימין, טקסט אחריו */}
                   <div className="flex flex-row items-center gap-3">
                     <button
                       type="button"
@@ -169,7 +168,6 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
                       {step.label}
                     </span>
                   </div>
-                  {/* קו מחבר בין המספרים */}
                   {!isLast && (
                     <div
                       style={{
@@ -187,120 +185,120 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave }: LoanAp
           </div>
         </aside>
 
-        {/* ── Main Area ── */}
-        <div className="flex-1 flex min-w-0 overflow-hidden">
-          {/* Center – Form */}
-          <div className="flex-1 min-w-0 overflow-y-auto py-8 px-6 md:px-12 lg:px-16">
-            {/* Mobile step indicator */}
-            <div className="md:hidden flex flex-row items-center gap-2 mb-5" style={{ justifyContent: 'flex-end' }}>
-              <span style={{ fontFamily: 'SimplerPro', fontSize: '12px', color: '#9CA3AF' }}>
-                שלב {currentStep} מתוך 5
-              </span>
-              <span style={{ fontFamily: 'SimplerPro', fontWeight: 600, fontSize: '14px', color: '#172554' }}>
-                {WIZARD_STEPS[currentStep - 1]?.label}
-              </span>
+        {/* ── Right side: content area + info panel + footer stacked ── */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          <div className="flex-1 flex min-w-0 min-h-0 overflow-hidden">
+            {/* Center – Form */}
+            <div className="flex-1 min-w-0 overflow-y-auto py-8 px-6 md:px-12 lg:px-16">
+              {/* Mobile step indicator */}
+              <div className="md:hidden flex flex-row items-center gap-2 mb-5" style={{ justifyContent: 'flex-end' }}>
+                <span style={{ fontFamily: 'SimplerPro', fontSize: '12px', color: '#9CA3AF' }}>
+                  שלב {currentStep} מתוך 5
+                </span>
+                <span style={{ fontFamily: 'SimplerPro', fontWeight: 600, fontSize: '14px', color: '#172554' }}>
+                  {WIZARD_STEPS[currentStep - 1]?.label}
+                </span>
+              </div>
+
+              {currentStep === 1 && (
+                <Step1Form step1={step1} setStep1={setStep1} />
+              )}
+              {currentStep > 1 && (
+                <div
+                  className="flex-1 flex items-center justify-center h-full"
+                  style={{ color: '#9CA3AF', fontFamily: 'SimplerPro' }}
+                >
+                  שלב {currentStep} – בהמשך יוטמע
+                </div>
+              )}
             </div>
 
-            {currentStep === 1 && (
-              <Step1Form step1={step1} setStep1={setStep1} />
-            )}
-            {currentStep > 1 && (
-              <div
-                className="flex-1 flex items-center justify-center h-full"
-                style={{ color: '#9CA3AF', fontFamily: 'SimplerPro' }}
-              >
-                שלב {currentStep} – בהמשך יוטמע
+            {/* ── Info Panel (שמאל) ── */}
+            <aside
+              className="hidden lg:flex flex-col shrink-0 w-[280px] xl:w-[320px] py-8 px-6 overflow-y-auto"
+              style={{
+                background: '#F1F5F9',
+                borderRight: '1px solid #E5E9F9',
+              }}
+            >
+              <div className="flex flex-row items-center gap-2 mb-2">
+                <Settings size={18} style={{ color: '#6B7280', flexShrink: 0 }} />
+                <span
+                  style={{
+                    fontFamily: 'SimplerPro',
+                    fontWeight: 700,
+                    fontSize: '16px',
+                    color: '#172554',
+                  }}
+                >
+                  תנאים לזכאות לווה
+                </span>
               </div>
-            )}
-          </div>
-
-          {/* ── Info Panel (שמאל) ── */}
-          <aside
-            className="hidden lg:flex flex-col shrink-0 w-[280px] xl:w-[320px] py-8 px-6 overflow-y-auto"
-            style={{
-              background: '#F1F5F9',
-              borderRight: '1px solid #E5E9F9',
-            }}
-          >
-            <div className="flex flex-row items-center gap-2 mb-2">
-              <Settings size={18} style={{ color: '#6B7280', flexShrink: 0 }} />
               <span
+                className="mb-5"
                 style={{
                   fontFamily: 'SimplerPro',
-                  fontWeight: 700,
-                  fontSize: '16px',
-                  color: '#172554',
+                  fontSize: 'var(--text-xs)',
+                  color: 'var(--muted-foreground)',
                 }}
               >
                 תנאים לזכאות לווה
               </span>
-            </div>
-            <span
-              className="mb-5"
+
+              <div className="flex flex-col gap-3">
+                <InfoCard>
+                  אם נמצאו במערכת מספר תיקים אפשריים לאותו לווה, הבקשה תועבר לבדיקה לפני המשך התהליך.
+                </InfoCard>
+                <InfoCard>
+                  אם היו ללווה שלוש החזרות לחיוב בשנה האחרונה, הבקשה תועבר לאישור מיוחד.
+                </InfoCard>
+                <InfoCard>
+                  אם ללווה יש הלוואות פעילות מאותו תורם, והסכום הכולל לאחר ההלוואה החדשה עולה על: 160,000 ₪ (הלוואה רגילה) – 240,000 ₪ (הלוואה למטרת דירה) – הבקשה תועבר לאישור מיוחד.
+                </InfoCard>
+              </div>
+            </aside>
+          </div>
+
+          {/* ─── Footer – בתוך אזור התוכן, לא חוצה את ה-sidebar ─── */}
+          <footer
+            className="flex flex-row items-center justify-between shrink-0 px-6 md:px-10 py-4"
+            style={{
+              background: 'var(--card)',
+              borderTop: '1px solid var(--border)',
+              minHeight: '72px',
+            }}
+          >
+            <button
+              type="button"
+              onClick={handleExitAndSave}
+              className="inline-flex items-center justify-center h-11 px-6 rounded-lg font-semibold cursor-pointer transition-all hover:bg-[rgba(0,0,0,0.03)]"
               style={{
                 fontFamily: 'SimplerPro',
-                fontSize: '13px',
-                color: '#6B7280',
+                fontSize: 'var(--text-base)',
+                color: 'var(--primary)',
+                background: 'transparent',
+                border: '1.5px solid var(--primary)',
               }}
             >
-              תנאים לזכאות לווה
-            </span>
+              יציאה ושמירה
+            </button>
 
-            <div className="flex flex-col gap-3">
-              <InfoCard>
-                אם נמצאו במערכת מספר תיקים אפשריים לאותו לווה, הבקשה תועבר לבדיקה לפני המשך התהליך.
-              </InfoCard>
-              <InfoCard>
-                אם היו ללווה שלוש החזרות לחיוב בשנה האחרונה, הבקשה תועבר לאישור מיוחד.
-              </InfoCard>
-              <InfoCard>
-                אם ללווה יש הלוואות פעילות מאותו תורם, והסכום הכולל לאחר ההלוואה החדשה עולה על: 160,000 ₪ (הלוואה רגילה) – 240,000 ₪ (הלוואה למטרת דירה) – הבקשה תועבר לאישור מיוחד.
-              </InfoCard>
-            </div>
-          </aside>
+            <button
+              type="button"
+              onClick={handleContinue}
+              className="inline-flex items-center justify-center h-11 px-8 rounded-lg font-semibold border-0 cursor-pointer transition-opacity hover:opacity-90"
+              style={{
+                fontFamily: 'SimplerPro',
+                fontSize: 'var(--text-base)',
+                color: 'var(--primary-foreground)',
+                background: 'var(--primary)',
+              }}
+            >
+              המשך
+            </button>
+          </footer>
         </div>
       </div>
-
-      {/* ─── Footer – בהיר ─── */}
-      <footer
-        className="flex flex-row items-center justify-between shrink-0 px-6 md:px-10 py-4"
-        style={{
-          background: '#FFFFFF',
-          borderTop: '1px solid #E5E9F9',
-          minHeight: '72px',
-        }}
-      >
-        {/* ימין (RTL) – יציאה ושמירה */}
-        <button
-          type="button"
-          onClick={handleExitAndSave}
-          className="inline-flex items-center justify-center h-11 px-6 rounded-lg font-semibold cursor-pointer transition-all hover:bg-[rgba(0,0,0,0.03)]"
-          style={{
-            fontFamily: 'SimplerPro',
-            fontSize: '15px',
-            color: '#172554',
-            background: 'transparent',
-            border: '1.5px solid #172554',
-          }}
-        >
-          יציאה ושמירה
-        </button>
-
-        {/* שמאל (RTL) – המשך */}
-        <button
-          type="button"
-          onClick={handleContinue}
-          className="inline-flex items-center justify-center h-11 px-8 rounded-lg font-semibold border-0 cursor-pointer transition-opacity hover:opacity-90"
-          style={{
-            fontFamily: 'SimplerPro',
-            fontSize: '15px',
-            color: '#FFFFFF',
-            background: '#172554',
-          }}
-        >
-          המשך
-        </button>
-      </footer>
     </div>
   );
 }
@@ -317,19 +315,19 @@ function Step1Form({
     <>
       <h2
         style={{
-          fontFamily: 'SimplerPro',
-          fontWeight: 700,
-          fontSize: '22px',
-          color: '#172554',
+          fontFamily: 'var(--font-family-base)',
+          fontWeight: 'var(--font-weight-bold)',
+          fontSize: 'var(--text-xl)',
+          color: 'var(--primary)',
           lineHeight: 1.3,
-          textAlign: 'center',
+          textAlign: 'right',
           marginBottom: 32,
         }}
       >
         פרטי הלווה
       </h2>
 
-      <div className="flex flex-col gap-5 max-w-[720px] mx-auto w-full">
+      <div className="flex flex-col gap-5 max-w-[720px] w-full">
         {/* Row 1: שם מלא | ת.ז. | תאריך לידה */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <WizardInput
@@ -389,7 +387,7 @@ function Step1Form({
   );
 }
 
-/* ─── Form Field ─── */
+/* ─── Form Field (DSM tokens) ─── */
 function WizardInput({
   label,
   value,
@@ -409,10 +407,10 @@ function WizardInput({
         <label
           className="block mb-2"
           style={{
-            fontFamily: 'SimplerPro',
-            fontSize: '14px',
-            fontWeight: 400,
-            color: '#495157',
+            fontFamily: 'var(--font-family-base)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--font-weight-normal)',
+            color: 'var(--muted-foreground)',
             textAlign: 'right',
           }}
         >
@@ -425,19 +423,17 @@ function WizardInput({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         dir="rtl"
-        className="w-full h-[42px] rounded-md border bg-white text-right px-3"
+        className="w-full h-9 rounded-md border border-border bg-input-background text-right px-3 text-sm"
         style={{
-          fontFamily: 'SimplerPro',
-          fontSize: '14px',
-          color: '#141E44',
-          borderColor: '#D9DDEC',
+          fontFamily: 'var(--font-family-base)',
+          color: 'var(--foreground)',
         }}
       />
     </div>
   );
 }
 
-/* ─── Select Field ─── */
+/* ─── Select Field (DSM tokens) ─── */
 function WizardSelect({
   label,
   value,
@@ -455,10 +451,10 @@ function WizardSelect({
         <label
           className="block mb-2"
           style={{
-            fontFamily: 'SimplerPro',
-            fontSize: '14px',
-            fontWeight: 400,
-            color: '#495157',
+            fontFamily: 'var(--font-family-base)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--font-weight-normal)',
+            color: 'var(--muted-foreground)',
             textAlign: 'right',
           }}
         >
@@ -470,12 +466,10 @@ function WizardSelect({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           dir="rtl"
-          className="w-full h-[42px] rounded-md border bg-white text-right cursor-pointer appearance-none pr-3 pl-9"
+          className="w-full h-9 rounded-md border border-border bg-input-background text-right cursor-pointer appearance-none pr-3 pl-9 text-sm"
           style={{
-            fontFamily: 'SimplerPro',
-            fontSize: '14px',
-            color: value ? '#141E44' : '#9CA3AF',
-            borderColor: '#D9DDEC',
+            fontFamily: 'var(--font-family-base)',
+            color: value ? 'var(--foreground)' : 'var(--muted-foreground)',
           }}
         >
           {options.map((opt) => (
@@ -491,7 +485,7 @@ function WizardSelect({
             left: 12,
             top: '50%',
             transform: 'translateY(-50%)',
-            color: '#9CA3AF',
+            color: 'var(--muted-foreground)',
           }}
         />
       </div>
