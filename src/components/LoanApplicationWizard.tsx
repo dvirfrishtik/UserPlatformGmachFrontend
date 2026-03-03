@@ -218,6 +218,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, onSubmit
   const [guarantors, setGuarantors] = useState<GuarantorData[]>(() => createEmptyGuarantors(5));
   const [step4, setStep4] = useState<LoanWizardStep4Data>(emptyStep4);
   const [step5, setStep5] = useState<LoanWizardStep5Data>(emptyStep5);
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
   if (!isOpen) return null;
 
@@ -249,7 +250,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, onSubmit
 
   const handleSubmitRequest = () => {
     onSubmit?.();
-    onClose();
+    setShowSuccessScreen(true);
   };
 
   return (
@@ -292,8 +293,14 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, onSubmit
         </button>
       </header>
 
-      {/* ─── Body: sidebar נמשך עד למטה, תוכן + פוטר לצידו ─── */}
+      {/* ─── Body: sidebar נמשך עד למטה, תוכן + פוטר לצידו (או מסך הצלחה) ─── */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
+        {showSuccessScreen ? (
+          <div className="flex-1 flex flex-col items-center justify-center min-h-0 overflow-y-auto py-12 px-6">
+            <LoanWizardSuccessScreen contactEmail={step4.borrowerEmail} onClose={onClose} />
+          </div>
+        ) : (
+          <>
         {/* ── Wizard Sidebar – כחול כהה, full height ── */}
         <aside
           className="hidden md:flex flex-col shrink-0 py-10 px-5"
@@ -468,7 +475,160 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, onSubmit
             </button>
           </footer>
         </div>
+          </>
+        )}
       </div>
+    </div>
+  );
+}
+
+/* ─── אנימציית צ׳ק מארק – מסך הצלחה שליחת בקשה ─── */
+function LoanWizardAnimatedCheckmark() {
+  return (
+    <div style={{ width: '120px', height: '120px', position: 'relative' }}>
+      <style>{`
+        @keyframes loan-success-circle-draw {
+          0% { stroke-dashoffset: 314; }
+          100% { stroke-dashoffset: 0; }
+        }
+        @keyframes loan-success-check-draw {
+          0% { stroke-dashoffset: 60; }
+          100% { stroke-dashoffset: 0; }
+        }
+        @keyframes loan-success-circle-fill {
+          0% { fill: transparent; }
+          100% { fill: rgba(59, 130, 246, 0.08); }
+        }
+        @keyframes loan-success-scale-bounce {
+          0% { transform: scale(0.8); opacity: 0; }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes loan-success-confetti-fall-1 {
+          0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+          100% { transform: translate(-40px, 60px) rotate(360deg); opacity: 0; }
+        }
+        @keyframes loan-success-confetti-fall-2 {
+          0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+          100% { transform: translate(35px, 55px) rotate(-270deg); opacity: 0; }
+        }
+        @keyframes loan-success-confetti-fall-3 {
+          0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+          100% { transform: translate(-20px, 70px) rotate(180deg); opacity: 0; }
+        }
+        @keyframes loan-success-confetti-fall-4 {
+          0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+          100% { transform: translate(45px, 45px) rotate(-360deg); opacity: 0; }
+        }
+        @keyframes loan-success-confetti-fall-5 {
+          0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+          100% { transform: translate(-50px, 40px) rotate(270deg); opacity: 0; }
+        }
+        @keyframes loan-success-confetti-fall-6 {
+          0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+          100% { transform: translate(25px, 65px) rotate(-180deg); opacity: 0; }
+        }
+        .loan-success-check-circle {
+          stroke-dasharray: 314;
+          stroke-dashoffset: 314;
+          animation: loan-success-circle-draw 0.6s ease-out 0.2s forwards, loan-success-circle-fill 0.4s ease-out 0.7s forwards;
+        }
+        .loan-success-check-mark {
+          stroke-dasharray: 60;
+          stroke-dashoffset: 60;
+          animation: loan-success-check-draw 0.4s ease-out 0.7s forwards;
+        }
+        .loan-success-check-container {
+          animation: loan-success-scale-bounce 0.5s ease-out 0.1s both;
+        }
+        .loan-success-confetti-dot { opacity: 0; }
+        .loan-success-confetti-1 { animation: loan-success-confetti-fall-1 1s ease-out 1s forwards; }
+        .loan-success-confetti-2 { animation: loan-success-confetti-fall-2 1.1s ease-out 1.05s forwards; }
+        .loan-success-confetti-3 { animation: loan-success-confetti-fall-3 0.9s ease-out 1.1s forwards; }
+        .loan-success-confetti-4 { animation: loan-success-confetti-fall-4 1.2s ease-out 1.02s forwards; }
+        .loan-success-confetti-5 { animation: loan-success-confetti-fall-5 1s ease-out 1.08s forwards; }
+        .loan-success-confetti-6 { animation: loan-success-confetti-fall-6 1.1s ease-out 1.15s forwards; }
+      `}</style>
+      <svg width="120" height="120" viewBox="0 0 120 120" className="loan-success-check-container">
+        <circle className="loan-success-check-circle" cx="60" cy="60" r="50" stroke="#3B82F6" strokeWidth="4" fill="transparent" />
+        <path className="loan-success-check-mark" d="M38 62 L52 76 L82 46" fill="none" stroke="#3B82F6" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+        <circle className="loan-success-confetti-dot loan-success-confetti-1" cx="30" cy="20" r="3" fill="#3B82F6" />
+        <rect className="loan-success-confetti-dot loan-success-confetti-2" x="85" y="15" width="6" height="6" rx="1" fill="#CCA559" />
+        <circle className="loan-success-confetti-dot loan-success-confetti-3" cx="15" cy="55" r="2.5" fill="#172554" />
+        <rect className="loan-success-confetti-dot loan-success-confetti-4" x="97" y="50" width="5" height="5" rx="1" fill="#3B82F6" />
+        <circle className="loan-success-confetti-dot loan-success-confetti-5" cx="25" cy="90" r="3" fill="#CCA559" />
+        <rect className="loan-success-confetti-dot loan-success-confetti-6" x="90" y="85" width="6" height="6" rx="1" fill="#172554" />
+      </svg>
+    </div>
+  );
+}
+
+/* ─── מסך הצלחה לאחר שליחת בקשה ─── */
+function LoanWizardSuccessScreen({
+  contactEmail,
+  onClose,
+}: {
+  contactEmail: string;
+  onClose: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center max-w-[560px] w-full" style={{ textAlign: 'center' }}>
+      <div style={{ width: '160px', height: '160px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <LoanWizardAnimatedCheckmark />
+      </div>
+      <p
+        style={{
+          fontFamily: 'var(--font-family-base)',
+          fontSize: '22px',
+          fontWeight: 'var(--font-weight-bold)',
+          color: '#141E44',
+          lineHeight: '30px',
+          textAlign: 'center',
+          marginTop: '32px',
+          marginBottom: '8px',
+        }}
+      >
+        הבקשה נשלחה בהצלחה
+      </p>
+      <p
+        style={{
+          fontFamily: 'var(--font-family-base)',
+          fontSize: '16px',
+          color: '#495157',
+          lineHeight: '24px',
+          textAlign: 'center',
+          marginBottom: '12px',
+        }}
+      >
+        הגמ״ח יצור איתך קשר בהקדם.
+      </p>
+      <p
+        style={{
+          fontFamily: 'var(--font-family-base)',
+          fontSize: '16px',
+          color: '#495157',
+          lineHeight: '24px',
+          textAlign: 'center',
+          marginBottom: '32px',
+        }}
+      >
+        {contactEmail
+          ? `שטר ההלוואה יישלח לכתובת האימייל שמילאת: ${contactEmail}`
+          : 'שטר ההלוואה יישלח לכתובת האימייל שמילאת בשלב פרטי התקשרות.'}
+      </p>
+      <button
+        type="button"
+        onClick={onClose}
+        className="inline-flex items-center justify-center h-12 px-8 rounded-lg font-semibold border-0 cursor-pointer transition-opacity hover:opacity-90"
+        style={{
+          fontFamily: 'var(--font-family-base)',
+          fontSize: 'var(--text-base)',
+          color: 'var(--primary-foreground)',
+          backgroundColor: 'var(--primary)',
+        }}
+      >
+        סגור
+      </button>
     </div>
   );
 }
