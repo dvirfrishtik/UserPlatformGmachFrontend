@@ -370,27 +370,28 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
               )}
             </div>
 
-            {/* ── Info Panel – קופסה צפה דבוקה לשמאל, לאורך כל הגובה ── */}
-            <div
-              className="hidden lg:block absolute top-8 bottom-8"
-              style={{ left: 24 }}
-            >
+            {/* ── Info Panel – קופסה צפה דבוקה לשמאל (לא מוצג בשלב פרטי התקשרות) ── */}
+            {currentStep !== 4 && (
               <div
-                className="rounded-xl overflow-hidden flex flex-col h-full"
-                style={{
-                  width: '280px',
-                  background: '#FFFFFF',
-                  border: '1px solid #E5E9F9',
-                  boxShadow: '0 4px 24px rgba(14, 78, 134, 0.08)',
-                }}
+                className="hidden lg:block absolute top-8 bottom-8"
+                style={{ left: 24 }}
               >
-                {currentStep === 1 && <Step1InfoPanelContent />}
-                {currentStep === 2 && <Step2InfoPanelContent />}
-                {currentStep === 3 && <Step3InfoPanelContent />}
-                {currentStep === 4 && <Step4InfoPanelContent />}
-                {currentStep > 4 && <Step1InfoPanelContent />}
+                <div
+                  className="rounded-xl overflow-hidden flex flex-col h-full"
+                  style={{
+                    width: '280px',
+                    background: '#FFFFFF',
+                    border: '1px solid #E5E9F9',
+                    boxShadow: '0 4px 24px rgba(14, 78, 134, 0.08)',
+                  }}
+                >
+                  {currentStep === 1 && <Step1InfoPanelContent />}
+                  {currentStep === 2 && <Step2InfoPanelContent />}
+                  {currentStep === 3 && <Step3InfoPanelContent />}
+                  {currentStep > 4 && <Step1InfoPanelContent />}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* ─── Footer – בתוך אזור התוכן, לא חוצה את ה-sidebar ─── */}
@@ -414,7 +415,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
                 border: '1.5px solid var(--primary)',
               }}
             >
-              יציאה ושמירה
+              חזרה לשלב הקודם
             </button>
 
             <button
@@ -428,7 +429,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
                 background: 'var(--primary)',
               }}
             >
-              המשך
+              המשך לשלב הבא
             </button>
           </footer>
         </div>
