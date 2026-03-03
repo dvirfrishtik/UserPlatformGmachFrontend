@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { X, ChevronDown, ChevronLeft, AlertTriangle, Info, Check, ExternalLink, User, Minus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -646,14 +647,13 @@ function OtherBorrowerApprovalPopup({
   onProceed: () => void;
 }) {
   if (!isOpen) return null;
-  return (
+  const overlay = (
     <div
-      className="fixed inset-0 z-[110] flex items-center justify-center p-4 md:p-6 box-border"
+      className="fixed inset-0 flex items-center justify-center p-4 md:p-6 box-border"
       style={{
-        backgroundColor: 'rgba(0, 2, 4, 0.45)',
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 2, 4, 0.5)',
         backdropFilter: 'blur(6px)',
-        minWidth: '100vw',
-        minHeight: '100vh',
         left: 0,
         right: 0,
         top: 0,
@@ -666,15 +666,12 @@ function OtherBorrowerApprovalPopup({
         className="relative flex flex-col shrink-0"
         style={{
           width: 'min(1100px, 92vw)',
-          maxWidth: '100%',
           height: 'min(900px, 90vh)',
-          maxHeight: '100%',
           background: 'linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)',
           borderRadius: '12px',
           border: '1px solid #E5E9F9',
           boxShadow: '0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)',
           overflow: 'hidden',
-          margin: 'auto',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -801,6 +798,7 @@ function OtherBorrowerApprovalPopup({
       </div>
     </div>
   );
+  return typeof document !== 'undefined' ? createPortal(overlay, document.body) : null;
 }
 
 /* ─── פופאפ: מימוש יחידות תרומה שלא נועדו עבור הלווה ─── */
@@ -814,14 +812,13 @@ function UnitNotForBorrowerPopup({
   onProceed: () => void;
 }) {
   if (!isOpen) return null;
-  return (
+  const overlay = (
     <div
-      className="fixed inset-0 z-[110] flex items-center justify-center p-4 md:p-6 box-border"
+      className="fixed inset-0 flex items-center justify-center p-4 md:p-6 box-border"
       style={{
-        backgroundColor: 'rgba(0, 2, 4, 0.45)',
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 2, 4, 0.5)',
         backdropFilter: 'blur(6px)',
-        minWidth: '100vw',
-        minHeight: '100vh',
         left: 0,
         right: 0,
         top: 0,
@@ -834,15 +831,12 @@ function UnitNotForBorrowerPopup({
         className="relative flex flex-col shrink-0"
         style={{
           width: 'min(1100px, 92vw)',
-          maxWidth: '100%',
           height: 'min(900px, 90vh)',
-          maxHeight: '100%',
           background: 'linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)',
           borderRadius: '12px',
           border: '1px solid #E5E9F9',
           boxShadow: '0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)',
           overflow: 'hidden',
-          margin: 'auto',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -968,6 +962,7 @@ function UnitNotForBorrowerPopup({
       </div>
     </div>
   );
+  return typeof document !== 'undefined' ? createPortal(overlay, document.body) : null;
 }
 
 /** גיל מינימלי: 17 שנים ו־10 חודשים (בחודשים) */
@@ -993,14 +988,13 @@ function UnderAgeApprovalPopup({
   onProceed: () => void;
 }) {
   if (!isOpen) return null;
-  return (
+  const overlay = (
     <div
-      className="fixed inset-0 z-[110] flex items-center justify-center p-4 md:p-6 box-border"
+      className="fixed inset-0 flex items-center justify-center p-4 md:p-6 box-border"
       style={{
-        backgroundColor: 'rgba(0, 2, 4, 0.45)',
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 2, 4, 0.5)',
         backdropFilter: 'blur(6px)',
-        minWidth: '100vw',
-        minHeight: '100vh',
         left: 0,
         right: 0,
         top: 0,
@@ -1013,15 +1007,12 @@ function UnderAgeApprovalPopup({
         className="relative flex flex-col shrink-0"
         style={{
           width: 'min(1100px, 92vw)',
-          maxWidth: '100%',
           height: 'min(900px, 90vh)',
-          maxHeight: '100%',
           background: 'linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)',
           borderRadius: '12px',
           border: '1px solid #E5E9F9',
           boxShadow: '0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)',
           overflow: 'hidden',
-          margin: 'auto',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -1145,6 +1136,7 @@ function UnderAgeApprovalPopup({
       </div>
     </div>
   );
+  return typeof document !== 'undefined' ? createPortal(overlay, document.body) : null;
 }
 
 /* ─── Step 1: פרטי הלווה ─── */
