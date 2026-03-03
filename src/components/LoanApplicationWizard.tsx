@@ -247,13 +247,13 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
               )}
             </div>
 
-            {/* ── Info Panel – קופסה צפה דבוקה לשמאל, בגובה הכותרת ── */}
+            {/* ── Info Panel – קופסה צפה דבוקה לשמאל, לאורך כל הגובה (margin זהה למעלה ולמטה) ── */}
             <div
-              className="hidden lg:block absolute top-8"
+              className="hidden lg:block absolute top-8 bottom-8"
               style={{ left: 24 }}
             >
               <div
-                className="rounded-xl overflow-hidden"
+                className="rounded-xl overflow-hidden flex flex-col h-full"
                 style={{
                   width: '280px',
                   background: '#FFFFFF',
@@ -263,7 +263,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
               >
                 {/* כותרת הקופסה */}
                 <div
-                  className="flex flex-row items-center gap-2 px-5 py-3"
+                  className="flex flex-row items-center gap-2 px-5 py-3 shrink-0"
                   style={{
                     borderBottom: '1px solid #E5E9F9',
                   }}
@@ -280,9 +280,9 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
                     תנאים לזכאות לווה
                   </span>
                 </div>
-                {/* תוכן */}
+                {/* תוכן – גלילה אם צריך */}
                 <div
-                  className="px-5 py-4"
+                  className="px-5 py-4 flex-1 overflow-y-auto min-h-0"
                   style={{ background: '#F8FAFC' }}
                 >
                   <p
@@ -676,8 +676,8 @@ function Step1Form({
           </div>
         </div>
 
-        {/* ─── פרטי בת הזוג של הלווה (מוצג רק כשנשוי) ─── */}
-        {step1.maritalStatus === 'married' && (
+        {/* ─── פרטי בת/בן זוג / מאורסת (מוצג כשנשוי או מאורס) ─── */}
+        {(step1.maritalStatus === 'married' || step1.maritalStatus === 'engaged') && (
           <div
             className="rounded-xl px-6 py-6 mt-2"
             style={{
@@ -695,7 +695,7 @@ function Step1Form({
                 textAlign: 'right',
               }}
             >
-              פרטי בת הזוג של הלווה
+              {step1.maritalStatus === 'married' ? 'פרטי בת הזוג של הלווה' : 'פרטי המאורסת של הלווה'}
             </h3>
             <div className="flex flex-col gap-4">
               {/* Row: שם מלא | ת.ז. | תאריך לידה */}
