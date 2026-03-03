@@ -218,6 +218,15 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
     }
   };
 
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep((s) => s - 1);
+    } else {
+      onExitAndSave?.();
+      onClose();
+    }
+  };
+
   const handleExitAndSave = () => {
     onExitAndSave?.();
     onClose();
@@ -336,7 +345,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
         {/* ── Right side: content area + info panel + footer stacked ── */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <div className="flex-1 flex min-w-0 min-h-0 overflow-hidden relative">
-            {/* Center – Form */}
+            {/* Center – Form (animated step content) */}
             <div className="flex-1 min-w-0 overflow-y-auto py-8 px-6 md:px-12 lg:px-16">
               {/* Mobile step indicator */}
               <div className="md:hidden flex flex-row items-center gap-2 mb-5" style={{ justifyContent: 'flex-end' }}>
@@ -348,26 +357,28 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
                 </span>
               </div>
 
-              {currentStep === 1 && (
-                <Step1Form step1={step1} setStep1={setStep1} childrenForLoan={childrenForLoan} />
-              )}
-              {currentStep === 2 && (
-                <Step2Form step2={step2} setStep2={setStep2} />
-              )}
-              {currentStep === 3 && (
-                <Step3Form guarantors={guarantors} setGuarantors={setGuarantors} />
-              )}
-              {currentStep === 4 && (
-                <Step4Form step4={step4} setStep4={setStep4} />
-              )}
-              {currentStep > 4 && (
-                <div
-                  className="flex-1 flex items-center justify-center h-full"
-                  style={{ color: '#9CA3AF', fontFamily: 'SimplerPro' }}
-                >
-                  שלב {currentStep} – בהמשך יוטמע
-                </div>
-              )}
+              <div key={currentStep} className="wizard-step-enter">
+                {currentStep === 1 && (
+                  <Step1Form step1={step1} setStep1={setStep1} childrenForLoan={childrenForLoan} />
+                )}
+                {currentStep === 2 && (
+                  <Step2Form step2={step2} setStep2={setStep2} />
+                )}
+                {currentStep === 3 && (
+                  <Step3Form guarantors={guarantors} setGuarantors={setGuarantors} />
+                )}
+                {currentStep === 4 && (
+                  <Step4Form step4={step4} setStep4={setStep4} />
+                )}
+                {currentStep > 4 && (
+                  <div
+                    className="flex-1 flex items-center justify-center h-full"
+                    style={{ color: '#9CA3AF', fontFamily: 'SimplerPro' }}
+                  >
+                    שלב {currentStep} – בהמשך יוטמע
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* ── Info Panel – קופסה צפה דבוקה לשמאל (לא מוצג בשלב פרטי התקשרות) ── */}
@@ -405,7 +416,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
           >
             <button
               type="button"
-              onClick={handleExitAndSave}
+              onClick={handleBack}
               className="inline-flex items-center justify-center h-11 px-6 rounded-lg font-semibold cursor-pointer transition-all hover:bg-[rgba(0,0,0,0.03)]"
               style={{
                 fontFamily: 'SimplerPro',
