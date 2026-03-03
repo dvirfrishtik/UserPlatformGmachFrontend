@@ -270,7 +270,7 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, children
           className="hidden md:flex flex-col shrink-0 py-10 px-5"
           style={{
             width: '200px',
-            background: '#172554',
+            background: 'linear-gradient(196.765deg, rgb(23, 37, 84) 0%, rgb(7, 13, 35) 100%)',
             borderLeft: '1px solid rgba(255,255,255,0.08)',
           }}
         >
@@ -1939,6 +1939,16 @@ function Step4InfoPanelContent() {
 }
 
 /* ─── Step 4: פרטי התקשרות ─── */
+const CONTACT_FIELD_CONFIG: Record<
+  LoanWizardStep4Data['contactMethod'],
+  { label: string; placeholder: string; inputType: 'email' | 'tel' | 'text' }
+> = {
+  borrower_email: { label: 'כתובת אימייל של הלווה', placeholder: 'הזן כתובת אימייל', inputType: 'email' },
+  donor_email: { label: 'כתובת אימייל של התורם', placeholder: 'הזן כתובת אימייל', inputType: 'email' },
+  borrower_fax: { label: "מס׳ פקס של הלווה", placeholder: "הזן מס׳ פקס", inputType: 'tel' },
+  other: { label: 'פרטי התקשרות', placeholder: 'הזן פרטים', inputType: 'text' },
+};
+
 function Step4Form({
   step4,
   setStep4,
@@ -1946,6 +1956,7 @@ function Step4Form({
   step4: LoanWizardStep4Data;
   setStep4: React.Dispatch<React.SetStateAction<LoanWizardStep4Data>>;
 }) {
+  const fieldConfig = CONTACT_FIELD_CONFIG[step4.contactMethod];
   return (
     <div dir="rtl" className="flex flex-col max-w-[720px] w-full">
       <h2
@@ -1959,19 +1970,8 @@ function Step4Form({
           marginBottom: 8,
         }}
       >
-        פרטי התקשרות
-      </h2>
-      <p
-        style={{
-          fontFamily: 'var(--font-family-base)',
-          fontSize: 'var(--text-base)',
-          color: 'var(--foreground)',
-          textAlign: 'right',
-          marginBottom: 4,
-        }}
-      >
         למי לשלוח את שטר ההלוואה?
-      </p>
+      </h2>
       <p
         style={{
           fontFamily: 'var(--font-family-base)',
@@ -1984,31 +1984,16 @@ function Step4Form({
         יש לבחור את הגורם עמו ניתן ליצור קשר:
       </p>
 
-      {/* 2x2 grid – contact method options (RTL: row1 = borrower_email, donor_email; row2 = borrower_fax, other) */}
+      {/* Contact method options – each rounded and separate */}
       <div className="grid grid-cols-2 gap-3 mb-6">
-        {CONTACT_METHOD_OPTIONS.map((opt, i) => {
+        {CONTACT_METHOD_OPTIONS.map((opt) => {
           const selected = step4.contactMethod === opt.value;
-          const col = i % 2;
-          const row = Math.floor(i / 2);
-          const topRight = row === 0 && col === 0;
-          const topLeft = row === 0 && col === 1;
-          const bottomRight = row === 1 && col === 0;
-          const bottomLeft = row === 1 && col === 1;
-          const radiusRtl = topRight
-            ? '0 8px 0 0'
-            : topLeft
-            ? '8px 0 0 0'
-            : bottomRight
-            ? '0 0 8px 0'
-            : bottomLeft
-            ? '0 0 0 8px'
-            : '0';
           return (
             <button
               key={opt.value}
               type="button"
               onClick={() => setStep4((p) => ({ ...p, contactMethod: opt.value }))}
-              className="inline-flex flex-row-reverse items-center justify-center gap-2 h-12 cursor-pointer transition-all border w-full"
+              className="inline-flex flex-row-reverse items-center justify-center gap-2 h-12 cursor-pointer transition-all border w-full rounded-lg"
               style={{
                 fontFamily: 'var(--font-family-base)',
                 fontSize: 'var(--text-sm)',
@@ -2016,7 +2001,6 @@ function Step4Form({
                 color: selected ? 'var(--primary)' : 'var(--muted-foreground)',
                 background: selected ? '#EFF6FF' : 'var(--card)',
                 borderColor: selected ? 'var(--primary)' : 'var(--border)',
-                borderRadius: radiusRtl,
                 textAlign: 'right',
               }}
             >
@@ -2049,13 +2033,13 @@ function Step4Form({
           textAlign: 'right',
         }}
       >
-        כתובת אימייל של הלווה
+        {fieldConfig.label}
       </label>
       <Input
-        type="email"
+        type={fieldConfig.inputType}
         value={step4.borrowerEmail}
         onChange={(e) => setStep4((p) => ({ ...p, borrowerEmail: e.target.value }))}
-        placeholder="הזן כתובת אימייל"
+        placeholder={fieldConfig.placeholder}
         dir="rtl"
         className="w-full h-9 rounded-md border border-border bg-input-background text-right px-3 text-sm placeholder:text-[#9CA3AF]"
         style={{
