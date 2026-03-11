@@ -644,6 +644,8 @@ function OtherBorrowerApprovalPopup({
   onClose: () => void;
   onProceed: () => void;
 }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   if (!isOpen) return null;
   const overlay = (
     <div
@@ -796,7 +798,8 @@ function OtherBorrowerApprovalPopup({
       </div>
     </div>
   );
-  return typeof document !== 'undefined' ? createPortal(overlay, document.body) : null;
+  if (!mounted || typeof document === 'undefined' || !document.body) return null;
+  return createPortal(overlay, document.body);
 }
 
 /* ─── פופאפ: מימוש יחידות תרומה שלא נועדו עבור הלווה ─── */
@@ -809,6 +812,8 @@ function UnitNotForBorrowerPopup({
   onClose: () => void;
   onProceed: () => void;
 }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   if (!isOpen) return null;
   const overlay = (
     <div
@@ -960,7 +965,8 @@ function UnitNotForBorrowerPopup({
       </div>
     </div>
   );
-  return typeof document !== 'undefined' ? createPortal(overlay, document.body) : null;
+  if (!mounted || typeof document === 'undefined' || !document.body) return null;
+  return createPortal(overlay, document.body);
 }
 
 /** גיל מינימלי: 17 שנים ו־10 חודשים (בחודשים) */
@@ -985,6 +991,8 @@ function UnderAgeApprovalPopup({
   onClose: () => void;
   onProceed: () => void;
 }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   if (!isOpen) return null;
   const overlay = (
     <div
@@ -1134,7 +1142,8 @@ function UnderAgeApprovalPopup({
       </div>
     </div>
   );
-  return typeof document !== 'undefined' ? createPortal(overlay, document.body) : null;
+  if (!mounted || typeof document === 'undefined' || !document.body) return null;
+  return createPortal(overlay, document.body);
 }
 
 /* ─── Step 1: פרטי הלווה ─── */

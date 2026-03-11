@@ -1,10 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { ChevronLeft } from 'lucide-react';
-import { InitialLoanRequestIntro } from '@/components/InitialLoanRequestIntro';
-import { LoanApplicationWizard } from '@/components/LoanApplicationWizard';
+
+const InitialLoanRequestIntro = dynamic(
+  () => import('@/components/InitialLoanRequestIntro').then((m) => m.InitialLoanRequestIntro),
+  { ssr: false }
+);
+
+const LoanApplicationWizard = dynamic(
+  () => import('@/components/LoanApplicationWizard').then((m) => m.LoanApplicationWizard),
+  { ssr: false }
+);
 
 // Mock: whether user has units ready for loan realization (could come from API)
 const hasUnitsReadyForLoan = true;
