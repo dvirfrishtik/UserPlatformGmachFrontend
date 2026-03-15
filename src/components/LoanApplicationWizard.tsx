@@ -2730,6 +2730,8 @@ function Step5Form({
 }) {
   const [showPaymentDetailTable, setShowPaymentDetailTable] = useState(false);
   const [termsPopupOpen, setTermsPopupOpen] = useState(false);
+  const [termsScrollError, setTermsScrollError] = useState(false);
+  const termsScrollRef = useRef<HTMLDivElement>(null);
   const totalUnits = step2.selectedUnitIds.length;
   const totalLoanAmount = DEFAULT_DONATION_UNITS
     .filter((u) => step2.selectedUnitIds.includes(u.id))
@@ -2882,15 +2884,27 @@ function Step5Form({
         />
       </div>
 
-      {/* פופאף תנאים – עיצוב כמו AddChildPopup; כפתור ראשי כמו בוויזארד */}
-      <Dialog open={termsPopupOpen} onOpenChange={setTermsPopupOpen}>
+      {/* פופאף תנאים – גודל כמו שאר הפופאפים, dir=rtl כדי שה-X יהיה בימין */}
+      <Dialog
+        open={termsPopupOpen}
+        onOpenChange={(open) => {
+          setTermsPopupOpen(open);
+          if (!open) setTermsScrollError(false);
+        }}
+      >
         <DialogContent
-          className="p-0 gap-0 max-w-[min(560px,92vw)] max-h-[90vh] flex flex-col w-[min(560px,92vw)]"
+          dir="rtl"
+          className="p-0 gap-0 flex flex-col"
           style={{
+            width: 'min(1100px, 92vw)',
+            maxWidth: 'min(1100px, 92vw)',
+            height: 'min(900px, 90vh)',
+            maxHeight: '90vh',
             background: 'linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)',
             borderRadius: '12px',
             border: '1px solid #E5E9F9',
             boxShadow: '0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)',
+            overflow: 'hidden',
           }}
         >
           <DialogHeader
@@ -2910,8 +2924,15 @@ function Step5Form({
             <div style={{ width: '36px' }} />
           </DialogHeader>
           <div
+            ref={termsScrollRef}
             className="flex-1 overflow-y-auto px-6 sm:px-8 py-5 text-right min-h-0"
             dir="rtl"
+            onScroll={() => {
+              const el = termsScrollRef.current;
+              if (!el || !termsScrollError) return;
+              const threshold = 30;
+              if (el.scrollHeight - el.scrollTop - el.clientHeight <= threshold) setTermsScrollError(false);
+            }}
             style={{
               fontFamily: 'var(--font-family-base)',
               fontSize: 'var(--text-sm)',
@@ -2931,25 +2952,23 @@ function Step5Form({
               </div>
             ))}
           </div>
+          {termsScrollError && (
+            <div
+              className="shrink-0 mx-6 mb-2 px-4 py-2 rounded-lg text-right text-sm font-medium"
+              style={{
+                fontFamily: 'var(--font-family-base)',
+                backgroundColor: 'rgba(220, 38, 38, 0.12)',
+                color: 'var(--destructive)',
+              }}
+              role="alert"
+            >
+              יש לקרוא את כל התנאים עד הסוף לפני האישור
+            </div>
+          )}
           <DialogFooter
             className="flex flex-row justify-center gap-3 shrink-0 px-6 sm:px-8 py-5 border-t border-[var(--border)]"
             style={{ direction: 'rtl' }}
           >
-            <button
-              type="button"
-              onClick={() => {
-                setStep5((p) => ({ ...p, termsAccepted: true }));
-                setTermsPopupOpen(false);
-              }}
-              className="inline-flex items-center justify-center min-h-[44px] h-11 px-5 sm:px-8 rounded-lg font-semibold border-0 cursor-pointer transition-opacity hover:opacity-90 text-sm sm:text-base"
-              style={{
-                fontFamily: 'SimplerPro',
-                color: 'var(--primary-foreground)',
-                background: 'var(--primary)',
-              }}
-            >
-              אני מאשר את התנאים
-            </button>
             <button
               type="button"
               onClick={() => setTermsPopupOpen(false)}
@@ -2961,7 +2980,32 @@ function Step5Form({
                 border: '1.5px solid var(--primary)',
               }}
             >
-              סגור
+              סגירת חלון
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const el = termsScrollRef.current;
+                if (!el) return;
+                const threshold = 30;
+                const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= threshold;
+                if (!atBottom) {
+                  setTermsScrollError(true);
+                  el.focus();
+                  return;
+                }
+                setTermsScrollError(false);
+                setStep5((p) => ({ ...p, termsAccepted: true }));
+                setTermsPopupOpen(false);
+              }}
+              className="inline-flex items-center justify-center min-h-[44px] h-11 px-5 sm:px-8 rounded-lg font-semibold border-0 cursor-pointer transition-opacity hover:opacity-90 text-sm sm:text-base"
+              style={{
+                fontFamily: 'SimplerPro',
+                color: 'var(--primary-foreground)',
+                background: 'var(--primary)',
+              }}
+            >
+              אני מאשר את התנאים
             </button>
           </DialogFooter>
         </DialogContent>
