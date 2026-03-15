@@ -2882,21 +2882,24 @@ function Step5Form({
         />
       </div>
 
-      {/* פופאף תנאים – עיצוב כמו פופאפים קיימים, כפתור ראשי "אני מאשר את התנאים" מסמן את הצ'ק בוקס */}
+      {/* פופאף תנאים – עיצוב כמו AddChildPopup; כפתור ראשי כמו בוויזארד */}
       <Dialog open={termsPopupOpen} onOpenChange={setTermsPopupOpen}>
         <DialogContent
-          className="p-0 gap-0 max-w-[min(560px,92vw)] max-h-[90vh] flex flex-col border border-[#E5E9F9] shadow-[0_0_12px_rgba(24,47,67,0.08),0_32px_64px_-16px_rgba(23,37,84,0.18)]"
+          className="p-0 gap-0 max-w-[min(560px,92vw)] max-h-[90vh] flex flex-col w-[min(560px,92vw)]"
           style={{
             background: 'linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)',
             borderRadius: '12px',
+            border: '1px solid #E5E9F9',
+            boxShadow: '0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)',
           }}
         >
           <DialogHeader
-            className="flex flex-row items-center justify-between shrink-0 px-6 py-5 border-b border-[var(--border)] text-right"
+            className="flex flex-row items-center justify-between shrink-0 px-6 sm:px-8 py-5 border-b border-[var(--border)]"
             style={{ direction: 'rtl' }}
           >
+            <div style={{ width: '36px' }} />
             <DialogTitle
-              className="text-lg font-bold leading-tight m-0"
+              className="text-xl font-bold leading-tight m-0 flex-1 text-center"
               style={{
                 fontFamily: 'var(--font-family-base)',
                 color: 'var(--foreground)',
@@ -2904,9 +2907,10 @@ function Step5Form({
             >
               תנאים לבקשת הלוואה
             </DialogTitle>
+            <div style={{ width: '36px' }} />
           </DialogHeader>
           <div
-            className="flex-1 overflow-y-auto px-6 py-4 text-right"
+            className="flex-1 overflow-y-auto px-6 sm:px-8 py-5 text-right min-h-0"
             dir="rtl"
             style={{
               fontFamily: 'var(--font-family-base)',
@@ -2928,26 +2932,37 @@ function Step5Form({
             ))}
           </div>
           <DialogFooter
-            className="flex flex-row justify-start gap-3 shrink-0 px-6 py-4 border-t border-[var(--border)]"
+            className="flex flex-row justify-center gap-3 shrink-0 px-6 sm:px-8 py-5 border-t border-[var(--border)]"
             style={{ direction: 'rtl' }}
           >
-            <Button
-              variant="default"
+            <button
+              type="button"
               onClick={() => {
                 setStep5((p) => ({ ...p, termsAccepted: true }));
                 setTermsPopupOpen(false);
               }}
-              className="rounded-lg"
+              className="inline-flex items-center justify-center min-h-[44px] h-11 px-5 sm:px-8 rounded-lg font-semibold border-0 cursor-pointer transition-opacity hover:opacity-90 text-sm sm:text-base"
+              style={{
+                fontFamily: 'SimplerPro',
+                color: 'var(--primary-foreground)',
+                background: 'var(--primary)',
+              }}
             >
               אני מאשר את התנאים
-            </Button>
-            <Button
-              variant="outline"
+            </button>
+            <button
+              type="button"
               onClick={() => setTermsPopupOpen(false)}
-              className="rounded-lg"
+              className="inline-flex items-center justify-center min-h-[44px] h-11 px-4 sm:px-6 rounded-lg font-semibold cursor-pointer transition-colors hover:bg-[rgba(0,0,0,0.03)] text-sm sm:text-base"
+              style={{
+                fontFamily: 'SimplerPro',
+                color: 'var(--primary)',
+                background: 'transparent',
+                border: '1.5px solid var(--primary)',
+              }}
             >
               סגור
-            </Button>
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
