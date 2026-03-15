@@ -2968,11 +2968,11 @@ function Step5Form({
               }}
               role="alert"
             >
-              יש לקרוא את כל התנאים עד הסוף לפני האישור
+              יש לגלול עד הסוף ולקרוא את כל התנאים
             </div>
           )}
           <DialogFooter
-            className="flex flex-row justify-center gap-3 shrink-0 px-6 sm:px-8 py-5 border-t border-[var(--border)]"
+            className="w-full flex flex-row justify-center items-center gap-3 shrink-0 px-6 sm:px-8 py-5 border-t border-[var(--border)]"
             style={{ direction: 'rtl' }}
           >
             <button
