@@ -115,7 +115,7 @@ function BorrowerChildCard({
             lineHeight: '20px',
           }}
         >
-          {child.unitsCount} יחידות
+          {child.unitsCount} יח׳ ניתנות למימוש
         </span>
       </div>
     </button>
