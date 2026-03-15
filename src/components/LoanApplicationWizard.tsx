@@ -2851,19 +2851,17 @@ function Step5Form({
 
       {/* תנאים ואישור – לחיצה פותחת פופאף; הצ'ק בוקס מסומן רק אחרי אישור בפופאף */}
       <div
-        className="rounded-xl w-full flex flex-row-reverse items-start gap-3 cursor-pointer"
+        className="rounded-xl w-full flex flex-row-reverse items-start gap-3"
         style={{
           background: '#F1F5F9',
           border: '1px solid #E2E8F0',
           padding: '16px 20px',
         }}
-        onClick={() => setTermsPopupOpen(true)}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && setTermsPopupOpen(true)}
       >
-        <label
-          className="flex-1 text-right cursor-pointer"
+        <button
+          type="button"
+          onClick={() => setTermsPopupOpen(true)}
+          className="flex-1 text-right cursor-pointer border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 rounded"
           style={{
             fontFamily: 'var(--font-family-base)',
             fontSize: 'var(--text-sm)',
@@ -2872,7 +2870,7 @@ function Step5Form({
           }}
         >
           אני מאשר שקראתי והבנתי את התנאים המשפטיים להגשת בקשה ראשונית להלוואה דרך הגמ"ח המרכזי
-        </label>
+        </button>
         <input
           type="checkbox"
           checked={step5.termsAccepted}
