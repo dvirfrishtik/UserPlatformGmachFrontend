@@ -2925,7 +2925,7 @@ function Step5Form({
           </DialogHeader>
           <div
             ref={termsScrollRef}
-            className="flex-1 overflow-y-auto px-6 sm:px-8 py-5 text-right min-h-0"
+            className="flex-1 overflow-y-auto px-6 sm:px-8 py-5 min-h-0 flex justify-center"
             dir="rtl"
             onScroll={() => {
               const el = termsScrollRef.current;
@@ -2933,24 +2933,30 @@ function Step5Form({
               const threshold = 30;
               if (el.scrollHeight - el.scrollTop - el.clientHeight <= threshold) setTermsScrollError(false);
             }}
-            style={{
-              fontFamily: 'var(--font-family-base)',
-              fontSize: 'var(--text-sm)',
-              color: 'var(--foreground)',
-              lineHeight: 1.6,
-            }}
           >
-            {LOAN_TERMS_SECTIONS.map((section) => (
-              <div key={section.title} className="mb-4 last:mb-0">
-                <div
-                  className="font-semibold mb-1"
-                  style={{ color: 'var(--primary)' }}
-                >
-                  {section.title}
+            <div
+              className="text-right w-full"
+              style={{
+                maxWidth: 'min(42rem, 85%)',
+                fontFamily: 'var(--font-family-base)',
+                fontSize: 'var(--text-sm)',
+                color: 'var(--foreground)',
+                lineHeight: 1.6,
+                marginInline: 'auto',
+              }}
+            >
+              {LOAN_TERMS_SECTIONS.map((section) => (
+                <div key={section.title} className="mb-4 last:mb-0">
+                  <div
+                    className="font-semibold mb-1"
+                    style={{ color: 'var(--primary)' }}
+                  >
+                    {section.title}
+                  </div>
+                  <p className="m-0 text-[var(--foreground)]">{section.body}</p>
                 </div>
-                <p className="m-0 text-[var(--foreground)]">{section.body}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
           {termsScrollError && (
             <div
