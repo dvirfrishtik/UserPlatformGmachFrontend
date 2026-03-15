@@ -1428,9 +1428,7 @@ function Step1Form({
 
   const isNameInList = step1.fullName.trim() && childrenForLoan.some((c) => c.name === step1.fullName.trim());
   const handleIdNumberFocus = () => {
-    if (step1.fullName.trim() && !isNameInList && !otherBorrowerApproved) {
-      setShowOtherBorrowerPopup(true);
-    }
+    // בוטל: לא מציגים פופאף "הוספת לווה שלא נתרמו עבורו יחידות" בעת הקלדת שם אחר
   };
 
   const handleOtherBorrowerProceed = () => {
