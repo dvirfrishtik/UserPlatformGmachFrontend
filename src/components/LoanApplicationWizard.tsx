@@ -47,6 +47,120 @@ const DEFAULT_CHILDREN_FOR_LOAN: ChildForLoan[] = [
   { id: 'child6', name: 'מיכל שולמית', unitsCount: 4 },
 ];
 
+/* ─── אווטר כרטיס (זהה לרכישת יחידות) ─── */
+function BorrowerAvatarIcon({ size = 40 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="20" fill="#EDD097" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M15.5008 14C15.5008 11.5147 17.5155 9.5 20.0008 9.5C22.4861 9.5 24.5008 11.5147 24.5008 14C24.5008 16.4853 22.4861 18.5 20.0008 18.5C17.5155 18.5 15.5008 16.4853 15.5008 14Z" fill="#172554" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M11.7521 28.1053C11.8294 23.6156 15.4928 20 20.0008 20C24.5089 20 28.1724 23.6157 28.2496 28.1056C28.2547 28.4034 28.0832 28.676 27.8125 28.8002C25.4335 29.8918 22.7873 30.5 20.0011 30.5C17.2147 30.5 14.5683 29.8917 12.1891 28.7999C11.9185 28.6757 11.7469 28.4031 11.7521 28.1053Z" fill="#172554" />
+    </svg>
+  );
+}
+
+/* ─── כרטיס בחירת ילד (זהה לרכישת יחידות) ─── */
+function BorrowerChildCard({
+  child,
+  isSelected,
+  onClick,
+}: {
+  child: ChildForLoan;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+  return (
+    <button
+      type="button"
+      className="flex items-center gap-3 sm:gap-4 w-full min-w-0 transition-all text-right"
+      style={{
+        padding: 'clamp(14px, 3vw, 20px) clamp(16px, 3.5vw, 24px)',
+        borderRadius: '8px',
+        backgroundColor: '#FFFFFF',
+        border: isSelected ? '1.5px solid #3B82F6' : '1.5px solid transparent',
+        cursor: 'pointer',
+        outline: 'none',
+        boxShadow: isSelected
+          ? '0 0 12px rgba(59, 130, 246, 0.12)'
+          : isHovered
+            ? '0 0 12px rgba(24, 47, 67, 0.12)'
+            : '0 0 12px rgba(24, 47, 67, 0.06)',
+      }}
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="shrink-0">
+        <BorrowerAvatarIcon size={40} />
+      </div>
+      <div className="flex flex-col items-start gap-0.5 min-w-0 flex-1">
+        <p
+          className="truncate w-full"
+          style={{
+            fontFamily: 'var(--font-family-base)',
+            fontSize: 'clamp(15px, 2.5vw, 17px)',
+            fontWeight: isSelected ? 'var(--font-weight-bold)' : 'var(--font-weight-semibold)',
+            color: isSelected ? '#141E44' : '#495157',
+            lineHeight: '24px',
+            transition: 'color 0.2s ease',
+          }}
+        >
+          {child.name}
+        </p>
+        <span
+          style={{
+            fontSize: 'clamp(13px, 2vw, 14px)',
+            color: '#6B7280',
+            fontWeight: 'var(--font-weight-normal)',
+            lineHeight: '20px',
+          }}
+        >
+          {child.unitsCount} יחידות
+        </span>
+      </div>
+    </button>
+  );
+}
+
+/* ─── כרטיס "לווה אחר" (סגנון זהה, בלי אווטר ויחידות) ─── */
+function BorrowerOtherCard({ isSelected, onClick }: { isSelected: boolean; onClick: () => void }) {
+  const [isHovered, setIsHovered] = useState(false);
+  return (
+    <button
+      type="button"
+      className="flex items-center justify-center w-full min-w-0 transition-all text-right"
+      style={{
+        padding: 'clamp(14px, 3vw, 20px) clamp(16px, 3.5vw, 24px)',
+        borderRadius: '8px',
+        backgroundColor: '#FFFFFF',
+        border: isSelected ? '1.5px solid #3B82F6' : '1.5px solid transparent',
+        cursor: 'pointer',
+        outline: 'none',
+        boxShadow: isSelected
+          ? '0 0 12px rgba(59, 130, 246, 0.12)'
+          : isHovered
+            ? '0 0 12px rgba(24, 47, 67, 0.12)'
+            : '0 0 12px rgba(24, 47, 67, 0.06)',
+      }}
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <span
+        style={{
+          fontFamily: 'var(--font-family-base)',
+          fontSize: 'clamp(15px, 2.5vw, 17px)',
+          fontWeight: isSelected ? 'var(--font-weight-bold)' : 'var(--font-weight-semibold)',
+          color: isSelected ? '#141E44' : '#495157',
+          lineHeight: '24px',
+        }}
+      >
+        לווה אחר
+      </span>
+    </button>
+  );
+}
+
 export interface LoanWizardStep1Data {
   fullName: string;
   idNumber: string;
@@ -1207,27 +1321,29 @@ function Step1Form({
         </h2>
       </div>
       <div className="flex flex-col gap-5 max-w-[720px] w-full min-w-0">
-        {/* משבצות: שמות הילדים + יחידות למימוש + לווה אחר */}
-        <div className="w-full" dir="rtl">
-          <label
-            className="block mb-3"
+        {/* כרטיסיות ילדים + לווה אחר – כמו בפופאפ רכישת יחידות */}
+        <div className="w-full flex flex-col items-end" dir="rtl">
+          <p
+            className="w-full mb-4 sm:mb-5"
             style={{
               fontFamily: 'var(--font-family-base)',
-              fontSize: 'var(--text-sm)',
+              fontSize: 'clamp(14px, 2.5vw, 16px)',
+              color: '#141E44',
               fontWeight: 'var(--font-weight-normal)',
-              color: 'var(--muted-foreground)',
               textAlign: 'right',
+              lineHeight: '20px',
             }}
           >
-            שם מלא
-          </label>
-          <div className="flex flex-wrap gap-2 sm:gap-3">
+            יש לבחור ילד/ה או לווה אחר:
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-3 sm:gap-[14px]">
             {childrenForLoan.map((child) => {
-              const selected = step1.borrowerType === 'child' && step1.selectedChildId === child.id;
+              const isSelected = step1.borrowerType === 'child' && step1.selectedChildId === child.id;
               return (
-                <button
+                <BorrowerChildCard
                   key={child.id}
-                  type="button"
+                  child={child}
+                  isSelected={isSelected}
                   onClick={() =>
                     setStep1((p) => ({
                       ...p,
@@ -1236,43 +1352,11 @@ function Step1Form({
                       fullName: child.name,
                     }))
                   }
-                  className="flex flex-col items-center justify-center gap-1.5 min-h-[88px] w-[min(120px,28vw)] sm:w-[110px] shrink-0 rounded-xl border transition-all cursor-pointer"
-                  style={{
-                    fontFamily: 'var(--font-family-base)',
-                    background: selected ? '#EFF6FF' : 'var(--card)',
-                    borderColor: selected ? 'var(--primary)' : 'var(--border)',
-                    borderWidth: selected ? 2 : 1,
-                    boxShadow: selected ? '0 2px 8px rgba(23, 37, 84, 0.12)' : 'var(--elevation-sm)',
-                  }}
-                >
-                  <div
-                    className="flex items-center justify-center w-10 h-10 rounded-full shrink-0"
-                    style={{ background: selected ? 'rgba(23, 37, 84, 0.12)' : 'var(--muted)' }}
-                  >
-                    <User size={20} style={{ color: selected ? 'var(--primary)' : 'var(--muted-foreground)' }} />
-                  </div>
-                  <span
-                    className="text-center block truncate w-full px-1"
-                    style={{
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: selected ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
-                      color: selected ? 'var(--primary)' : 'var(--foreground)',
-                    }}
-                  >
-                    {child.name}
-                  </span>
-                  <span
-                    className="text-center block text-xs"
-                    style={{ color: 'var(--muted-foreground)' }}
-                  >
-                    {child.unitsCount} יחידות
-                  </span>
-                </button>
+                />
               );
             })}
-            {/* משבצת לווה אחר */}
-            <button
-              type="button"
+            <BorrowerOtherCard
+              isSelected={step1.borrowerType === 'other'}
               onClick={() =>
                 setStep1((p) => ({
                   ...p,
@@ -1281,43 +1365,22 @@ function Step1Form({
                   fullName: p.fullName,
                 }))
               }
-              className="flex flex-col items-center justify-center min-h-[88px] w-[min(120px,28vw)] sm:w-[110px] shrink-0 rounded-xl border transition-all cursor-pointer"
-              style={{
-                fontFamily: 'var(--font-family-base)',
-                background: step1.borrowerType === 'other' ? '#EFF6FF' : 'var(--card)',
-                borderColor: step1.borrowerType === 'other' ? 'var(--primary)' : 'var(--border)',
-                borderWidth: step1.borrowerType === 'other' ? 2 : 1,
-                boxShadow: step1.borrowerType === 'other' ? '0 2px 8px rgba(23, 37, 84, 0.12)' : 'var(--elevation-sm)',
-              }}
-            >
-              <span
-                className="text-center px-2"
-                style={{
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: step1.borrowerType === 'other' ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
-                  color: step1.borrowerType === 'other' ? 'var(--primary)' : 'var(--foreground)',
-                }}
-              >
-                לווה אחר
-              </span>
-            </button>
+            />
           </div>
         </div>
 
-        {/* שדה שם מלא – מוצג רק כש"לווה אחר" נבחר */}
-        {step1.borrowerType === 'other' && (
-          <div className="w-full">
+        {/* שם מלא (רק בלווה אחר) | ת.ז. | תאריך לידה – באותה שורה */}
+        <div
+          className={`grid gap-4 ${step1.borrowerType === 'other' ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2'}`}
+        >
+          {step1.borrowerType === 'other' && (
             <WizardInput
               label="שם מלא"
               value={step1.fullName}
               onChange={(v) => setStep1((p) => ({ ...p, fullName: v }))}
               placeholder="הזן שם מלא"
             />
-          </div>
-        )}
-
-        {/* ת.ז. | תאריך לידה */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          )}
           <WizardInput
             label="ת.ז."
             value={step1.idNumber}
