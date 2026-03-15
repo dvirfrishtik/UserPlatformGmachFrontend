@@ -11,7 +11,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog';
 import { LoanRepaymentTable } from '@/components/LoanRepaymentTable';
 
@@ -2971,7 +2970,7 @@ function Step5Form({
               יש לגלול עד הסוף ולקרוא את כל התנאים
             </div>
           )}
-          <DialogFooter
+          <div
             className="w-full flex flex-row justify-center items-center gap-3 shrink-0 px-6 sm:px-8 py-5 border-t border-[var(--border)]"
             style={{ direction: 'rtl' }}
           >
@@ -3013,7 +3012,7 @@ function Step5Form({
             >
               אני מאשר את התנאים
             </button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
