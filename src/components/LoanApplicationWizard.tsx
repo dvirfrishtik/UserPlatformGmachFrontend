@@ -1484,19 +1484,6 @@ function Step1Form({
       <div className="flex flex-col gap-5 max-w-[720px] w-full min-w-0">
         {/* כרטיסיות ילדים + לווה אחר – כמו בפופאפ רכישת יחידות */}
         <div className="w-full flex flex-col items-end" dir="rtl">
-          <p
-            className="w-full mb-4 sm:mb-5"
-            style={{
-              fontFamily: 'var(--font-family-base)',
-              fontSize: 'clamp(14px, 2.5vw, 16px)',
-              color: '#141E44',
-              fontWeight: 'var(--font-weight-normal)',
-              textAlign: 'right',
-              lineHeight: '20px',
-            }}
-          >
-            יש לבחור ילד/ה או לווה אחר:
-          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-3 sm:gap-[14px]">
             {childrenForLoan.map((child) => {
               const isSelected = step1.borrowerType === 'child' && step1.selectedChildId === child.id;
