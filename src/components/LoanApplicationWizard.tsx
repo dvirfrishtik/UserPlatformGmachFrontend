@@ -2268,18 +2268,27 @@ function UnitCard({
   selected: boolean;
   onToggle: () => void;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
   return (
     <button
       type="button"
       onClick={onToggle}
       dir="rtl"
-      className="flex flex-col rounded-xl cursor-pointer transition-all text-right"
+      className="flex flex-col w-full min-w-0 transition-all text-right cursor-pointer outline-none"
       style={{
-        background: selected ? '#F8FAFC' : '#FFFFFF',
-        border: selected ? '2px solid var(--primary)' : '1.5px solid #E5E9F9',
-        padding: '14px 16px',
+        padding: 'clamp(14px, 3vw, 20px) clamp(16px, 3.5vw, 24px)',
+        borderRadius: '8px',
+        backgroundColor: '#FFFFFF',
+        border: selected ? '1.5px solid #3B82F6' : '1.5px solid transparent',
+        boxShadow: selected
+          ? '0 0 12px rgba(59, 130, 246, 0.12)'
+          : isHovered
+            ? '0 0 12px rgba(24, 47, 67, 0.12)'
+            : '0 0 12px rgba(24, 47, 67, 0.06)',
         position: 'relative',
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Top row: icon+title on the right, checkbox on the left (RTL) */}
       <div className="flex flex-row items-center justify-between w-full mb-3">
@@ -2288,9 +2297,10 @@ function UnitCard({
           <span
             style={{
               fontFamily: 'var(--font-family-base)',
-              fontWeight: 'var(--font-weight-semibold)',
-              fontSize: '14px',
-              color: '#172554',
+              fontWeight: selected ? 'var(--font-weight-bold)' : 'var(--font-weight-semibold)',
+              fontSize: 'clamp(14px, 2.5vw, 16px)',
+              color: selected ? '#141E44' : '#495157',
+              transition: 'color 0.2s ease',
             }}
           >
             יחידה #{unit.unitNumber}
