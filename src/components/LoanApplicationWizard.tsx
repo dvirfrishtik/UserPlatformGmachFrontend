@@ -1609,19 +1609,21 @@ function Step1Form({
                     fontFamily: 'var(--font-family-base)',
                     fontSize: 'var(--text-sm)',
                     fontWeight: selected ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
-                    color: selected ? '#172554' : 'var(--muted-foreground)',
-                    background: selected ? '#EFF6FF' : 'var(--card)',
-                    borderColor: selected ? '#BFDBFE' : 'var(--border)',
+                    color: selected ? '#141E44' : 'var(--muted-foreground)',
+                    background: '#FFFFFF',
+                    borderColor: selected ? '#3B82F6' : 'var(--border)',
+                    borderWidth: selected ? '1.5px' : '1px',
                     borderRadius: isFirst ? '0 999px 999px 0' : isLast ? '999px 0 0 999px' : 0,
                     marginRight: isFirst ? 0 : -1,
                     position: 'relative',
                     zIndex: selected ? 1 : 0,
+                    boxShadow: selected ? '0 0 12px rgba(59, 130, 246, 0.12)' : 'none',
                   }}
                 >
                   <span
                     className="flex items-center justify-center w-[18px] h-[18px] rounded-full shrink-0"
                     style={{
-                      border: `2px solid ${selected ? '#93C5FD' : 'var(--border)'}`,
+                      border: `2px solid ${selected ? '#3B82F6' : 'var(--border)'}`,
                     }}
                   >
                     {selected && (
