@@ -2250,40 +2250,42 @@ function Step2Form({
         )}
       </div>
 
-      {/* ─── Summary bar ─── */}
+      {/* ─── Summary bar – fixed at bottom, gradient background ─── */}
       {totalSelected > 0 && (
-        <div
-          className="flex flex-row flex-wrap items-center justify-between gap-2 max-w-[720px] w-full min-w-0 rounded-xl mt-6 px-4 py-3 sm:px-5 sm:py-3.5"
-          dir="rtl"
-          style={{
-            background: '#FFFFFF',
-            border: '1.5px solid #CCA559',
-            boxShadow: '0 2px 12px rgba(204, 165, 89, 0.1)',
-          }}
-        >
-          <span
+        <div className="fixed inset-x-0 bottom-6 z-[60] flex justify-center pointer-events-none">
+          <div
+            className="pointer-events-auto flex flex-row flex-wrap items-center justify-between gap-2 max-w-[720px] w-[min(720px,92vw)] rounded-full px-5 py-3 sm:px-6 sm:py-3.5"
+            dir="rtl"
             style={{
-              fontFamily: 'var(--font-family-base)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-semibold)',
-              color: '#172554',
+              background: 'linear-gradient(196.765deg, rgb(23, 37, 84) 0%, rgb(7, 13, 35) 100%)',
+              border: '1.5px solid rgba(250, 204, 21, 0.75)',
+              boxShadow: '0 10px 30px rgba(15, 23, 42, 0.45)',
             }}
           >
-            סה״כ נבחרו: {totalSelected} יחידות
-            <span style={{ margin: '0 8px', color: '#CCA559' }}>|</span>
-            סכום להלוואה: {totalLoanAmount.toLocaleString('he-IL')}₪
-          </span>
-          <div className="flex flex-row items-center gap-2">
-            <Info size={14} style={{ color: '#CCA559' }} />
             <span
               style={{
                 fontFamily: 'var(--font-family-base)',
                 fontSize: 'var(--text-sm)',
-                color: '#6B7280',
+                fontWeight: 'var(--font-weight-semibold)',
+                color: '#F9FAFB',
               }}
             >
-              החזר חודשי צפוי: ~{monthlyPayment.toLocaleString('he-IL')}₪
+              סה״כ נבחרו: {totalSelected} יחידות
+              <span style={{ margin: '0 8px', color: '#FACC15' }}>|</span>
+              סכום להלוואה: {totalLoanAmount.toLocaleString('he-IL')}₪
             </span>
+            <div className="flex flex-row items-center gap-2">
+              <Info size={14} style={{ color: '#FACC15' }} />
+              <span
+                style={{
+                  fontFamily: 'var(--font-family-base)',
+                  fontSize: 'var(--text-sm)',
+                  color: '#E5E7EB',
+                }}
+              >
+                החזר חודשי צפוי: ~{monthlyPayment.toLocaleString('he-IL')}₪
+              </span>
+            </div>
           </div>
         </div>
       )}
