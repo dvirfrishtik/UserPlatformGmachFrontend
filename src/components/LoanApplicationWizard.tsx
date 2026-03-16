@@ -1328,43 +1328,50 @@ function UnderAgeApprovalPopup({
           className="flex-1 flex flex-col items-center justify-center overflow-y-auto"
           style={{ padding: '32px 40px' }}
         >
-          <div className="flex flex-col items-center text-center max-w-[560px]">
-            <div
-              className="flex items-center justify-center w-16 h-16 rounded-full shrink-0 mb-6"
-              style={{ background: 'rgba(23, 37, 84, 0.08)' }}
-            >
-              <AlertTriangle size={32} style={{ color: 'var(--primary)' }} strokeWidth={2} />
-            </div>
+          <div className="flex flex-col items-center max-w-[560px] w-full mx-auto text-center">
+            <Image
+              src="/icons/warning.svg"
+              alt=""
+              width={80}
+              height={80}
+              unoptimized
+              className="shrink-0 mb-6"
+            />
             <h3
-              className="mb-4"
+              className="mb-4 w-full"
               style={{
                 fontFamily: 'var(--font-family-base)',
-                fontSize: 'var(--text-2xl)',
+                fontSize: 'clamp(1.35rem, 3vw, 1.75rem)',
                 fontWeight: 'var(--font-weight-bold)',
                 color: '#141E44',
                 lineHeight: 1.35,
+                textAlign: 'center',
               }}
             >
-              תאריך הלידה שנבחר מראה שהלווה צעיר מ־17 שנים ו־10 חודשים. בקשת הלוואה במצב זה דורשת אישור מיוחד.
+              תאריך הלידה שנבחר מראה שהלווה צעיר מ־17 שנים ו־10 חודשים.
+              <br />
+              בקשת הלוואה במצב זה דורשת אישור מיוחד.
             </h3>
             <p
-              className="mb-3"
+              className="mb-3 w-full"
               style={{
                 fontFamily: 'var(--font-family-base)',
                 fontSize: 'var(--text-base)',
                 color: '#495157',
                 lineHeight: 1.6,
+                textAlign: 'center',
               }}
             >
               בקשת הלוואה עבור לווה מתחת לגיל המינימלי מחייבת בדיקה ואישור מיוחד של הגמ״ח.
             </p>
             <p
-              className="mb-8"
+              className="mb-8 w-full"
               style={{
                 fontFamily: 'var(--font-family-base)',
                 fontSize: 'var(--text-base)',
                 color: '#495157',
                 lineHeight: 1.6,
+                textAlign: 'center',
               }}
             >
               המשך התהליך תלוי באישור הגמ״ח ועשוי להאריך משמעותית את זמן הטיפול בבקשה.
