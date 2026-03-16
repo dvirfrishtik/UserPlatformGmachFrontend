@@ -2318,29 +2318,85 @@ function UnitCard({
         </div>
       </div>
 
-      {/* Data row – RTL: עבור, שנת ייעוד, זכאות הלוואה */}
-      <div className="flex flex-row items-start justify-between w-full gap-2">
-        <div className="flex flex-col items-center flex-1">
-          <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '11px', color: '#9CA3AF' }}>
+      {/* Data row – RTL: עבור, שנת ייעוד, זכאות הלוואה – יישור לימין, ללא שבירת שורות */}
+      <div className="flex flex-row items-stretch w-full gap-4" style={{ direction: 'rtl' }}>
+        <div className="flex flex-col items-end flex-1 min-w-0">
+          <span
+            className="block w-full"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: '11px',
+              color: '#9CA3AF',
+              textAlign: 'right',
+              whiteSpace: 'nowrap',
+            }}
+          >
             עבור
           </span>
-          <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '13px', fontWeight: 600, color: '#172554' }}>
+          <span
+            className="block w-full truncate"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#172554',
+              textAlign: 'right',
+            }}
+          >
             {unit.forName}
           </span>
         </div>
-        <div className="flex flex-col items-center flex-1">
-          <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '11px', color: '#9CA3AF' }}>
+        <div className="flex flex-col items-end flex-1 min-w-0">
+          <span
+            className="block w-full"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: '11px',
+              color: '#9CA3AF',
+              textAlign: 'right',
+              whiteSpace: 'nowrap',
+            }}
+          >
             שנת ייעוד
           </span>
-          <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '13px', fontWeight: 600, color: '#172554' }}>
+          <span
+            className="block w-full"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#172554',
+              textAlign: 'right',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {unit.year}
           </span>
         </div>
-        <div className="flex flex-col items-center flex-1">
-          <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '11px', color: '#9CA3AF' }}>
+        <div className="flex flex-col items-end flex-1 min-w-0">
+          <span
+            className="block w-full"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: '11px',
+              color: '#9CA3AF',
+              textAlign: 'right',
+              whiteSpace: 'nowrap',
+            }}
+          >
             זכאות הלוואה
           </span>
-          <span style={{ fontFamily: 'var(--font-family-base)', fontSize: '13px', fontWeight: 600, color: '#172554' }}>
+          <span
+            className="block w-full"
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#172554',
+              textAlign: 'right',
+              whiteSpace: 'nowrap',
+            }}
+          >
             ₪{unit.loanEntitlement.toLocaleString('he-IL')}
           </span>
         </div>
