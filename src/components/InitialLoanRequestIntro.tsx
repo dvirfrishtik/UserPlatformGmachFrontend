@@ -198,7 +198,7 @@ export function InitialLoanRequestIntro({ isOpen, onClose, onStartProcess }: Ini
               }}
             >
               <Image
-                src="/icons/loan.svg"
+                src="/icons/loanreq1.svg"
                 alt=""
                 width={515}
                 height={515}
