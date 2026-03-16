@@ -2342,6 +2342,7 @@ function UnitCard({
               color: '#172554',
               textAlign: 'right',
             }}
+            title={unit.forName}
           >
             {unit.forName}
           </span>
