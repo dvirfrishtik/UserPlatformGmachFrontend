@@ -2106,31 +2106,57 @@ function Step2Form({
       />
       {/* ─── מטרת ההלוואה ─── */}
       <div className="w-full flex flex-col items-center">
-      <div className="w-full max-w-[720px] mb-6" style={{ textAlign: 'right' }}>
-        <h2
-          style={{
-            fontFamily: 'var(--font-family-base)',
-            fontWeight: 'var(--font-weight-bold)',
-            fontSize: 'var(--text-xl)',
-            color: 'var(--primary)',
-            lineHeight: 1.3,
-          }}
-        >
-          מטרת ההלוואה
-        </h2>
-      </div>
-      <div className="flex flex-col gap-5 max-w-[720px] w-full min-w-0">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-3 sm:gap-[14px]">
-          {LOAN_PURPOSE_OPTIONS.map((opt) => (
-            <LoanPurposeCard
-              key={opt.value}
-              option={opt}
-              isSelected={step2.loanPurpose === opt.value}
-              onClick={() => setStep2((p) => ({ ...p, loanPurpose: opt.value }))}
-            />
-          ))}
+        <div className="w-full max-w-[720px] mb-6" style={{ textAlign: 'right' }}>
+          <h2
+            style={{
+              fontFamily: 'var(--font-family-base)',
+              fontWeight: 'var(--font-weight-bold)',
+              fontSize: 'var(--text-xl)',
+              color: 'var(--primary)',
+              lineHeight: 1.3,
+            }}
+          >
+            מטרת ההלוואה
+          </h2>
         </div>
-      </div>
+        <div className="flex flex-col gap-5 max-w-[720px] w-full min-w-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-3 sm:gap-[14px]">
+            {LOAN_PURPOSE_OPTIONS.map((opt) => (
+              <LoanPurposeCard
+                key={opt.value}
+                option={opt}
+                isSelected={step2.loanPurpose === opt.value}
+                onClick={() => setStep2((p) => ({ ...p, loanPurpose: opt.value }))}
+              />
+            ))}
+          </div>
+          {step2.loanPurpose === 'other' && (
+            <div className="mt-1">
+              <label
+                className="block mb-2"
+                style={{
+                  fontFamily: 'var(--font-family-base)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-normal)',
+                  color: 'var(--muted-foreground)',
+                  textAlign: 'right',
+                }}
+              >
+                יש לפרט את מטרת ההלוואה
+              </label>
+              <Input
+                type="text"
+                dir="rtl"
+                placeholder="לדוגמה: סגירת הלוואות קיימות, הוצאות רפואיות, שיפוץ דירה וכד׳"
+                className="w-full h-auto min-h-[44px] rounded-md border border-border bg-input-background text-right px-3 py-2 text-sm placeholder:text-[#9CA3AF]"
+                style={{
+                  fontFamily: 'var(--font-family-base)',
+                  color: 'var(--foreground)',
+                }}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ─── יחידות תרומה עבורן תבוקש ההלוואה ─── */}
