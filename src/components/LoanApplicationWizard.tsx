@@ -707,6 +707,37 @@ export function LoanApplicationWizard({ isOpen, onClose, onExitAndSave, onSubmit
             )}
           </div>
 
+          {/* ─── Units summary – attached above footer ─── */}
+          {currentStep === 2 && step2.selectedUnitIds.length > 0 && (() => {
+            const _total = step2.selectedUnitIds.length;
+            const _amount = DEFAULT_DONATION_UNITS
+              .filter((u) => step2.selectedUnitIds.includes(u.id))
+              .reduce((s, u) => s + u.loanEntitlement, 0);
+            const _monthly = Math.round(_amount / 120);
+            return (
+              <div
+                className="shrink-0 flex flex-row items-center justify-center gap-4 sm:gap-6 px-4 py-2.5 sm:py-3"
+                dir="rtl"
+                style={{
+                  background: 'linear-gradient(135deg, #1E3A5F 0%, #172554 50%, #0F172A 100%)',
+                  borderRadius: '14px 14px 0 0',
+                }}
+              >
+                <span style={{ fontFamily: 'var(--font-family-base)', fontSize: 'var(--text-sm)', fontWeight: 600, color: '#FFFFFF' }}>
+                  {_total} יחידות נבחרו
+                </span>
+                <span style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
+                <span style={{ fontFamily: 'var(--font-family-base)', fontSize: 'var(--text-sm)', fontWeight: 600, color: '#FFFFFF' }}>
+                  סכום להלוואה: {_amount.toLocaleString('he-IL')}₪
+                </span>
+                <span style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
+                <span style={{ fontFamily: 'var(--font-family-base)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>
+                  החזר חודשי צפוי: ~{_monthly.toLocaleString('he-IL')}₪
+                </span>
+              </div>
+            );
+          })()}
+
           {/* ─── Footer – בתוך אזור התוכן, מותאם מובייל ─── */}
           <footer
             className="flex flex-row flex-wrap items-center justify-between gap-3 shrink-0 px-4 py-3 sm:px-6 sm:py-4 md:px-10"
@@ -2246,49 +2277,7 @@ function Step2Form({
         )}
       </div>
 
-      {/* ─── Summary bar – stuck to bottom ─── */}
-      {totalSelected > 0 && (
-        <div
-          className="sticky bottom-0 z-[50] w-full flex flex-row items-center justify-center gap-4 sm:gap-6 px-4 py-2.5 sm:py-3"
-          dir="rtl"
-          style={{
-            background: 'linear-gradient(135deg, #1E3A5F 0%, #172554 50%, #0F172A 100%)',
-            boxShadow: '0 -4px 20px rgba(15, 23, 42, 0.15)',
-          }}
-        >
-          <span
-            style={{
-              fontFamily: 'var(--font-family-base)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-semibold)',
-              color: '#FFFFFF',
-            }}
-          >
-            {totalSelected} יחידות נבחרו
-          </span>
-          <span style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.25)' }} />
-          <span
-            style={{
-              fontFamily: 'var(--font-family-base)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-semibold)',
-              color: '#FFFFFF',
-            }}
-          >
-            סכום להלוואה: {totalLoanAmount.toLocaleString('he-IL')}₪
-          </span>
-          <span style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.25)' }} />
-          <span
-            style={{
-              fontFamily: 'var(--font-family-base)',
-              fontSize: 'var(--text-sm)',
-              color: 'rgba(255,255,255,0.7)',
-            }}
-          >
-            החזר חודשי צפוי: ~{monthlyPayment.toLocaleString('he-IL')}₪
-          </span>
-        </div>
-      )}
+      
       </div>
     </>
   );
