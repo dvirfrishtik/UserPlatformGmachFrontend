@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { LoanRepaymentTable } from '@/components/LoanRepaymentTable';
 
 /* ─── תנאים לבקשת הלוואה (תצוגה בפופאף) ─── */
@@ -2333,19 +2334,25 @@ function UnitCard({
           >
             עבור
           </span>
-          <span
-            className="block w-full truncate"
-            style={{
-              fontFamily: 'var(--font-family-base)',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: '#172554',
-              textAlign: 'right',
-            }}
-            title={unit.forName}
-          >
-            {unit.forName}
-          </span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span
+                className="block w-full truncate"
+                style={{
+                  fontFamily: 'var(--font-family-base)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: '#172554',
+                  textAlign: 'right',
+                }}
+              >
+                {unit.forName}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-[280px] break-words text-right" sideOffset={6}>
+              {unit.forName}
+            </TooltipContent>
+          </Tooltip>
         </div>
         <div className="flex flex-col items-end flex-1 min-w-0">
           <span
