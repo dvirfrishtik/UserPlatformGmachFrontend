@@ -61,8 +61,8 @@ export function AppSidebar() {
         />
       </div>
 
-      {/* Main Menu */}
-      <div className="flex-1 flex flex-col justify-between px-2 py-4">
+      {/* Scrollable menu area */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-4">
         <div className="flex flex-col gap-2">
           {menuItems.slice(0, 2).map((item) => (
             <SidebarItem
@@ -75,7 +75,6 @@ export function AppSidebar() {
             />
           ))}
 
-          {/* Separator after לוח תנועות */}
           <div className="bg-white h-px opacity-30 my-2" />
 
           {menuItems.slice(2).map((item) => (
@@ -89,7 +88,6 @@ export function AppSidebar() {
             />
           ))}
 
-          {/* Divider */}
           <div className="bg-white h-px opacity-30 my-2" />
 
           {lowerMenuItems.map((item) => (
@@ -141,8 +139,10 @@ export function AppSidebar() {
             </div>
           )}
         </div>
+      </div>
 
-        {/* Account Section */}
+      {/* Account Section - fixed at bottom */}
+      <div className="shrink-0 px-2 pb-4 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <div className="flex flex-col">
           {accountItems.map((item) => (
             <SidebarItem
