@@ -79,16 +79,16 @@ function ChangeChargeDayPopup({
   paymentMethodType: 'bank' | 'credit';
   onSelectCharge: (charge: ChargeRow) => void;
 }) {
-  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [selectedDay, setSelectedDay] = useState<number>(charge.chargeDay);
   const [isChargeDropdownOpen, setIsChargeDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setSelectedDay(null);
+      setSelectedDay(charge.chargeDay);
       setIsChargeDropdownOpen(false);
     }
-  }, [isOpen, charge.id]);
+  }, [isOpen, charge.id, charge.chargeDay]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -106,8 +106,8 @@ function ChangeChargeDayPopup({
     ? `הלוואה ${charge.identifier}`
     : `יחידות ${charge.identifier}`;
 
-  const isCurrentDay = selectedDay === charge.chargeDay;
-  const canSubmit = !!selectedDay && !isCurrentDay;
+  const hasChanged = selectedDay !== charge.chargeDay;
+  const canSubmit = hasChanged;
 
   const totalMonthlyForCharge = charge.monthlyAmount;
 
@@ -269,7 +269,7 @@ function ChangeChargeDayPopup({
                           key={c.id}
                           onClick={() => {
                             onSelectCharge(c);
-                            setSelectedDay(null);
+                            setSelectedDay(c.chargeDay);
                             setIsChargeDropdownOpen(false);
                           }}
                           className="w-full transition-colors"
@@ -306,7 +306,7 @@ function ChangeChargeDayPopup({
             </div>
           </div>
 
-          {/* Day selection */}
+          {/* Day selection – pill style inspired by loan request capsules */}
           <div style={{ marginBottom: '32px' }}>
             <label style={{
               display: 'block',
@@ -320,114 +320,124 @@ function ChangeChargeDayPopup({
             </label>
             <div className="flex flex-row-reverse flex-wrap gap-3" style={{ justifyContent: 'flex-start' }}>
               {AVAILABLE_CHARGE_DAYS.map((day) => {
-                const isSelected = selectedDay === day;
+                const isActive = selectedDay === day;
+                const isCurrent = day === charge.chargeDay;
                 return (
                   <button
                     key={day}
                     onClick={() => setSelectedDay(day)}
-                    className="transition-all"
+                    className="inline-flex items-center justify-center gap-2 transition-all"
                     style={{
-                      padding: '10px 28px',
-                      borderRadius: 'var(--radius-button)',
-                      border: isSelected
-                        ? '1.5px solid var(--primary)'
+                      padding: '10px 24px',
+                      borderRadius: '999px',
+                      border: isActive
+                        ? '1.5px solid #3B82F6'
                         : '1.5px solid var(--border)',
-                      backgroundColor: isSelected ? 'var(--primary)' : '#FFFFFF',
-                      color: isSelected ? 'var(--primary-foreground)' : 'var(--foreground)',
-                      fontSize: 'var(--text-base)',
-                      fontWeight: isSelected ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
+                      backgroundColor: '#FFFFFF',
+                      color: isActive ? '#141E44' : 'var(--muted-foreground)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: isActive ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
                       cursor: 'pointer',
-                      boxShadow: isSelected ? '0 2px 8px rgba(23, 37, 84, 0.15)' : '0 0 12px rgba(24, 47, 67, 0.06)',
+                      boxShadow: isActive ? '0 0 12px rgba(59, 130, 246, 0.12)' : '0 0 12px rgba(24, 47, 67, 0.06)',
+                      position: 'relative',
+                      zIndex: isActive ? 1 : 0,
                     }}
                     onMouseEnter={(e) => {
-                      if (!isSelected) {
-                        e.currentTarget.style.borderColor = 'var(--primary)';
-                        e.currentTarget.style.backgroundColor = '#F8F9FC';
+                      if (!isActive) {
+                        e.currentTarget.style.borderColor = '#3B82F6';
+                        e.currentTarget.style.backgroundColor = '#F8FAFF';
                       }
                     }}
                     onMouseLeave={(e) => {
-                      if (!isSelected) {
+                      if (!isActive) {
                         e.currentTarget.style.borderColor = 'var(--border)';
                         e.currentTarget.style.backgroundColor = '#FFFFFF';
                       }
                     }}
                   >
-                    {day} לחודש
+                    <span
+                      className="flex items-center justify-center w-[18px] h-[18px] rounded-full shrink-0"
+                      style={{ border: `2px solid ${isActive ? '#3B82F6' : 'var(--border)'}` }}
+                    >
+                      {isActive && <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#3B82F6' }} />}
+                    </span>
+                    <span>{day} לחודש</span>
+                    {isCurrent && (
+                      <span style={{ fontSize: '11px', color: 'var(--muted-foreground)', fontWeight: 'var(--font-weight-normal)' }}>(נוכחי)</span>
+                    )}
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Info cards – white card style matching the popup's design system */}
-          {selectedDay && !isCurrentDay && (
-            <div
-              className="w-full"
-              style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '8px',
-                boxShadow: '0 0 12px rgba(24, 47, 67, 0.06)',
-                overflow: 'hidden',
-              }}
-            >
+          {/* Info banners – only when a different day is selected */}
+          {hasChanged && (
+            <div className="flex flex-col gap-4">
               <div
-                className="flex items-center gap-3"
+                className="rounded-xl px-4 py-4 sm:px-6 sm:py-5"
                 style={{
-                  padding: '16px 24px',
-                  borderBottom: '1px solid #E5E9F9',
+                  background: '#FFFFFF',
+                  border: '1px solid #E5E9F9',
+                  boxShadow: '0 4px 18px rgba(15, 23, 42, 0.06)',
                 }}
               >
-                <div className="shrink-0 flex items-center justify-center" style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: '#FEF3C7' }}>
-                  <AlertTriangle size={16} style={{ color: '#D97706' }} />
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 mt-0.5">
+                    <AlertTriangle size={18} style={{ color: '#D97706' }} />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p style={{
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      color: '#141E44',
+                      lineHeight: '20px',
+                    }}>
+                      שים לב
+                    </p>
+                    <p style={{
+                      fontSize: 'var(--text-sm)',
+                      color: 'var(--muted-foreground)',
+                      lineHeight: '22px',
+                      fontWeight: 'var(--font-weight-normal)',
+                    }}>
+                      החל מהחיוב הקרוב, התשלום החודשי עבור {chargeLabel} יתבצע ב-<strong style={{ color: '#141E44' }}>{selectedDay} לחודש</strong>.
+                    </p>
+                  </div>
                 </div>
-                <p style={{
-                  fontSize: 'var(--text-sm)',
-                  color: 'var(--foreground)',
-                  lineHeight: '22px',
-                  fontWeight: 'var(--font-weight-normal)',
-                }}>
-                  החל מהחיוב הקרוב, התשלום החודשי עבור {chargeLabel} יתבצע ב-<strong>{selectedDay} לחודש</strong>.
-                </p>
               </div>
               <div
-                className="flex items-center gap-3"
-                style={{ padding: '16px 24px' }}
+                className="rounded-xl px-4 py-4 sm:px-6 sm:py-5"
+                style={{
+                  background: '#FFFFFF',
+                  border: '1px solid #E5E9F9',
+                  boxShadow: '0 4px 18px rgba(15, 23, 42, 0.06)',
+                }}
               >
-                <div className="shrink-0 flex items-center justify-center" style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: '#EFF6FF' }}>
-                  <Info size={16} style={{ color: '#3B82F6' }} />
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 mt-0.5">
+                    <Info size={18} style={{ color: '#3B82F6' }} />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p style={{
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      color: '#141E44',
+                      lineHeight: '20px',
+                    }}>
+                      החיוב הבא
+                    </p>
+                    <p style={{
+                      fontSize: 'var(--text-sm)',
+                      color: 'var(--muted-foreground)',
+                      lineHeight: '22px',
+                      fontWeight: 'var(--font-weight-normal)',
+                    }}>
+                      על סה&quot;כ <strong style={{ color: '#141E44' }}>{totalMonthlyForCharge}</strong>, יתבצע בתאריך <strong style={{ color: '#141E44' }}>{getNextChargeDate(selectedDay)}</strong>.
+                    </p>
+                  </div>
                 </div>
-                <p style={{
-                  fontSize: 'var(--text-sm)',
-                  color: 'var(--foreground)',
-                  lineHeight: '22px',
-                  fontWeight: 'var(--font-weight-normal)',
-                }}>
-                  החיוב הבא, על סה&quot;כ {totalMonthlyForCharge}, יתבצע בתאריך <strong>{getNextChargeDate(selectedDay)}</strong>.
-                </p>
               </div>
-            </div>
-          )}
-
-          {selectedDay && isCurrentDay && (
-            <div
-              className="w-full flex items-center gap-3"
-              style={{
-                padding: '16px 24px',
-                backgroundColor: '#FFFFFF',
-                borderRadius: '8px',
-                boxShadow: '0 0 12px rgba(24, 47, 67, 0.06)',
-              }}
-            >
-              <div className="shrink-0 flex items-center justify-center" style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--muted)' }}>
-                <Info size={16} style={{ color: 'var(--muted-foreground)' }} />
-              </div>
-              <p style={{
-                fontSize: 'var(--text-sm)',
-                color: 'var(--muted-foreground)',
-                lineHeight: '22px',
-              }}>
-                זהו יום החיוב הנוכחי. לא נדרש שינוי.
-              </p>
             </div>
           )}
         </div>
