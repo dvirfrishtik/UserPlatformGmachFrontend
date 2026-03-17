@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import svgPathsBank from "../../imports/svg-gu3atsm2x8";
 import svgPathsCard from "../../imports/svg-ghcztcsik0";
 import svgPathsRefresh from "../../imports/svg-uq5jcfbn1j";
-import IconOutlineEllipsisVertical from "../../imports/IconOutlineEllipsisVertical";
+
 
 function IconOutlineBank() {
   return (
@@ -166,19 +166,17 @@ export function PaymentMethodCard({
                 e.stopPropagation();
                 setIsMenuOpen(!isMenuOpen);
               }}
-              className="text-muted-foreground hover:text-secondary-foreground transition-colors flex items-center justify-center gap-2"
+              className="text-muted-foreground hover:text-foreground transition-all"
               style={{
                 borderRadius: "var(--radius-button, 8px)",
-                padding: "8px 14px",
-                fontSize: "var(--text-base, 16px)",
+                padding: "6px 16px",
+                fontSize: "var(--text-sm, 14px)",
                 fontWeight: "var(--font-weight-semibold, 600)",
                 lineHeight: "20px",
+                background: "white",
               }}
             >
-              <div className="shrink-0" style={{ width: 20, height: 20 }}>
-                <IconOutlineEllipsisVertical />
-              </div>
-              <span>פעולות</span>
+              פעולות
             </button>
 
             {isMenuOpen && (

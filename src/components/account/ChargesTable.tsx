@@ -99,8 +99,8 @@ export function ChargesTable({ charges }: ChargesTableProps) {
                 style={{
                   paddingRight: "var(--spacing-6, 24px)",
                   paddingLeft: "var(--spacing-6, 24px)",
-                  paddingTop: "var(--spacing-4, 16px)",
-                  paddingBottom: "var(--spacing-4, 16px)",
+                  paddingTop: "var(--spacing-5, 20px)",
+                  paddingBottom: "var(--spacing-5, 20px)",
                   borderBottom: index < charges.length - 1 ? "1px solid var(--border)" : "none",
                 }}
               >
