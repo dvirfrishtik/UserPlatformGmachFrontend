@@ -60,7 +60,7 @@ function IconCreditCard({ size = 18, color = "#676767" }: { size?: number; color
   );
 }
 
-const AVAILABLE_CHARGE_DAYS = [2, 5, 10, 15, 20, 25];
+const AVAILABLE_CHARGE_DAYS = [2, 10, 20];
 
 function ChangeChargeDayPopup({
   isOpen,
@@ -107,7 +107,7 @@ function ChangeChargeDayPopup({
     : `יחידות ${charge.identifier}`;
 
   const isCurrentDay = selectedDay === charge.chargeDay;
-  const isDisabled = !selectedDay || isCurrentDay;
+  const canSubmit = !!selectedDay && !isCurrentDay;
 
   const totalMonthlyForCharge = charge.monthlyAmount;
 
@@ -126,106 +126,122 @@ function ChangeChargeDayPopup({
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center"
-      style={{ backgroundColor: "rgba(0, 2, 4, 0.45)", backdropFilter: "blur(6px)" }}
+      style={{ backgroundColor: 'rgba(0, 2, 4, 0.45)', backdropFilter: 'blur(6px)' }}
       onClick={onClose}
     >
       <div
         className="relative flex flex-col"
         style={{
-          width: "min(520px, 92vw)",
-          background: "linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)",
-          borderRadius: "12px",
-          border: "1px solid #E5E9F9",
-          boxShadow: "0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)",
-          overflow: "hidden",
+          width: 'min(1100px, 92vw)',
+          height: 'min(900px, 90vh)',
+          background: 'linear-gradient(180deg, #F7F8FA 0%, #F7F8FA 100%)',
+          borderRadius: '12px',
+          border: '1px solid #E5E9F9',
+          boxShadow: '0 0 12px rgba(24, 47, 67, 0.08), 0 32px 64px -16px rgba(23, 37, 84, 0.18)',
+          overflow: 'hidden',
         }}
         dir="rtl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {/* Header – identical to PurchaseUnitsWizard / AddChildPopup */}
         <div
           className="flex items-center justify-between shrink-0"
-          style={{ padding: "20px 28px", borderBottom: "1px solid #E5E9F9" }}
+          style={{ padding: '20px 32px', borderBottom: '1px solid var(--border)' }}
         >
-          <div style={{ width: "36px" }} />
+          <div style={{ width: '36px' }} />
           <h2 style={{
-            fontSize: "20px",
-            fontWeight: "var(--font-weight-bold)",
-            color: "#141E44",
-            lineHeight: "1.3",
-            textAlign: "center",
+            fontSize: '20px',
+            fontWeight: 'var(--font-weight-bold)',
+            color: 'var(--foreground)',
+            lineHeight: '1.3',
+            textAlign: 'center',
           }}>
             החלפת יום חיוב
           </h2>
           <button
             onClick={onClose}
             className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors hover:bg-[rgba(0,0,0,0.04)]"
-            style={{ border: "none", cursor: "pointer", backgroundColor: "transparent" }}
+            style={{ border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }}
             aria-label="סגור"
           >
-            <X size={20} style={{ color: "#495157" }} />
+            <X size={20} style={{ color: 'var(--muted-foreground)' }} />
           </button>
         </div>
 
         {/* Content */}
-        <div style={{ padding: "28px 28px 0" }}>
+        <div className="flex-1 overflow-y-auto" style={{ padding: '32px 40px' }}>
           {/* Dropdowns row */}
-          <div className="flex gap-4" style={{ marginBottom: "28px" }}>
-            {/* Payment method - read-only display */}
-            <div className="flex flex-col gap-2 flex-1">
-              <p style={{ fontSize: "14px", color: "#6B7280", fontWeight: "var(--font-weight-normal)", textAlign: "right" }}>
+          <div className="grid grid-cols-2 gap-4" style={{ marginBottom: '32px' }}>
+            {/* Payment method - read-only */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-normal)',
+                color: 'var(--muted-foreground)',
+                marginBottom: '8px',
+                textAlign: 'right',
+              }}>
                 אמצעי תשלום
-              </p>
+              </label>
               <div
-                className="flex items-center gap-2"
-                style={{
-                  padding: "8px 14px",
-                  borderRadius: "8px",
-                  border: "1px solid #D1D5DB",
-                  backgroundColor: "#FFFFFF",
-                  height: "44px",
-                }}
+                className="flex items-center gap-2 h-9 w-full rounded-[6px] px-3.5 py-2 border-border bg-input-background text-foreground"
+                style={{ border: '1px solid var(--border)' }}
               >
                 {paymentMethodType === 'bank'
-                  ? <IconBank size={18} color="#495157" />
-                  : <IconCreditCard size={18} color="#495157" />
+                  ? <IconBank size={16} color="var(--muted-foreground)" />
+                  : <IconCreditCard size={16} color="var(--muted-foreground)" />
                 }
-                <span style={{ fontSize: "15px", color: "#141E44", fontWeight: "var(--font-weight-normal)", flex: 1, textAlign: "right" }}>
+                <span style={{
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--foreground)',
+                  fontWeight: 'var(--font-weight-normal)',
+                  flex: 1,
+                  textAlign: 'right',
+                }}>
                   {paymentMethodLabel}
                 </span>
               </div>
             </div>
 
             {/* Charge selector dropdown */}
-            <div className="flex flex-col gap-2 flex-1" ref={dropdownRef}>
-              <p style={{ fontSize: "14px", color: "#6B7280", fontWeight: "var(--font-weight-normal)", textAlign: "right" }}>
+            <div ref={dropdownRef}>
+              <label style={{
+                display: 'block',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-normal)',
+                color: 'var(--muted-foreground)',
+                marginBottom: '8px',
+                textAlign: 'right',
+              }}>
                 חיוב עבור
-              </p>
+              </label>
               <div className="relative">
                 <button
                   onClick={() => setIsChargeDropdownOpen(!isChargeDropdownOpen)}
-                  className="flex items-center gap-2 transition-colors w-full"
+                  className="flex items-center gap-2 transition-colors w-full h-9 rounded-[6px] px-3.5 py-2"
                   style={{
-                    padding: "8px 14px",
-                    borderRadius: "8px",
-                    border: "1px solid #D1D5DB",
-                    backgroundColor: "#FFFFFF",
-                    cursor: "pointer",
-                    justifyContent: "space-between",
-                    height: "44px",
+                    border: '1px solid var(--border)',
+                    backgroundColor: 'var(--input-background)',
+                    cursor: 'pointer',
+                    justifyContent: 'space-between',
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#F9FAFB"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#FFFFFF"; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F9FAFB'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--input-background)'; }}
                 >
-                  <span style={{ fontSize: "15px", color: "#141E44", fontWeight: "var(--font-weight-normal)" }}>
+                  <span style={{
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--foreground)',
+                    fontWeight: 'var(--font-weight-normal)',
+                  }}>
                     {chargeLabel}
                   </span>
                   <ChevronDown
                     size={16}
                     style={{
-                      color: "#6B7280",
-                      transform: isChargeDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
-                      transition: "transform 0.2s ease",
+                      color: 'var(--muted-foreground)',
+                      transform: isChargeDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease',
                     }}
                   />
                 </button>
@@ -233,13 +249,13 @@ function ChangeChargeDayPopup({
                   <div
                     className="absolute z-10 w-full"
                     style={{
-                      top: "calc(100% + 4px)",
+                      top: 'calc(100% + 4px)',
                       right: 0,
-                      backgroundColor: "#FFFFFF",
-                      border: "1px solid #E5E9F9",
-                      borderRadius: "8px",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                      overflow: "hidden",
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid var(--border)',
+                      borderRadius: '6px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                      overflow: 'hidden',
                     }}
                   >
                     {charges.map((c) => {
@@ -258,28 +274,28 @@ function ChangeChargeDayPopup({
                           }}
                           className="w-full transition-colors"
                           style={{
-                            padding: "10px 14px",
-                            textAlign: "right",
-                            fontSize: "15px",
-                            color: isActive ? "#141E44" : "#495157",
-                            fontWeight: isActive ? "var(--font-weight-semibold)" : "var(--font-weight-normal)",
-                            backgroundColor: isActive ? "#F0F4FF" : "#FFFFFF",
-                            border: "none",
-                            cursor: "pointer",
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "2px",
+                            padding: '10px 14px',
+                            textAlign: 'right',
+                            fontSize: 'var(--text-sm)',
+                            color: isActive ? 'var(--foreground)' : 'var(--muted-foreground)',
+                            fontWeight: isActive ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
+                            backgroundColor: isActive ? '#F0F4FF' : '#FFFFFF',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '2px',
                           }}
                           onMouseEnter={(e) => {
-                            if (!isActive) e.currentTarget.style.backgroundColor = "#F9FAFB";
+                            if (!isActive) e.currentTarget.style.backgroundColor = '#F9FAFB';
                           }}
                           onMouseLeave={(e) => {
-                            if (!isActive) e.currentTarget.style.backgroundColor = "#FFFFFF";
+                            if (!isActive) e.currentTarget.style.backgroundColor = '#FFFFFF';
                           }}
                         >
                           <span>{label}</span>
                           {subtitle && (
-                            <span style={{ fontSize: "13px", color: "#9CA3AF" }}>{subtitle}</span>
+                            <span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>{subtitle}</span>
                           )}
                         </button>
                       );
@@ -291,89 +307,101 @@ function ChangeChargeDayPopup({
           </div>
 
           {/* Day selection */}
-          <div style={{ marginBottom: "24px" }}>
-            <p style={{
-              fontSize: "14px",
-              color: "#6B7280",
-              fontWeight: "var(--font-weight-normal)",
-              textAlign: "right",
-              marginBottom: "12px",
+          <div style={{ marginBottom: '32px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-normal)',
+              color: 'var(--muted-foreground)',
+              marginBottom: '12px',
+              textAlign: 'right',
             }}>
               יום חיוב בחודש
-            </p>
-            <div className="flex flex-wrap gap-2" style={{ justifyContent: "flex-end" }}>
+            </label>
+            <div className="flex flex-row-reverse flex-wrap gap-3" style={{ justifyContent: 'flex-start' }}>
               {AVAILABLE_CHARGE_DAYS.map((day) => {
                 const isSelected = selectedDay === day;
-                const isCurrent = day === charge.chargeDay;
                 return (
                   <button
                     key={day}
                     onClick={() => setSelectedDay(day)}
                     className="transition-all"
                     style={{
-                      padding: "8px 20px",
-                      borderRadius: "8px",
+                      padding: '10px 28px',
+                      borderRadius: 'var(--radius-button)',
                       border: isSelected
-                        ? "1.5px solid #172554"
-                        : "1.5px solid #D1D5DB",
-                      backgroundColor: isSelected ? "#172554" : "#FFFFFF",
-                      color: isSelected ? "#FFFFFF" : "#141E44",
-                      fontSize: "15px",
-                      fontWeight: isSelected ? "var(--font-weight-semibold)" : "var(--font-weight-normal)",
-                      cursor: "pointer",
-                      boxShadow: isSelected ? "0 2px 8px rgba(23, 37, 84, 0.15)" : "none",
+                        ? '1.5px solid var(--primary)'
+                        : '1.5px solid var(--border)',
+                      backgroundColor: isSelected ? 'var(--primary)' : '#FFFFFF',
+                      color: isSelected ? 'var(--primary-foreground)' : 'var(--foreground)',
+                      fontSize: 'var(--text-base)',
+                      fontWeight: isSelected ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
+                      cursor: 'pointer',
+                      boxShadow: isSelected ? '0 2px 8px rgba(23, 37, 84, 0.15)' : '0 0 12px rgba(24, 47, 67, 0.06)',
                     }}
                     onMouseEnter={(e) => {
                       if (!isSelected) {
-                        e.currentTarget.style.borderColor = "#172554";
-                        e.currentTarget.style.backgroundColor = "#F8F9FC";
+                        e.currentTarget.style.borderColor = 'var(--primary)';
+                        e.currentTarget.style.backgroundColor = '#F8F9FC';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isSelected) {
-                        e.currentTarget.style.borderColor = "#D1D5DB";
-                        e.currentTarget.style.backgroundColor = "#FFFFFF";
+                        e.currentTarget.style.borderColor = 'var(--border)';
+                        e.currentTarget.style.backgroundColor = '#FFFFFF';
                       }
                     }}
                   >
                     {day} לחודש
-                    {isCurrent && !isSelected && (
-                      <span style={{ fontSize: "12px", color: "#9CA3AF", marginRight: "6px" }}>(נוכחי)</span>
-                    )}
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Info banners */}
+          {/* Info cards – white card style matching the popup's design system */}
           {selectedDay && !isCurrentDay && (
-            <div className="flex flex-col gap-3" style={{ marginBottom: "24px" }}>
+            <div
+              className="w-full"
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '8px',
+                boxShadow: '0 0 12px rgba(24, 47, 67, 0.06)',
+                overflow: 'hidden',
+              }}
+            >
               <div
-                className="flex items-start gap-3"
+                className="flex items-center gap-3"
                 style={{
-                  padding: "14px 16px",
-                  borderRadius: "8px",
-                  backgroundColor: "#FEF9E7",
-                  border: "1px solid #F5E6A3",
+                  padding: '16px 24px',
+                  borderBottom: '1px solid #E5E9F9',
                 }}
               >
-                <AlertTriangle size={18} style={{ color: "#B8860B", marginTop: "1px", shrink: 0 }} />
-                <p style={{ fontSize: "14px", color: "#6B5A00", lineHeight: "22px", fontWeight: "var(--font-weight-normal)" }}>
+                <div className="shrink-0 flex items-center justify-center" style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: '#FEF3C7' }}>
+                  <AlertTriangle size={16} style={{ color: '#D97706' }} />
+                </div>
+                <p style={{
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--foreground)',
+                  lineHeight: '22px',
+                  fontWeight: 'var(--font-weight-normal)',
+                }}>
                   החל מהחיוב הקרוב, התשלום החודשי עבור {chargeLabel} יתבצע ב-<strong>{selectedDay} לחודש</strong>.
                 </p>
               </div>
               <div
-                className="flex items-start gap-3"
-                style={{
-                  padding: "14px 16px",
-                  borderRadius: "8px",
-                  backgroundColor: "#EFF6FF",
-                  border: "1px solid #BFDBFE",
-                }}
+                className="flex items-center gap-3"
+                style={{ padding: '16px 24px' }}
               >
-                <Info size={18} style={{ color: "#3B82F6", marginTop: "1px", shrink: 0 }} />
-                <p style={{ fontSize: "14px", color: "#1E40AF", lineHeight: "22px", fontWeight: "var(--font-weight-normal)" }}>
+                <div className="shrink-0 flex items-center justify-center" style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: '#EFF6FF' }}>
+                  <Info size={16} style={{ color: '#3B82F6' }} />
+                </div>
+                <p style={{
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--foreground)',
+                  lineHeight: '22px',
+                  fontWeight: 'var(--font-weight-normal)',
+                }}>
                   החיוב הבא, על סה&quot;כ {totalMonthlyForCharge}, יתבצע בתאריך <strong>{getNextChargeDate(selectedDay)}</strong>.
                 </p>
               </div>
@@ -382,48 +410,55 @@ function ChangeChargeDayPopup({
 
           {selectedDay && isCurrentDay && (
             <div
-              className="flex items-start gap-3"
+              className="w-full flex items-center gap-3"
               style={{
-                padding: "14px 16px",
-                borderRadius: "8px",
-                backgroundColor: "#F3F5FA",
-                border: "1px solid #E5E9F9",
-                marginBottom: "24px",
+                padding: '16px 24px',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '8px',
+                boxShadow: '0 0 12px rgba(24, 47, 67, 0.06)',
               }}
             >
-              <Info size={18} style={{ color: "#6B7280", marginTop: "1px" }} />
-              <p style={{ fontSize: "14px", color: "#495157", lineHeight: "22px" }}>
+              <div className="shrink-0 flex items-center justify-center" style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--muted)' }}>
+                <Info size={16} style={{ color: 'var(--muted-foreground)' }} />
+              </div>
+              <p style={{
+                fontSize: 'var(--text-sm)',
+                color: 'var(--muted-foreground)',
+                lineHeight: '22px',
+              }}>
                 זהו יום החיוב הנוכחי. לא נדרש שינוי.
               </p>
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div style={{ padding: "0 28px 28px" }}>
+        {/* Footer – identical to AddChildPopup / PurchaseUnitsWizard */}
+        <div
+          className="shrink-0 w-full"
+          style={{ padding: '20px 40px 30px 40px' }}
+        >
           <button
-            disabled={isDisabled}
+            disabled={!canSubmit}
             className="w-full inline-flex items-center justify-center transition-all"
             style={{
-              height: "48px",
-              borderRadius: "8px",
-              fontSize: "16px",
-              fontWeight: "var(--font-weight-semibold)",
-              color: isDisabled ? "#495157" : "#FFFFFF",
-              backgroundColor: isDisabled ? "#E5E9F9" : "#172554",
-              border: "none",
-              cursor: isDisabled ? "not-allowed" : "pointer",
-              opacity: isDisabled ? 0.6 : 1,
+              height: '48px',
+              padding: '0 24px',
+              borderRadius: 'var(--radius-button)',
+              fontSize: 'var(--text-base)',
+              fontWeight: 'var(--font-weight-semibold)',
+              color: canSubmit ? 'var(--primary-foreground)' : 'var(--muted-foreground)',
+              backgroundColor: canSubmit ? 'var(--primary)' : 'var(--muted)',
+              border: 'none',
+              cursor: canSubmit ? 'pointer' : 'not-allowed',
+              opacity: canSubmit ? 1 : 0.6,
             }}
             onMouseEnter={(e) => {
-              if (!isDisabled) e.currentTarget.style.backgroundColor = "#0F1A3E";
+              if (canSubmit) e.currentTarget.style.backgroundColor = '#0F1A3E';
             }}
             onMouseLeave={(e) => {
-              if (!isDisabled) e.currentTarget.style.backgroundColor = "#172554";
+              if (canSubmit) e.currentTarget.style.backgroundColor = 'var(--primary)';
             }}
-            onClick={() => {
-              onClose();
-            }}
+            onClick={() => { onClose(); }}
           >
             אישור
           </button>
