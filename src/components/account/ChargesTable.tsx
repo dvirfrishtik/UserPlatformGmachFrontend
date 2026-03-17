@@ -142,14 +142,18 @@ export function ChargesTable({ charges }: ChargesTableProps) {
                   </p>
                 </div>
                 <div className="flex-1 flex items-center justify-end">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="border-primary text-secondary-foreground hover:bg-primary/5 hover:text-secondary-foreground font-semibold rounded-lg"
-                  >
-                    <IconRefresh />
-                    החלפת אמצעי תשלום
-                  </Button>
+                  <div className="relative group">
+                    <Button
+                      variant="outline"
+                      className="border-primary text-secondary-foreground hover:bg-primary/5 hover:text-secondary-foreground font-semibold rounded-lg h-10 min-h-10 px-3 lg:px-6"
+                    >
+                      <IconRefresh />
+                      <span className="hidden lg:inline">החלפת אמצעי תשלום</span>
+                    </Button>
+                    <div className="lg:hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-foreground text-background text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10">
+                      החלפת אמצעי תשלום
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
