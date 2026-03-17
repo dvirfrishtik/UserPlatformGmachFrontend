@@ -123,7 +123,7 @@ export function PaymentMethodCard({
 
   return (
     <div
-      className="bg-page-section flex flex-col items-start w-full transition-all"
+      className="bg-page-section flex flex-col items-start w-full sm:w-auto sm:flex-[1_1_240px] sm:min-w-[240px] sm:max-w-[320px] transition-all"
       style={{
         borderRadius: "var(--radius-card)",
         border: isSelected ? "1px solid var(--muted-foreground)" : "1px solid var(--border)",
