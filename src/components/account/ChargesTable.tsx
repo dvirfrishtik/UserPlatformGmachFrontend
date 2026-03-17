@@ -1,10 +1,11 @@
 'use client';
 
 import svgPaths from "../../imports/svg-uq5jcfbn1j";
+import { Button } from "@/components/ui/button";
 
 function IconRefresh() {
   return (
-    <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
       <path d={svgPaths.p16638f80} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
     </svg>
   );
@@ -73,7 +74,7 @@ export function ChargesTable({ charges }: ChargesTableProps) {
             </div>
             <div className="flex items-center justify-start" style={{ width: "120px", paddingLeft: "var(--spacing-3, 12px)" }}>
               <p className="text-muted-foreground text-right" style={{ fontSize: "var(--text-sm, 14px)", fontWeight: "var(--font-weight-bold, 700)", lineHeight: "18px" }}>
-                סכום חודשי
+                סכום חיוב חודשי
               </p>
             </div>
             <div className="flex items-center justify-start" style={{ width: "140px", paddingLeft: "var(--spacing-3, 12px)" }}>
@@ -141,21 +142,10 @@ export function ChargesTable({ charges }: ChargesTableProps) {
                   </p>
                 </div>
                 <div className="flex-1 flex items-center justify-end">
-                  <button
-                    className="inline-flex items-center gap-1.5 text-primary hover:bg-muted/50 transition-colors whitespace-nowrap"
-                    style={{
-                      fontSize: "var(--text-sm, 14px)",
-                      fontWeight: "var(--font-weight-semibold, 600)",
-                      lineHeight: "18px",
-                      padding: "6px 12px",
-                      borderRadius: "var(--radius-button)",
-                      border: "1px solid var(--border)",
-                      background: "var(--card)",
-                    }}
-                  >
+                  <Button variant="outline" size="sm">
                     <IconRefresh />
-                    <span>החלפת אמצעי תשלום</span>
-                  </button>
+                    החלפת אמצעי תשלום
+                  </Button>
                 </div>
               </div>
             ))}
@@ -225,20 +215,10 @@ export function ChargesTable({ charges }: ChargesTableProps) {
                 )}
               </div>
             </div>
-            <button
-              className="flex items-center justify-center text-primary hover:bg-muted/40 transition-all w-full"
-              style={{
-                borderRadius: "var(--radius-button)",
-                padding: "var(--spacing-2, 8px)",
-                gap: "var(--spacing-2, 8px)",
-                border: "1px solid var(--border)",
-              }}
-            >
-              <p style={{ fontSize: "var(--text-sm, 14px)", fontWeight: "var(--font-weight-semibold, 600)", lineHeight: "18px" }}>
-                החלפת אמצעי תשלום
-              </p>
+            <Button variant="outline" size="sm" className="w-full">
               <IconRefresh />
-            </button>
+              החלפת אמצעי תשלום
+            </Button>
           </div>
         ))}
       </div>

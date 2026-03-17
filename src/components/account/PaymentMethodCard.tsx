@@ -151,7 +151,7 @@ export function PaymentMethodCard({
                 lineHeight: "18px",
               }}
             >
-              {bankName} {lastFourDigits}
+              {lastFourDigits}
             </p>
           </div>
 
