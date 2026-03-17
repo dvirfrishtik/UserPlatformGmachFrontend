@@ -147,8 +147,8 @@ export function ChargesTable({ charges }: ChargesTableProps) {
                     size="lg"
                     className="border-primary text-secondary-foreground hover:bg-primary/5 hover:text-secondary-foreground font-semibold rounded-lg"
                   >
-                    החלפת אמצעי תשלום
                     <IconRefresh />
+                    החלפת אמצעי תשלום
                   </Button>
                 </div>
               </div>
@@ -224,8 +224,8 @@ export function ChargesTable({ charges }: ChargesTableProps) {
               size="lg"
               className="w-full border-primary text-secondary-foreground hover:bg-primary/5 hover:text-secondary-foreground font-semibold rounded-lg"
             >
-              החלפת אמצעי תשלום
               <IconRefresh />
+              החלפת אמצעי תשלום
             </Button>
           </div>
         ))}
