@@ -19,6 +19,7 @@ export default function AccountPage() {
       identifier: "#25645",
       childName: "שרה לאה",
       monthlyAmount: "₪ 1,400",
+      chargeDay: 5,
       paidPayments: { count: 30, totalAmount: "15,000 ₪" },
     },
     {
@@ -27,6 +28,7 @@ export default function AccountPage() {
       identifier: "#2-4",
       childName: "שרה לאה",
       monthlyAmount: "₪ 240",
+      chargeDay: 5,
       paidPayments: { count: 30, totalAmount: "15,000 ₪" },
     },
     {
@@ -35,6 +37,7 @@ export default function AccountPage() {
       identifier: "#25645",
       childName: "שרה לאה",
       monthlyAmount: "₪ 900",
+      chargeDay: 12,
       paidPayments: { count: 30, totalAmount: "15,000 ₪" },
     },
     {
@@ -43,6 +46,7 @@ export default function AccountPage() {
       identifier: "#1-3",
       childName: "משה",
       monthlyAmount: "₪ 420",
+      chargeDay: 5,
       paidPayments: { count: 24, totalAmount: "10,080 ₪" },
     },
     {
@@ -51,6 +55,7 @@ export default function AccountPage() {
       identifier: "#25646",
       childName: "דוד",
       monthlyAmount: "₪ 240",
+      chargeDay: 20,
       paidPayments: { count: 15, totalAmount: "3,600 ₪" },
     },
   ];
@@ -62,6 +67,7 @@ export default function AccountPage() {
       identifier: "#31245",
       childName: "יעקב דוד",
       monthlyAmount: "₪ 800",
+      chargeDay: 15,
       paidPayments: { count: 18, totalAmount: "8,500 ₪" },
     },
     {
@@ -70,6 +76,7 @@ export default function AccountPage() {
       identifier: "#3-2",
       childName: "רחל",
       monthlyAmount: "₪ 350",
+      chargeDay: 15,
       paidPayments: { count: 22, totalAmount: "6,200 ₪" },
     },
     {
@@ -78,6 +85,7 @@ export default function AccountPage() {
       identifier: "#31246",
       childName: "יעקב דוד",
       monthlyAmount: "₪ 350",
+      chargeDay: 1,
       paidPayments: { count: 10, totalAmount: "3,500 ₪" },
     },
   ];
@@ -126,6 +134,7 @@ export default function AccountPage() {
               lastFourDigits="988-4893855"
               monthlyCharge="₪ 3,200"
               nextChargeDate="10/01"
+              activeChargesCount={mockCharges.length}
               isSelected={expandedCardId === 1}
               onDetailsClick={() => setExpandedCardId(expandedCardId === 1 ? null : 1)}
               hasAnySelected={expandedCardId !== null}
@@ -137,6 +146,7 @@ export default function AccountPage() {
               lastFourDigits="4783"
               monthlyCharge="₪ 1,500"
               nextChargeDate="15/01"
+              activeChargesCount={mockChargesMax.length}
               paymentType="credit-card"
               isSelected={expandedCardId === 2}
               onDetailsClick={() => setExpandedCardId(expandedCardId === 2 ? null : 2)}
@@ -149,6 +159,7 @@ export default function AccountPage() {
               lastFourDigits="456-9876"
               monthlyCharge="₪ 2,800"
               nextChargeDate="20/01"
+              activeChargesCount={0}
               onDetailsClick={() => console.log("Details clicked")}
               hasAnySelected={expandedCardId !== null}
               paymentMethodId={3}

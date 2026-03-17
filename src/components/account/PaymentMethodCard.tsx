@@ -58,6 +58,7 @@ interface PaymentMethodCardProps {
   lastFourDigits: string;
   monthlyCharge: string;
   nextChargeDate: string;
+  activeChargesCount?: number;
   isSelected?: boolean;
   onDetailsClick?: () => void;
   hasAnySelected?: boolean;
@@ -71,6 +72,7 @@ export function PaymentMethodCard({
   lastFourDigits,
   monthlyCharge,
   nextChargeDate,
+  activeChargesCount,
   isSelected = false,
   onDetailsClick,
   hasAnySelected = false,
@@ -240,6 +242,16 @@ export function PaymentMethodCard({
               תאריך חיוב קרוב
             </p>
           </div>
+          {activeChargesCount !== undefined && (
+            <div className="flex flex-col items-start justify-start self-start" style={{ gap: "var(--spacing-0-5, 2px)" }}>
+              <p className="text-foreground text-right whitespace-nowrap" style={{ fontSize: "var(--text-xl)", fontWeight: "var(--font-weight-bold)", lineHeight: "24px" }}>
+                {activeChargesCount}
+              </p>
+              <p className="text-muted-foreground text-right whitespace-nowrap" style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-weight-normal)", lineHeight: "16px" }}>
+                חיובים פעילים
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
