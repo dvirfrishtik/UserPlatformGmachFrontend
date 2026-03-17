@@ -53,6 +53,17 @@ function IconRefresh() {
   );
 }
 
+function IconCalendar() {
+  return (
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  );
+}
+
 interface PaymentMethodCardProps {
   bankName: string;
   lastFourDigits: string;
@@ -166,19 +177,34 @@ export function PaymentMethodCard({
                 e.stopPropagation();
                 setIsMenuOpen(!isMenuOpen);
               }}
-              className="text-muted-foreground hover:text-foreground transition-all flex items-center gap-1.5"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all flex items-center gap-1.5"
               style={{
                 borderRadius: "var(--radius-button, 8px)",
                 padding: "6px 14px",
                 fontSize: "var(--text-sm, 14px)",
                 fontWeight: "var(--font-weight-semibold, 600)",
                 lineHeight: "20px",
-                background: "white",
+                background: isMenuOpen ? "var(--muted)" : "white",
                 border: "1px solid var(--border)",
+                color: isMenuOpen ? "var(--foreground)" : undefined,
               }}
             >
               <span>פעולות</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  opacity: 0.7,
+                  transition: "transform 200ms ease",
+                  transform: isMenuOpen ? "rotate(180deg)" : "rotate(0deg)",
+                }}
+              >
                 <polyline points="6 9 12 15 18 9" />
               </svg>
             </button>
@@ -189,7 +215,7 @@ export function PaymentMethodCard({
                 style={{
                   top: "calc(100% + 4px)",
                   left: "0",
-                  minWidth: "220px",
+                  minWidth: "240px",
                   borderRadius: "var(--radius-lg, 8px)",
                   border: "1px solid var(--border)",
                   boxShadow: "var(--elevation-sm)",
@@ -229,6 +255,23 @@ export function PaymentMethodCard({
                       <IconRefresh />
                     </div>
                     <span>העברת כלל החיובים לאמצעי אחר</span>
+                  </button>
+                  <div style={{ height: "1px", backgroundColor: "var(--border)", margin: "var(--spacing-1, 4px) 0" }} />
+                  <button
+                    onClick={() => handleMenuAction("change-charge-day")}
+                    className="text-foreground hover:bg-muted/60 text-right transition-colors w-full flex items-center justify-start gap-3"
+                    style={{
+                      padding: "var(--spacing-3, 12px) var(--spacing-4, 16px)",
+                      borderRadius: "var(--radius-md, 6px)",
+                      fontSize: "var(--text-base)",
+                      fontWeight: "var(--font-weight-normal)",
+                      lineHeight: "20px",
+                    }}
+                  >
+                    <div className="flex items-center justify-center shrink-0" style={{ width: "20px", height: "20px" }}>
+                      <IconCalendar />
+                    </div>
+                    <span>שינוי יום חיוב לכלל החיובים</span>
                   </button>
                 </div>
               </div>
