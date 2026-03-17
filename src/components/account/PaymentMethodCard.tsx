@@ -156,72 +156,80 @@ export function PaymentMethodCard({
           </div>
 
           {/* More Menu */}
-          {(isSelected || isHovered) && (
-            <div className="relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsMenuOpen(!isMenuOpen);
-                }}
-                className="text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors flex items-center justify-center"
-                style={{ width: "32px", height: "32px", borderRadius: "var(--radius-md, 6px)" }}
-              >
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMenuOpen(!isMenuOpen);
+              }}
+              className="text-secondary-foreground hover:bg-muted/60 transition-colors flex items-center justify-center gap-1"
+              style={{
+                borderRadius: "var(--radius-button, 8px)",
+                border: "1px solid var(--border)",
+                padding: "4px 10px",
+                fontSize: "var(--text-xs, 12px)",
+                fontWeight: "var(--font-weight-semibold, 600)",
+                lineHeight: "16px",
+                background: "var(--card)",
+              }}
+            >
+              <span>פעולות</span>
+              <div className="shrink-0" style={{ width: 16, height: 16 }}>
                 <IconOutlineEllipsisVertical />
-              </button>
+              </div>
+            </button>
 
-              {isMenuOpen && (
-                <div
-                  className="absolute bg-card border-border shadow-lg z-50"
-                  style={{
-                    top: "calc(100% + 4px)",
-                    left: "0",
-                    minWidth: "220px",
-                    borderRadius: "var(--radius-lg, 8px)",
-                    border: "1px solid var(--border)",
-                    boxShadow: "var(--elevation-sm)",
-                  }}
-                  dir="rtl"
-                  ref={menuRef}
-                >
-                  <div className="flex flex-col" style={{ padding: "var(--spacing-1, 4px)" }}>
-                    <button
-                      onClick={() => handleMenuAction("view-details")}
-                      className="text-foreground hover:bg-muted/60 text-right transition-colors w-full flex items-center justify-start gap-3"
-                      style={{
-                        padding: "var(--spacing-3, 12px) var(--spacing-4, 16px)",
-                        borderRadius: "var(--radius-md, 6px)",
-                        fontSize: "var(--text-base)",
-                        fontWeight: "var(--font-weight-normal)",
-                        lineHeight: "20px",
-                      }}
-                    >
-                      <div className="flex items-center justify-center shrink-0" style={{ width: "20px", height: "20px" }}>
-                        <IconEye />
-                      </div>
-                      <span>צפייה בפירוט תנועות</span>
-                    </button>
-                    <div style={{ height: "1px", backgroundColor: "var(--border)", margin: "var(--spacing-1, 4px) 0" }} />
-                    <button
-                      onClick={() => handleMenuAction("change-payment")}
-                      className="text-foreground hover:bg-muted/60 text-right transition-colors w-full flex items-center justify-start gap-3"
-                      style={{
-                        padding: "var(--spacing-3, 12px) var(--spacing-4, 16px)",
-                        borderRadius: "var(--radius-md, 6px)",
-                        fontSize: "var(--text-base)",
-                        fontWeight: "var(--font-weight-normal)",
-                        lineHeight: "20px",
-                      }}
-                    >
-                      <div className="flex items-center justify-center shrink-0" style={{ width: "20px", height: "20px" }}>
-                        <IconRefresh />
-                      </div>
-                      <span>העברת כלל החיובים לאמצעי אחר</span>
-                    </button>
-                  </div>
+            {isMenuOpen && (
+              <div
+                className="absolute bg-card border-border shadow-lg z-50"
+                style={{
+                  top: "calc(100% + 4px)",
+                  left: "0",
+                  minWidth: "220px",
+                  borderRadius: "var(--radius-lg, 8px)",
+                  border: "1px solid var(--border)",
+                  boxShadow: "var(--elevation-sm)",
+                }}
+                dir="rtl"
+              >
+                <div className="flex flex-col" style={{ padding: "var(--spacing-1, 4px)" }}>
+                  <button
+                    onClick={() => handleMenuAction("view-details")}
+                    className="text-foreground hover:bg-muted/60 text-right transition-colors w-full flex items-center justify-start gap-3"
+                    style={{
+                      padding: "var(--spacing-3, 12px) var(--spacing-4, 16px)",
+                      borderRadius: "var(--radius-md, 6px)",
+                      fontSize: "var(--text-base)",
+                      fontWeight: "var(--font-weight-normal)",
+                      lineHeight: "20px",
+                    }}
+                  >
+                    <div className="flex items-center justify-center shrink-0" style={{ width: "20px", height: "20px" }}>
+                      <IconEye />
+                    </div>
+                    <span>צפייה בפירוט תנועות</span>
+                  </button>
+                  <div style={{ height: "1px", backgroundColor: "var(--border)", margin: "var(--spacing-1, 4px) 0" }} />
+                  <button
+                    onClick={() => handleMenuAction("change-payment")}
+                    className="text-foreground hover:bg-muted/60 text-right transition-colors w-full flex items-center justify-start gap-3"
+                    style={{
+                      padding: "var(--spacing-3, 12px) var(--spacing-4, 16px)",
+                      borderRadius: "var(--radius-md, 6px)",
+                      fontSize: "var(--text-base)",
+                      fontWeight: "var(--font-weight-normal)",
+                      lineHeight: "20px",
+                    }}
+                  >
+                    <div className="flex items-center justify-center shrink-0" style={{ width: "20px", height: "20px" }}>
+                      <IconRefresh />
+                    </div>
+                    <span>העברת כלל החיובים לאמצעי אחר</span>
+                  </button>
                 </div>
-              )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Stats */}
