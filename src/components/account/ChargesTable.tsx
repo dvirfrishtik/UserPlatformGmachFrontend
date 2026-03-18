@@ -306,7 +306,7 @@ function ChangeChargeDayPopup({
             </div>
           </div>
 
-          {/* Day selection – pill style inspired by loan request capsules */}
+          {/* Day selection – connected pill strip (same as loan request marital status) */}
           <div style={{ marginBottom: '32px' }}>
             <label style={{
               display: 'block',
@@ -318,57 +318,96 @@ function ChangeChargeDayPopup({
             }}>
               יום חיוב בחודש
             </label>
-            <div className="flex flex-row-reverse flex-wrap gap-3" style={{ justifyContent: 'flex-start' }}>
-              {AVAILABLE_CHARGE_DAYS.map((day) => {
-                const isActive = selectedDay === day;
-                const isCurrent = day === charge.chargeDay;
-                return (
-                  <button
-                    key={day}
-                    onClick={() => setSelectedDay(day)}
-                    className="inline-flex items-center justify-center gap-2 transition-all"
-                    style={{
-                      padding: '10px 24px',
-                      borderRadius: '999px',
-                      border: isActive
-                        ? '1.5px solid #3B82F6'
-                        : '1.5px solid var(--border)',
-                      backgroundColor: '#FFFFFF',
-                      color: isActive ? '#141E44' : 'var(--muted-foreground)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: isActive ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
-                      cursor: 'pointer',
-                      boxShadow: isActive ? '0 0 12px rgba(59, 130, 246, 0.12)' : '0 0 12px rgba(24, 47, 67, 0.06)',
-                      position: 'relative',
-                      zIndex: isActive ? 1 : 0,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.borderColor = '#3B82F6';
-                        e.currentTarget.style.backgroundColor = '#F8FAFF';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.borderColor = 'var(--border)';
-                        e.currentTarget.style.backgroundColor = '#FFFFFF';
-                      }
-                    }}
-                  >
-                    <span
-                      className="flex items-center justify-center w-[18px] h-[18px] rounded-full shrink-0"
-                      style={{ border: `2px solid ${isActive ? '#3B82F6' : 'var(--border)'}` }}
-                    >
-                      {isActive && <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#3B82F6' }} />}
-                    </span>
-                    <span>{day} לחודש</span>
-                    {isCurrent && (
-                      <span style={{ fontSize: '11px', color: 'var(--muted-foreground)', fontWeight: 'var(--font-weight-normal)' }}>(נוכחי)</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+            {(() => {
+              const days = [...AVAILABLE_CHARGE_DAYS];
+              if (!days.includes(charge.chargeDay)) {
+                days.push(charge.chargeDay);
+                days.sort((a, b) => a - b);
+              }
+              const count = days.length;
+              return (
+                <>
+                  {/* Desktop: connected pill strip */}
+                  <div className="hidden sm:flex" style={{ direction: 'rtl' }}>
+                    {days.map((day, i) => {
+                      const selected = selectedDay === day;
+                      const isCurrent = day === charge.chargeDay;
+                      const isFirst = i === 0;
+                      const isLast = i === count - 1;
+                      return (
+                        <button
+                          key={day}
+                          type="button"
+                          onClick={() => setSelectedDay(day)}
+                          className="inline-flex items-center justify-center gap-2 min-h-[44px] h-11 cursor-pointer transition-all border"
+                          style={{
+                            fontFamily: 'var(--font-family-base)',
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: selected ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
+                            color: selected ? '#141E44' : 'var(--muted-foreground)',
+                            background: '#FFFFFF',
+                            borderColor: selected ? '#3B82F6' : 'var(--border)',
+                            borderWidth: selected ? '1.5px' : '1px',
+                            borderRadius: isFirst ? '0 999px 999px 0' : isLast ? '999px 0 0 999px' : '0',
+                            marginRight: isFirst ? 0 : -1,
+                            position: 'relative',
+                            zIndex: selected ? 1 : 0,
+                            boxShadow: selected ? '0 0 12px rgba(59, 130, 246, 0.12)' : 'none',
+                            padding: '0 20px',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <span
+                            className="flex items-center justify-center w-[18px] h-[18px] rounded-full shrink-0"
+                            style={{ border: `2px solid ${selected ? '#3B82F6' : 'var(--border)'}` }}
+                          >
+                            {selected && <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#3B82F6' }} />}
+                          </span>
+                          {day} לחודש
+                          {isCurrent && <span style={{ fontSize: '11px', color: 'var(--muted-foreground)', fontWeight: 'var(--font-weight-normal)', marginRight: '2px' }}>(נוכחי)</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Mobile: individual pills */}
+                  <div className="flex sm:hidden flex-row gap-2 overflow-x-auto pb-1" dir="rtl">
+                    {days.map((day) => {
+                      const selected = selectedDay === day;
+                      const isCurrent = day === charge.chargeDay;
+                      return (
+                        <button
+                          key={day}
+                          type="button"
+                          onClick={() => setSelectedDay(day)}
+                          className="inline-flex items-center justify-center gap-1.5 min-h-[40px] h-10 px-3 shrink-0 cursor-pointer transition-all"
+                          style={{
+                            fontFamily: 'var(--font-family-base)',
+                            fontSize: '13px',
+                            fontWeight: selected ? 600 : 400,
+                            color: selected ? '#141E44' : 'var(--muted-foreground)',
+                            background: '#FFFFFF',
+                            border: `${selected ? '1.5px' : '1px'} solid ${selected ? '#3B82F6' : 'var(--border)'}`,
+                            borderRadius: '999px',
+                            boxShadow: selected ? '0 0 12px rgba(59, 130, 246, 0.12)' : 'none',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <span
+                            className="flex items-center justify-center w-4 h-4 rounded-full shrink-0"
+                            style={{ border: `2px solid ${selected ? '#3B82F6' : 'var(--border)'}` }}
+                          >
+                            {selected && <span className="w-2 h-2 rounded-full" style={{ background: '#3B82F6' }} />}
+                          </span>
+                          {day} לחודש
+                          {isCurrent && <span style={{ fontSize: '11px', color: 'var(--muted-foreground)' }}>(נוכחי)</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })()}
           </div>
 
           {/* Info banners – only when a different day is selected */}
