@@ -80,12 +80,14 @@ function ChangeChargeDayPopup({
   onSelectCharge: (charge: ChargeRow) => void;
 }) {
   const [selectedDay, setSelectedDay] = useState<number>(charge.chargeDay);
+  const [isAllChargesSelected, setIsAllChargesSelected] = useState(false);
   const [isChargeDropdownOpen, setIsChargeDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
       setSelectedDay(charge.chargeDay);
+      setIsAllChargesSelected(false);
       setIsChargeDropdownOpen(false);
     }
   }, [isOpen, charge.id, charge.chargeDay]);
@@ -105,6 +107,8 @@ function ChangeChargeDayPopup({
   const chargeLabel = charge.type === 'loan'
     ? `הלוואה ${charge.identifier}`
     : `יחידות ${charge.identifier}`;
+
+  const chargeScopeLabel = isAllChargesSelected ? 'כל החיובים' : chargeLabel;
 
   const hasChanged = selectedDay !== charge.chargeDay;
   const canSubmit = hasChanged;
@@ -234,7 +238,7 @@ function ChangeChargeDayPopup({
                     color: 'var(--foreground)',
                     fontWeight: 'var(--font-weight-normal)',
                   }}>
-                    {chargeLabel}
+                    {chargeScopeLabel}
                   </span>
                   <ChevronDown
                     size={16}
@@ -258,6 +262,35 @@ function ChangeChargeDayPopup({
                       overflow: 'hidden',
                     }}
                   >
+                    <button
+                      key="all-charges"
+                      onClick={() => {
+                        setIsAllChargesSelected(true);
+                        setIsChargeDropdownOpen(false);
+                      }}
+                      className="w-full transition-colors"
+                      style={{
+                        padding: '10px 14px',
+                        textAlign: 'right',
+                        fontSize: 'var(--text-sm)',
+                        color: isAllChargesSelected ? 'var(--foreground)' : 'var(--muted-foreground)',
+                        fontWeight: isAllChargesSelected ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
+                        backgroundColor: isAllChargesSelected ? '#F0F4FF' : '#FFFFFF',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '2px',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isAllChargesSelected) e.currentTarget.style.backgroundColor = '#F9FAFB';
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isAllChargesSelected) e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      }}
+                    >
+                      <span>כל החיובים</span>
+                    </button>
                     {charges.map((c) => {
                       const label = c.type === 'loan'
                         ? `הלוואה ${c.identifier}`
@@ -268,6 +301,7 @@ function ChangeChargeDayPopup({
                         <button
                           key={c.id}
                           onClick={() => {
+                            setIsAllChargesSelected(false);
                             onSelectCharge(c);
                             setSelectedDay(c.chargeDay);
                             setIsChargeDropdownOpen(false);
@@ -410,72 +444,61 @@ function ChangeChargeDayPopup({
             })()}
           </div>
 
-          {/* Info banners – only when a different day is selected */}
+          {/* Info banners – match provided inspector styles */}
           {hasChanged && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <div
-                className="rounded-xl px-4 py-4 sm:px-6 sm:py-5"
+                className="w-full flex items-center justify-between"
                 style={{
-                  background: '#FFFFFF',
-                  border: '1px solid #E5E9F9',
-                  boxShadow: '0 4px 18px rgba(15, 23, 42, 0.06)',
+                  backgroundColor: '#fff3e0',
+                  border: '1px solid #ff9800',
+                  borderRadius: '8px',
+                  padding: '12px 16px',
                 }}
               >
-                <div className="flex items-start gap-3">
-                  <div className="shrink-0 mt-0.5">
-                    <AlertTriangle size={18} style={{ color: '#D97706' }} />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <p style={{
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: 'var(--font-weight-semibold)',
-                      color: '#141E44',
-                      lineHeight: '20px',
-                    }}>
-                      שים לב
-                    </p>
-                    <p style={{
-                      fontSize: 'var(--text-sm)',
-                      color: 'var(--muted-foreground)',
-                      lineHeight: '22px',
-                      fontWeight: 'var(--font-weight-normal)',
-                    }}>
-                      החל מהחיוב הקרוב, התשלום החודשי עבור {chargeLabel} יתבצע ב-<strong style={{ color: '#141E44' }}>{selectedDay} לחודש</strong>.
-                    </p>
-                  </div>
+                <div className="shrink-0 flex items-center justify-center" style={{ width: 22, height: 22 }}>
+                  <AlertTriangle size={18} style={{ color: '#D97706' }} />
                 </div>
+                <p
+                  className="min-w-0"
+                  style={{
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--foreground)',
+                    lineHeight: '20px',
+                    fontWeight: 'var(--font-weight-normal)',
+                    textAlign: 'right',
+                    flex: 1,
+                  }}
+                >
+                  החל מהחיוב הקרוב, התשלום החודשי עבור {chargeScopeLabel} יתבצע ב-<strong>{selectedDay} לחודש</strong>.
+                </p>
               </div>
+
               <div
-                className="rounded-xl px-4 py-4 sm:px-6 sm:py-5"
+                className="w-full flex items-center justify-between"
                 style={{
-                  background: '#FFFFFF',
-                  border: '1px solid #E5E9F9',
-                  boxShadow: '0 4px 18px rgba(15, 23, 42, 0.06)',
+                  backgroundColor: '#e3f2fd',
+                  border: '1px solid #2196f3',
+                  borderRadius: '8px',
+                  padding: '12px 16px',
                 }}
               >
-                <div className="flex items-start gap-3">
-                  <div className="shrink-0 mt-0.5">
-                    <Info size={18} style={{ color: '#3B82F6' }} />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <p style={{
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: 'var(--font-weight-semibold)',
-                      color: '#141E44',
-                      lineHeight: '20px',
-                    }}>
-                      החיוב הבא
-                    </p>
-                    <p style={{
-                      fontSize: 'var(--text-sm)',
-                      color: 'var(--muted-foreground)',
-                      lineHeight: '22px',
-                      fontWeight: 'var(--font-weight-normal)',
-                    }}>
-                      על סה&quot;כ <strong style={{ color: '#141E44' }}>{totalMonthlyForCharge}</strong>, יתבצע בתאריך <strong style={{ color: '#141E44' }}>{getNextChargeDate(selectedDay)}</strong>.
-                    </p>
-                  </div>
+                <div className="shrink-0 flex items-center justify-center" style={{ width: 22, height: 22 }}>
+                  <Info size={18} style={{ color: '#3B82F6' }} />
                 </div>
+                <p
+                  className="min-w-0"
+                  style={{
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--foreground)',
+                    lineHeight: '20px',
+                    fontWeight: 'var(--font-weight-normal)',
+                    textAlign: 'right',
+                    flex: 1,
+                  }}
+                >
+                  החיוב הבא, על סה&quot;כ <strong>{totalMonthlyForCharge}</strong>, יתבצע בתאריך <strong>{getNextChargeDate(selectedDay)}</strong>.
+                </p>
               </div>
             </div>
           )}
