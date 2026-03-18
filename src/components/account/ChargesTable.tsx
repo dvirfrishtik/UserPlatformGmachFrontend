@@ -5,6 +5,19 @@ import { X, ChevronDown, AlertTriangle, Info } from 'lucide-react';
 import svgPaths from "../../imports/svg-uq5jcfbn1j";
 import { Button } from "@/components/ui/button";
 
+function IconAlertInfoBadge() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+      <circle cx="11" cy="11" r="10" fill="#FF9800" />
+      <path
+        d="M11 5.6c.6 0 1.05.45 1.05 1.05v5.9c0 .6-.45 1.05-1.05 1.05s-1.05-.45-1.05-1.05v-5.9c0-.6.45-1.05 1.05-1.05Z"
+        fill="#FFFFFF"
+      />
+      <circle cx="11" cy="16.2" r="1.1" fill="#FFFFFF" />
+    </svg>
+  );
+}
+
 function IconRefresh() {
   return (
     <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
@@ -454,16 +467,19 @@ function ChangeChargeDayPopup({
           {hasChanged && (
             <div className="flex flex-col gap-3">
               <div
-                className="w-full flex items-center justify-between"
+                className="w-full flex items-center"
                 style={{
                   backgroundColor: '#fff3e0',
                   border: '1px solid #ff9800',
                   borderRadius: '8px',
                   padding: '12px 16px',
+                  flexDirection: 'row-reverse',
+                  justifyContent: 'flex-start',
+                  gap: '12px',
                 }}
               >
                 <div className="shrink-0 flex items-center justify-center" style={{ width: 22, height: 22 }}>
-                  <AlertTriangle size={18} style={{ color: '#D97706' }} />
+                  <IconAlertInfoBadge />
                 </div>
                 <p
                   className="min-w-0"
@@ -481,16 +497,19 @@ function ChangeChargeDayPopup({
               </div>
 
               <div
-                className="w-full flex items-center justify-between"
+                className="w-full flex items-center"
                 style={{
-                  backgroundColor: '#e3f2fd',
-                  border: '1px solid #2196f3',
+                  backgroundColor: '#fff3e0',
+                  border: '1px solid #ff9800',
                   borderRadius: '8px',
                   padding: '12px 16px',
+                  flexDirection: 'row-reverse',
+                  justifyContent: 'flex-start',
+                  gap: '12px',
                 }}
               >
                 <div className="shrink-0 flex items-center justify-center" style={{ width: 22, height: 22 }}>
-                  <Info size={18} style={{ color: '#3B82F6' }} />
+                  <IconAlertInfoBadge />
                 </div>
                 <p
                   className="min-w-0"
