@@ -492,7 +492,16 @@ function ChangeChargeDayPopup({
                     flex: 1,
                   }}
                 >
-                  החל מהחיוב הקרוב, התשלום החודשי עבור {chargeScopeLabel} יתבצע ב-<strong>{selectedDay} לחודש</strong>.
+                  {isAllChargesSelected ? (
+                    <>
+                      החל מהחיוב הקרוב, התשלום החודשי עבור כל החיובים תחת האמצעי הנבחר יתבצע ב-
+                      <strong>{selectedDay} לחודש</strong>.
+                    </>
+                  ) : (
+                    <>
+                      החל מהחיוב הקרוב, התשלום החודשי עבור {chargeScopeLabel} יתבצע ב-<strong>{selectedDay} לחודש</strong>.
+                    </>
+                  )}
                 </p>
               </div>
 
