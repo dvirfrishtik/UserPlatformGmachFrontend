@@ -43,7 +43,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen w-full flex bg-page-section overflow-x-hidden" dir="rtl">
+    <div
+      className="min-h-screen w-full flex bg-page-section overflow-x-hidden"
+      dir="rtl"
+      style={{
+        ["--sidebar-width" as any]:
+          windowWidth >= 768 ? (isSidebarCollapsed ? "72px" : "237px") : "0px",
+      }}
+    >
       {/* Desktop Sidebar - Hidden on Mobile */}
       <div className="hidden md:block">
         <AppSidebar collapsed={isSidebarCollapsed} onToggleCollapsed={handleToggleSidebarCollapsed} />
@@ -62,7 +69,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main Content Area */}
       <div
         className="flex-1 flex flex-col min-h-screen min-w-0"
-        style={{ marginRight: windowWidth >= 768 ? (isSidebarCollapsed ? '72px' : '237px') : 0 }}
+        style={{ marginRight: "var(--sidebar-width, 237px)" }}
       >
         {/* Mobile Header */}
         <div className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-card border-b border-border shadow-[var(--elevation-sm)]">
