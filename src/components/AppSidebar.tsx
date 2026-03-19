@@ -5,7 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-export function AppSidebar() {
+export function AppSidebar({
+  collapsed = false,
+  onToggleCollapsed,
+}: {
+  collapsed?: boolean;
+  onToggleCollapsed?: () => void;
+}) {
   const pathname = usePathname();
 
   const menuItems = [
@@ -98,16 +104,34 @@ export function AppSidebar() {
 
   return (
     <div
-      className="fixed top-0 right-0 h-screen w-[237px] flex flex-col z-50"
+      className={`fixed top-0 right-0 h-screen flex flex-col z-50 transition-[width] duration-200 ${collapsed ? "w-[72px]" : "w-[237px]"}`}
       style={{ background: "linear-gradient(196.765deg, rgb(23, 37, 84) 0%, rgb(7, 13, 35) 100%)" }}
     >
       {/* Header with Logo */}
-      <div className="h-[72px] flex items-center justify-start px-2 bg-[#172554]">
-        <img
-          alt="Logo"
-          className="h-[36px] w-[156px] object-cover"
-          src="/assets/f63bc72c8d54f154a5f6f3eb5aa95d02b6f326c9.png"
-        />
+      <div className="h-[72px] flex items-center justify-between px-2 bg-[#172554]">
+        {!collapsed ? (
+          <img
+            alt="Logo"
+            className="h-[36px] w-[156px] object-cover"
+            src="/assets/f63bc72c8d54f154a5f6f3eb5aa95d02b6f326c9.png"
+          />
+        ) : (
+          <div className="w-10" />
+        )}
+        {onToggleCollapsed && (
+          <button
+            type="button"
+            onClick={onToggleCollapsed}
+            className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.08)]"
+            style={{ border: "1px solid rgba(255,255,255,0.18)" }}
+            aria-label={collapsed ? "הרחבת תפריט" : "צמצום תפריט"}
+            title={collapsed ? "הרחבת תפריט" : "צמצום תפריט"}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ transform: collapsed ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }}>
+              <path d="M9 6l6 6-6 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Scrollable menu area */}
@@ -115,7 +139,7 @@ export function AppSidebar() {
         .sidebar-scroll::-webkit-scrollbar { width: 0; background: transparent; }
         .sidebar-scroll { scrollbar-width: none; }
       `}</style>
-      <div ref={scrollRef} className="sidebar-scroll flex-1 overflow-y-auto overflow-x-hidden px-2 py-4">
+      <div ref={scrollRef} className={`sidebar-scroll flex-1 overflow-y-auto overflow-x-hidden py-4 ${collapsed ? "px-1" : "px-2"}`}>
         <div className="flex flex-col gap-2">
           {menuItems.slice(0, 2).map((item) => (
             <SidebarItem
@@ -125,6 +149,7 @@ export function AppSidebar() {
               isActive={activeItem === item.id}
               hasNotification={item.hasNotification}
               href={item.href}
+              collapsed={collapsed}
             />
           ))}
 
@@ -138,6 +163,7 @@ export function AppSidebar() {
               isActive={activeItem === item.id}
               hasNotification={item.hasNotification}
               href={item.href}
+              collapsed={collapsed}
             />
           ))}
 
@@ -150,6 +176,7 @@ export function AppSidebar() {
               icon={item.icon}
               isActive={activeItem === item.id}
               href={item.href}
+              collapsed={collapsed}
             />
           ))}
 
@@ -162,13 +189,16 @@ export function AppSidebar() {
               toolsOpen ? 'bg-[rgba(255,255,255,0.1)]' : 'hover:bg-[rgba(255,255,255,0.05)]'
             }`}
             dir="rtl"
+            title="כלים ומידע נוסף"
           >
             <div className="shrink-0">
               <img src="/icons/tools-tab.svg" alt="" width={24} height={24} />
             </div>
-            <p className={`${toolsOpen ? 'text-[#cca559] font-bold' : 'text-white'}`}>
+            {!collapsed && (
+              <p className={`${toolsOpen ? 'text-[#cca559] font-bold' : 'text-white'}`}>
               כלים ומידע נוסף
-            </p>
+              </p>
+            )}
             <div className="shrink-0 mr-auto">
               <svg
                 width="16" height="16" fill="none" viewBox="0 0 24 24"
@@ -179,7 +209,7 @@ export function AppSidebar() {
             </div>
           </button>
           {toolsOpen && (
-            <div ref={toolsContentRef} className="flex flex-col gap-0.5 pr-4">
+            <div ref={toolsContentRef} className={`flex flex-col gap-0.5 ${collapsed ? "pr-0" : "pr-4"}`}>
               {toolsItems.map((item) => (
                 <SidebarItem
                   key={item.id}
@@ -188,6 +218,7 @@ export function AppSidebar() {
                   isActive={activeItem === item.id}
                   external={item.external}
                   href={item.href}
+                  collapsed={collapsed}
                 />
               ))}
             </div>
@@ -197,7 +228,7 @@ export function AppSidebar() {
 
       {/* Account Section - fixed at bottom */}
       <div
-        className="relative shrink-0 px-2 pb-4 pt-2"
+        className={`relative shrink-0 pb-4 pt-2 ${collapsed ? "px-1" : "px-2"}`}
         style={{
           borderTop: hasMenuOverflow ? "1px solid rgba(255, 255, 255, 0.28)" : "1px solid transparent",
         }}
@@ -210,6 +241,7 @@ export function AppSidebar() {
               icon={item.icon}
               isActive={activeItem === item.id}
               href={item.href}
+              collapsed={collapsed}
             />
           ))}
         </div>
@@ -225,22 +257,25 @@ interface SidebarItemProps {
   hasNotification?: boolean;
   external?: boolean;
   href: string;
+  collapsed?: boolean;
 }
 
-function SidebarItem({ label, icon, isActive, hasNotification, external, href }: SidebarItemProps) {
+function SidebarItem({ label, icon, isActive, hasNotification, external, href, collapsed }: SidebarItemProps) {
   const content = (
     <>
       <div className="shrink-0">{icon}</div>
-      <p className={`${isActive ? "text-[#cca559] font-bold" : "text-white"}`}>
-        {label}
-      </p>
+      {!collapsed && (
+        <p className={`${isActive ? "text-[#cca559] font-bold" : "text-white"}`}>
+          {label}
+        </p>
+      )}
       {external && (
         <div className="shrink-0 mr-auto">
           <IconOpenNewTab />
         </div>
       )}
       {hasNotification && (
-        <div className="absolute left-[65px] top-[11px] w-[7px] h-[7px] bg-[#f93e3e] rounded-full" />
+        <div className={`absolute top-[11px] w-[7px] h-[7px] bg-[#f93e3e] rounded-full ${collapsed ? "left-[14px]" : "left-[65px]"}`} />
       )}
     </>
   );
@@ -249,10 +284,11 @@ function SidebarItem({ label, icon, isActive, hasNotification, external, href }:
     return (
       <Link
         href={href}
-        className={`h-12 rounded flex items-center px-2 gap-2 relative cursor-pointer transition-colors no-underline ${
+        className={`h-12 rounded flex items-center ${collapsed ? "justify-center px-0" : "px-2"} gap-2 relative cursor-pointer transition-colors no-underline ${
           isActive ? "bg-[rgba(255,255,255,0.1)]" : "hover:bg-[rgba(255,255,255,0.05)]"
         }`}
         dir="rtl"
+        title={label}
       >
         {content}
       </Link>
@@ -261,10 +297,11 @@ function SidebarItem({ label, icon, isActive, hasNotification, external, href }:
 
   return (
     <div
-      className={`h-12 rounded flex items-center px-2 gap-2 relative cursor-pointer transition-colors ${
+      className={`h-12 rounded flex items-center ${collapsed ? "justify-center px-0" : "px-2"} gap-2 relative cursor-pointer transition-colors ${
         isActive ? "bg-[rgba(255,255,255,0.1)]" : "hover:bg-[rgba(255,255,255,0.05)]"
       }`}
       dir="rtl"
+      title={label}
     >
       {content}
     </div>

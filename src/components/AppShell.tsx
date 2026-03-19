@@ -1,18 +1,52 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AppSidebar } from './AppSidebar';
 import { AppHeader } from './AppHeader';
 import { Menu, X } from 'lucide-react';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState<number>(typeof window === 'undefined' ? 1440 : window.innerWidth);
+  const [collapsedPreference, setCollapsedPreference] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem('sidebarCollapsed');
+      if (raw === 'true') setCollapsedPreference(true);
+      else if (raw === 'false') setCollapsedPreference(false);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const isBelowXl = windowWidth < 1280;
+  const isSidebarCollapsed = useMemo(() => {
+    if (collapsedPreference === null) return isBelowXl;
+    return isBelowXl ? collapsedPreference : collapsedPreference;
+  }, [collapsedPreference, isBelowXl]);
+
+  function handleToggleSidebarCollapsed() {
+    const next = !isSidebarCollapsed;
+    setCollapsedPreference(next);
+    try {
+      window.localStorage.setItem('sidebarCollapsed', String(next));
+    } catch {
+      // ignore
+    }
+  }
 
   return (
     <div className="min-h-screen w-full flex bg-page-section overflow-x-hidden" dir="rtl">
       {/* Desktop Sidebar - Hidden on Mobile */}
       <div className="hidden md:block">
-        <AppSidebar />
+        <AppSidebar collapsed={isSidebarCollapsed} onToggleCollapsed={handleToggleSidebarCollapsed} />
       </div>
 
       {/* Mobile Sidebar Overlay */}
@@ -26,7 +60,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen min-w-0 md:mr-[237px]">
+      <div
+        className="flex-1 flex flex-col min-h-screen min-w-0"
+        style={{ marginRight: windowWidth >= 768 ? (isSidebarCollapsed ? '72px' : '237px') : 0 }}
+      >
         {/* Mobile Header */}
         <div className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-card border-b border-border shadow-[var(--elevation-sm)]">
           <button
