@@ -606,9 +606,19 @@ export default function DonationUnitsPage() {
 
 // Helper Components
 function ProgressBar({ paidAmount, totalAmount }: { paidAmount: number; totalAmount: number }) {
+  const progress = totalAmount > 0 ? Math.min(100, (paidAmount / totalAmount) * 100) : 0;
+  const isFullyPaid = progress >= 100;
   return (
     <div style={{ width: "100%", height: "6px", backgroundColor: "var(--muted)", borderRadius: "100px", overflow: "hidden" }}>
-      <div style={{ height: "100%", width: `${(paidAmount / totalAmount) * 100}%`, backgroundColor: "var(--primary)", borderRadius: "100px", transition: "width 0.3s ease" }} />
+      <div
+        style={{
+          height: "100%",
+          width: `${progress}%`,
+          backgroundColor: isFullyPaid ? "#CCA559" : "var(--primary)",
+          borderRadius: "100px",
+          transition: "width 0.3s ease",
+        }}
+      />
     </div>
   );
 }
