@@ -39,6 +39,7 @@ export function AppSidebar() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const toolsButtonRef = useRef<HTMLButtonElement>(null);
   const toolsContentRef = useRef<HTMLDivElement>(null);
+  const [hasMenuOverflow, setHasMenuOverflow] = useState(false);
 
   useEffect(() => {
     if (!toolsOpen) return;
@@ -63,6 +64,26 @@ export function AppSidebar() {
         el.scrollBy({ top: -(topOverflow + 12), behavior: "smooth" });
       }
     });
+  }, [toolsOpen]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const compute = () => {
+      setHasMenuOverflow(el.scrollHeight > el.clientHeight + 1);
+    };
+
+    compute();
+
+    const ro = new ResizeObserver(() => compute());
+    ro.observe(el);
+    window.addEventListener("resize", compute);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", compute);
+    };
   }, [toolsOpen]);
 
   const getActiveItem = () => {
@@ -178,17 +199,9 @@ export function AppSidebar() {
       <div
         className="relative shrink-0 px-2 pb-4 pt-2"
         style={{
-          boxShadow: '0 -12px 28px rgba(0, 0, 0, 0.45)',
+          borderTop: hasMenuOverflow ? "1px solid rgba(255, 255, 255, 0.28)" : "1px solid transparent",
         }}
       >
-        {/* Stronger scroll hint shadow/gradient above account area */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-6 left-0 right-0 h-6"
-          style={{
-            background: "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 100%)",
-          }}
-        />
         <div className="flex flex-col">
           {accountItems.map((item) => (
             <SidebarItem
