@@ -1,15 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  AlertTriangle,
-  CheckCircle,
-  Loader2,
-  ShieldCheck,
-  Trash2,
-  Upload,
-  X,
-} from "lucide-react";
+import { CheckCircle, Loader2, ShieldCheck, Trash2, Upload, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -20,6 +12,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+/** אייקון אזהרה מהעיצוב (משמש זום על אזור האייקון בצילום המקורי) */
+const DELETE_CONFIRM_WARNING_SRC = "/icons/delete-confirm-warning.png";
 
 /* ——— Small UI pieces (Figma Make parity, no extra packages) ——— */
 
@@ -141,11 +136,15 @@ function ConfirmDeleteDialog({
       >
         <div className="flex flex-col items-center text-center px-6 sm:px-10 pt-9 pb-1">
           <div
-            className="mb-5 flex size-[72px] shrink-0 items-center justify-center rounded-full bg-destructive/[0.12] text-destructive shadow-[0_0_0_8px_rgba(237,7,34,0.06)]"
+            className="mx-auto mb-5 size-[76px] shrink-0 rounded-full bg-[#E8EDF7] shadow-[0_0_0_7px_rgba(25,79,195,0.08),inset_0_1px_0_rgba(255,255,255,0.7)] ring-1 ring-white/60"
+            style={{
+              backgroundImage: `url(${DELETE_CONFIRM_WARNING_SRC})`,
+              backgroundRepeat: "no-repeat",
+              backgroundSize: "620% auto",
+              backgroundPosition: "50% 11%",
+            }}
             aria-hidden
-          >
-            <AlertTriangle className="size-9" strokeWidth={2.25} />
-          </div>
+          />
           <DialogHeader className="w-full space-y-3 text-center sm:text-center">
             <DialogTitle className="text-foreground text-xl font-bold leading-snug tracking-tight">
               {title}
