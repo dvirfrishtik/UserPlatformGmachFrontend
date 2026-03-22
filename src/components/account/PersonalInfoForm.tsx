@@ -1,7 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CheckCircle, Loader2, ShieldCheck, Trash2, Upload, X } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle,
+  Loader2,
+  ShieldCheck,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -98,6 +106,7 @@ function DeleteButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
+      onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
       className="h-[45px] w-[45px] flex items-center justify-center bg-transparent text-foreground border border-border rounded-md hover:bg-muted transition-colors"
       style={{ borderRadius: "var(--radius)" }}
@@ -105,6 +114,72 @@ function DeleteButton({ onClick }: { onClick: () => void }) {
     >
       <Trash2 className="size-5" strokeWidth={1.5} />
     </button>
+  );
+}
+
+function ConfirmDeleteDialog({
+  open,
+  onOpenChange,
+  title,
+  description,
+  onConfirm,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  onConfirm: () => void;
+}) {
+  useDialogBodyScrollLock(open);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className="bg-card max-w-[440px] gap-0 p-0 overflow-hidden sm:max-w-[440px]"
+        style={{ borderRadius: "var(--radius-card)" }}
+        dir="rtl"
+      >
+        <div className="px-8 pt-8 pb-2">
+          <div className="flex justify-center mb-4">
+            <div
+              className="flex items-center justify-center size-[56px] rounded-full bg-destructive/10 text-destructive"
+              aria-hidden
+            >
+              <AlertTriangle className="size-7" strokeWidth={2} />
+            </div>
+          </div>
+          <DialogHeader className="text-right space-y-3 sm:text-right">
+            <DialogTitle className="text-foreground text-[20px] font-bold leading-tight">
+              {title}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground text-[15px] leading-relaxed">
+              {description}
+            </DialogDescription>
+          </DialogHeader>
+        </div>
+        <div className="flex gap-3 justify-center px-8 pb-8 pt-6 border-t border-border/60 bg-muted/20">
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            className="h-10 min-w-[120px] px-5 flex items-center justify-center bg-secondary text-secondary-foreground border border-border hover:bg-muted transition-colors font-bold text-sm"
+            style={{ borderRadius: "var(--radius-button)" }}
+          >
+            ביטול
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              onConfirm();
+              onOpenChange(false);
+            }}
+            className="h-10 min-w-[120px] px-5 flex items-center justify-center bg-destructive text-destructive-foreground hover:opacity-90 transition-opacity font-bold text-sm shadow-sm"
+            style={{ borderRadius: "var(--radius-button)" }}
+          >
+            מחק
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -880,6 +955,10 @@ export function PersonalInfoForm() {
   const [emailNeedsReverification, setEmailNeedsReverification] = useState(true);
   const [emailReverified, setEmailReverified] = useState(false);
 
+  const [pendingDelete, setPendingDelete] = useState<
+    null | { type: "phone" | "email"; id: number }
+  >(null);
+
   const hasPersonalDetailsChanges = useCallback(() => {
     return (["firstName", "lastName", "idNumber", "birthDate"] as const).some(
       (key) => formValues[key] !== originalValues[key],
@@ -963,8 +1042,16 @@ export function PersonalInfoForm() {
     setNewPhoneError("");
   };
 
-  const handleDeletePhone = (id: number) => {
-    setPhones(phones.filter((p) => p.id !== id));
+  const handleConfirmDelete = () => {
+    if (!pendingDelete) return;
+    if (pendingDelete.type === "phone") {
+      setPhones((prev) => prev.filter((p) => p.id !== pendingDelete.id));
+    } else {
+      setEmails((prev) => prev.filter((e) => e.id !== pendingDelete.id));
+    }
+    setFocusedPhoneId(null);
+    setFocusedEmailId(null);
+    showToast("השדה נמחק בהצלחה");
   };
 
   const handleAddEmail = () => {
@@ -986,10 +1073,6 @@ export function PersonalInfoForm() {
     setIsAddingEmail(false);
     setNewEmailValue("");
     setNewEmailError("");
-  };
-
-  const handleDeleteEmail = (id: number) => {
-    setEmails(emails.filter((e) => e.id !== id));
   };
 
   const handleSaveChanges = () => {
@@ -1143,6 +1226,20 @@ export function PersonalInfoForm() {
         mode={pendingEmailChange || "add"}
       />
 
+      <ConfirmDeleteDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title="לאשר מחיקה?"
+        description={
+          pendingDelete?.type === "email"
+            ? "פעולה זו תסיר את כתובת המייל מהרשימה. האם אתה בטוח שברצונך למחוק?"
+            : "פעולה זו תסיר את מספר הטלפון מהרשימה. האם אתה בטוח שברצונך למחוק?"
+        }
+        onConfirm={handleConfirmDelete}
+      />
+
       <div
         className="bg-card shadow-[var(--elevation-sm)] rounded-[var(--radius-card)] p-6 md:p-8"
         dir="rtl"
@@ -1247,7 +1344,7 @@ export function PersonalInfoForm() {
                     focusedPhoneId === phone.id ? "w-[45px] opacity-100" : "w-0 opacity-0 pointer-events-none",
                   )}
                 >
-                  <DeleteButton onClick={() => handleDeletePhone(phone.id)} />
+                  <DeleteButton onClick={() => setPendingDelete({ type: "phone", id: phone.id })} />
                 </div>
               ) : null}
             </div>
@@ -1338,7 +1435,7 @@ export function PersonalInfoForm() {
                     focusedEmailId === email.id ? "w-[45px] opacity-100" : "w-0 opacity-0 pointer-events-none",
                   )}
                 >
-                  <DeleteButton onClick={() => handleDeleteEmail(email.id)} />
+                  <DeleteButton onClick={() => setPendingDelete({ type: "email", id: email.id })} />
                 </div>
               ) : null}
             </div>
