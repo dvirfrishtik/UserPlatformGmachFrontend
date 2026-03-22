@@ -212,6 +212,10 @@ function Toast({
 
   const visible = entered && !exiting;
 
+  /** חייבים רווחים ב-calc(100% + X) — אחרת ה-CSS לא תקין והדפדפן מתעלם מ-transform */
+  const transformHidden = "translate3d(0, calc(100% + 1.5rem), 0)";
+  const transformVisible = "translate3d(0, 0, 0)";
+
   return (
     <div
       className="fixed bottom-12 left-1/2 z-[120] -translate-x-1/2 pointer-events-none [contain:layout]"
@@ -219,16 +223,14 @@ function Toast({
     >
       <div
         className={cn(
-          "pointer-events-auto origin-bottom transform-gpu transition-[transform,opacity] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
-          visible
-            ? "translate-y-0 opacity-100"
-            : "translate-y-[calc(100%+1.5rem)] opacity-0",
-          exiting && "ease-[cubic-bezier(0.4,0,1,1)]",
+          "pointer-events-auto origin-bottom will-change-transform motion-reduce:transition-none",
           exiting ? "pointer-events-none" : "",
         )}
         style={{
-          transitionDuration: exiting ? `${TOAST_LEAVE_MS}ms` : `${TOAST_ENTER_MS}ms`,
+          transform: visible ? transformVisible : transformHidden,
+          opacity: visible ? 1 : 0,
           transitionProperty: "transform, opacity",
+          transitionDuration: exiting ? `${TOAST_LEAVE_MS}ms` : `${TOAST_ENTER_MS}ms`,
           transitionTimingFunction: exiting
             ? "cubic-bezier(0.4, 0, 1, 1)"
             : "cubic-bezier(0.16, 1, 0.3, 1)",
