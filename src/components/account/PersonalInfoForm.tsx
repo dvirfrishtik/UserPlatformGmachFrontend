@@ -135,33 +135,32 @@ function ConfirmDeleteDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="bg-card max-w-[440px] gap-0 p-0 overflow-hidden sm:max-w-[440px]"
+        className="bg-card max-w-[min(100%,420px)] gap-0 p-0 overflow-hidden border-border/80 shadow-[0_24px_48px_-12px_rgba(23,37,84,0.18)] sm:max-w-[420px]"
         style={{ borderRadius: "var(--radius-card)" }}
         dir="rtl"
       >
-        <div className="px-8 pt-8 pb-2">
-          <div className="flex justify-center mb-4">
-            <div
-              className="flex items-center justify-center size-[56px] rounded-full bg-destructive/10 text-destructive"
-              aria-hidden
-            >
-              <AlertTriangle className="size-7" strokeWidth={2} />
-            </div>
+        <div className="flex flex-col items-center text-center px-6 sm:px-10 pt-9 pb-1">
+          <div
+            className="mb-5 flex size-[72px] shrink-0 items-center justify-center rounded-full bg-destructive/[0.12] text-destructive shadow-[0_0_0_8px_rgba(237,7,34,0.06)]"
+            aria-hidden
+          >
+            <AlertTriangle className="size-9" strokeWidth={2.25} />
           </div>
-          <DialogHeader className="text-right space-y-3 sm:text-right">
-            <DialogTitle className="text-foreground text-[20px] font-bold leading-tight">
+          <DialogHeader className="w-full space-y-3 text-center sm:text-center">
+            <DialogTitle className="text-foreground text-xl font-bold leading-snug tracking-tight">
               {title}
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground text-[15px] leading-relaxed">
+            <DialogDescription className="text-muted-foreground text-[15px] leading-relaxed max-w-[300px] mx-auto">
               {description}
             </DialogDescription>
           </DialogHeader>
         </div>
-        <div className="flex gap-3 justify-center px-8 pb-8 pt-6 border-t border-border/60 bg-muted/20">
+
+        <div className="mt-6 flex flex-col-reverse items-stretch gap-3 border-t border-border/50 bg-gradient-to-b from-muted/25 to-muted/45 px-6 py-6 sm:flex-row sm:items-center sm:justify-center sm:gap-4 sm:px-10">
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="h-10 min-w-[120px] px-5 flex items-center justify-center bg-secondary text-secondary-foreground border border-border hover:bg-muted transition-colors font-bold text-sm"
+            className="h-11 min-h-11 w-full sm:w-auto sm:min-w-[132px] px-6 flex items-center justify-center bg-background text-foreground border border-border hover:bg-muted/80 transition-colors font-bold text-sm shadow-sm"
             style={{ borderRadius: "var(--radius-button)" }}
           >
             ביטול
@@ -172,7 +171,7 @@ function ConfirmDeleteDialog({
               onConfirm();
               onOpenChange(false);
             }}
-            className="h-10 min-w-[120px] px-5 flex items-center justify-center bg-destructive text-destructive-foreground hover:opacity-90 transition-opacity font-bold text-sm shadow-sm"
+            className="h-11 min-h-11 w-full sm:w-auto sm:min-w-[132px] px-6 flex items-center justify-center bg-destructive text-destructive-foreground hover:opacity-95 active:scale-[0.98] transition-all font-bold text-sm shadow-md shadow-destructive/25"
             style={{ borderRadius: "var(--radius-button)" }}
           >
             מחק
