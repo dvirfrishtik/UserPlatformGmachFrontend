@@ -899,14 +899,7 @@ function ReverificationAlert({
         )}
         style={{ fontSize: attachToField ? undefined : "var(--text-base)", color: "var(--foreground)" }}
       >
-        {attachToField ? (
-          <>
-            <span className="font-medium text-foreground">לגבי כתובת המייל הזו: </span>
-            חלפו {timePeriod} מאז שעודכנה {getTypeText()}, יש לאמת את הכתובת מחדש.
-          </>
-        ) : (
-          <>חלפו {timePeriod} מאז שעודכנה {getTypeText()}, יש לאמת את הכתובת מחדש</>
-        )}
+        חלפו {timePeriod} מאז שעודכנה {getTypeText()}, יש לאמת את הכתובת מחדש
       </p>
       <button
         type="button"
