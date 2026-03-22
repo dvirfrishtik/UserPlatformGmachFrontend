@@ -108,10 +108,32 @@ function DeleteButton({ onClick }: { onClick: () => void }) {
   );
 }
 
-function Toast({ message, onClose }: { message: string; onClose: () => void }) {
+const TOAST_EXIT_MS = 350;
+
+type PersonalInfoToastState = { id: number; message: string; exiting: boolean };
+
+function Toast({
+  message,
+  exiting,
+  onDismissRequest,
+}: {
+  message: string;
+  exiting: boolean;
+  onDismissRequest: () => void;
+}) {
+  const [entered, setEntered] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setEntered(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   return (
     <div
-      className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[120] animate-in fade-in slide-in-from-bottom-4 duration-300"
+      className={cn(
+        "fixed bottom-12 left-1/2 -translate-x-1/2 z-[120] transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[opacity,transform]",
+        entered && !exiting ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+        exiting ? "pointer-events-none" : "",
+      )}
       dir="rtl"
     >
       <div
@@ -139,7 +161,7 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
           </p>
           <button
             type="button"
-            onClick={onClose}
+            onClick={onDismissRequest}
             className="flex-shrink-0 size-8 rounded-[var(--radius)] hover:bg-muted/50 flex items-center justify-center transition-colors group"
             aria-label="סגור"
           >
@@ -792,10 +814,12 @@ function ReverificationAlert({
 type PhoneEntry = {
   id: number;
   value: string;
-  label: string;
-  type: "mobile" | "home";
   isDefault: boolean;
 };
+
+function phoneFieldLabel(index: number) {
+  return `מס׳ טלפון (${index + 1})`;
+}
 
 type EmailEntry = {
   id: number;
@@ -819,7 +843,7 @@ export function PersonalInfoForm() {
   const [formValues, setFormValues] = useState({ ...originalValues });
 
   const [phones, setPhones] = useState<PhoneEntry[]>([
-    { id: 1, value: "0548755233", label: "טלפון נייד", type: "mobile", isDefault: true },
+    { id: 1, value: "0548755233", isDefault: true },
   ]);
   const [originalPhones, setOriginalPhones] = useState<PhoneEntry[]>(
     () => structuredClone(phones),
@@ -835,7 +859,6 @@ export function PersonalInfoForm() {
   const [isAddingPhone, setIsAddingPhone] = useState(false);
   const [isAddingEmail, setIsAddingEmail] = useState(false);
   const [newPhoneValue, setNewPhoneValue] = useState("");
-  const [newPhoneType, setNewPhoneType] = useState<"mobile" | "home">("mobile");
   const [newEmailValue, setNewEmailValue] = useState("");
   const [focusedPhoneId, setFocusedPhoneId] = useState<number | null>(null);
   const [focusedEmailId, setFocusedEmailId] = useState<number | null>(null);
@@ -843,8 +866,8 @@ export function PersonalInfoForm() {
   const [newPhoneError, setNewPhoneError] = useState("");
   const [newEmailError, setNewEmailError] = useState("");
 
-  const [toastMessage, setToastMessage] = useState("");
-  const [isToastVisible, setIsToastVisible] = useState(false);
+  const toastIdRef = useRef(0);
+  const [toast, setToast] = useState<PersonalInfoToastState | null>(null);
 
   const [isVerificationDialogOpen, setIsVerificationDialogOpen] = useState(false);
   const [isPhoneVerificationDialogOpen, setIsPhoneVerificationDialogOpen] = useState(false);
@@ -883,14 +906,26 @@ export function PersonalInfoForm() {
   const showAddressSaveButtons = hasAddressChanges();
 
   useEffect(() => {
-    if (!isToastVisible) return;
-    const t = setTimeout(() => setIsToastVisible(false), 8000);
+    if (!toast || toast.exiting) return;
+    const t = setTimeout(() => {
+      setToast((prev) => (prev && !prev.exiting ? { ...prev, exiting: true } : prev));
+    }, 10000);
     return () => clearTimeout(t);
-  }, [isToastVisible]);
+  }, [toast?.id, toast?.exiting]);
+
+  useEffect(() => {
+    if (!toast?.exiting) return;
+    const t = setTimeout(() => setToast(null), TOAST_EXIT_MS);
+    return () => clearTimeout(t);
+  }, [toast?.exiting, toast?.id]);
 
   const showToast = (message: string) => {
-    setToastMessage(message);
-    setIsToastVisible(true);
+    toastIdRef.current += 1;
+    setToast({ id: toastIdRef.current, message, exiting: false });
+  };
+
+  const dismissToast = () => {
+    setToast((prev) => (prev && !prev.exiting ? { ...prev, exiting: true } : prev));
   };
 
   const validatePhone = (phone: string): boolean => {
@@ -907,35 +942,16 @@ export function PersonalInfoForm() {
     e.preventDefault();
   };
 
-  const handleAddPhone = (type: "mobile" | "home") => {
-    setNewPhoneType(type);
+  const handleAddPhone = () => {
     setNewPhoneValue("");
     setIsAddingPhone(true);
   };
 
   const handleSavePhone = () => {
     if (validatePhone(newPhoneValue)) {
-      if (newPhoneType === "mobile") {
-        setPhoneNumberToVerify(newPhoneValue);
-        setPendingPhoneChange("add");
-        setIsPhoneVerificationDialogOpen(true);
-      } else {
-        const homeCount = phones.filter((p) => p.type === "home").length;
-        const newPhone: PhoneEntry = {
-          id: Date.now(),
-          value: newPhoneValue,
-          label: `טלפון בית (${homeCount + 1})`,
-          type: newPhoneType,
-          isDefault: false,
-        };
-        const updatedPhones = [...phones, newPhone];
-        setPhones(updatedPhones);
-        setOriginalPhones(structuredClone(updatedPhones));
-        setNewPhoneError("");
-        setIsAddingPhone(false);
-        setNewPhoneValue("");
-        showToast("מס׳ הטלפון נוסף בהצלחה");
-      }
+      setPhoneNumberToVerify(newPhoneValue);
+      setPendingPhoneChange("add");
+      setIsPhoneVerificationDialogOpen(true);
     } else {
       setNewPhoneError("מס׳ הטלפון לא תקין");
     }
@@ -982,14 +998,11 @@ export function PersonalInfoForm() {
       return;
     }
 
-    const currentMobilePhones = phones.filter((p) => p.type === "mobile");
-    const originalMobilePhones = originalPhones.filter((p) => p.type === "mobile");
-    const hasMobilePhoneChanges =
-      JSON.stringify(currentMobilePhones) !== JSON.stringify(originalMobilePhones);
+    const hasPhoneChanges = JSON.stringify(phones) !== JSON.stringify(originalPhones);
 
-    if (hasMobilePhoneChanges) {
-      const changedPhone = currentMobilePhones.find((current) => {
-        const original = originalMobilePhones.find((orig) => orig.id === current.id);
+    if (hasPhoneChanges) {
+      const changedPhone = phones.find((current) => {
+        const original = originalPhones.find((orig) => orig.id === current.id);
         return !original || original.value !== current.value;
       });
       if (changedPhone) {
@@ -1022,12 +1035,9 @@ export function PersonalInfoForm() {
 
   const handlePhoneVerificationSubmit = () => {
     if (pendingPhoneChange === "add") {
-      const mobileCount = phones.filter((p) => p.type === "mobile").length;
       const newPhone: PhoneEntry = {
         id: Date.now(),
         value: newPhoneValue,
-        label: `טלפון נייד (${mobileCount + 1})`,
-        type: "mobile",
         isDefault: false,
       };
       const updatedPhones = [...phones, newPhone];
@@ -1102,8 +1112,13 @@ export function PersonalInfoForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6 md:gap-8 relative">
-      {isToastVisible ? (
-        <Toast message={toastMessage} onClose={() => setIsToastVisible(false)} />
+      {toast ? (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          exiting={toast.exiting}
+          onDismissRequest={dismissToast}
+        />
       ) : null}
 
       <IdVerificationDialog
@@ -1196,8 +1211,8 @@ export function PersonalInfoForm() {
         <div className="flex flex-col gap-6 md:gap-8">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between w-full gap-4">
             <div className="flex flex-col gap-1">
-              <h4>מספר טלפון</h4>
-              <p className="text-muted-foreground">החלפת טלפון נייד דורשת אימות בקוד טלפוני</p>
+              <h4>מספרי טלפון</h4>
+              <p className="text-muted-foreground">החלפת מס׳ טלפון דורשת אימות בקוד טלפוני</p>
             </div>
             {isAddingPhone ? (
               <ActionButtons onSave={handleSavePhone} onCancel={handleCancelPhone} />
@@ -1206,11 +1221,11 @@ export function PersonalInfoForm() {
             ) : null}
           </div>
 
-          {phones.map((phone) => (
+          {phones.map((phone, index) => (
             <div key={phone.id} className="flex gap-2 items-end">
               <div className="flex flex-col gap-2 flex-1 min-w-0">
                 <label htmlFor={`phone-${phone.id}`} className="text-sm font-medium">
-                  {phone.label}
+                  {phoneFieldLabel(index)}
                 </label>
                 <Input
                   id={`phone-${phone.id}`}
@@ -1242,7 +1257,7 @@ export function PersonalInfoForm() {
             <div className="flex gap-8 items-end">
               <div className="flex flex-col gap-2 flex-1">
                 <label htmlFor="newPhone" className="text-sm font-medium">
-                  {newPhoneType === "mobile" ? "טלפון נייד" : "טלפון בבית"}
+                  {phoneFieldLabel(phones.length)}
                 </label>
                 <Input
                   id="newPhone"
@@ -1263,8 +1278,7 @@ export function PersonalInfoForm() {
 
           {!isAddingPhone ? (
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-stretch sm:items-end sm:justify-end">
-              <AddButton onClick={() => handleAddPhone("home")}>הוספת טלפון בית</AddButton>
-              <AddButton onClick={() => handleAddPhone("mobile")}>הוספת טלפון נייד</AddButton>
+              <AddButton onClick={handleAddPhone}>הוספת מס׳ טלפון</AddButton>
             </div>
           ) : null}
         </div>
