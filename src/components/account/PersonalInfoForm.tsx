@@ -183,7 +183,8 @@ function ConfirmDeleteDialog({
   );
 }
 
-const TOAST_EXIT_MS = 350;
+const TOAST_EXIT_MS = 420;
+const TOAST_MOTION_MS = 400;
 
 type PersonalInfoToastState = { id: number; message: string; exiting: boolean };
 
@@ -202,46 +203,59 @@ function Toast({
     return () => cancelAnimationFrame(id);
   }, []);
 
+  const visible = entered && !exiting;
+
   return (
     <div
-      className={cn(
-        "fixed bottom-12 left-1/2 -translate-x-1/2 z-[120] transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[opacity,transform]",
-        entered && !exiting ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-        exiting ? "pointer-events-none" : "",
-      )}
-      dir="rtl"
+      className="fixed bottom-12 left-1/2 z-[120] -translate-x-1/2 pointer-events-none"
+      aria-live="polite"
     >
       <div
-        className="bg-card border overflow-hidden rounded-[var(--radius-button)]"
+        className={cn(
+          "pointer-events-auto will-change-[opacity,transform] transition-[opacity,transform]",
+          visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-10 scale-[0.97]",
+          exiting ? "pointer-events-none" : "",
+        )}
         style={{
-          boxShadow:
-            "0px 8px 24px rgba(23, 37, 84, 0.12), 0px 2px 8px rgba(23, 37, 84, 0.08)",
-          width: "max-content",
-          minWidth: "min(420px, calc(100vw - 2rem))",
-          maxWidth: "600px",
-          borderColor: "var(--border)",
+          transitionDuration: `${TOAST_MOTION_MS}ms`,
+          transitionTimingFunction: exiting
+            ? "cubic-bezier(0.4, 0, 1, 1)"
+            : "cubic-bezier(0.22, 1, 0.36, 1)",
         }}
+        dir="rtl"
       >
-        <div className="flex items-center gap-4 px-6 py-4">
-          <div className="flex-shrink-0">
-            <div
-              className="size-10 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: "rgba(23, 37, 84, 0.1)" }}
-            >
-              <CheckCircle className="size-6 text-primary" strokeWidth={2.5} />
+        <div
+          className="bg-card border overflow-hidden rounded-[var(--radius-button)]"
+          style={{
+            boxShadow:
+              "0px 8px 24px rgba(23, 37, 84, 0.12), 0px 2px 8px rgba(23, 37, 84, 0.08)",
+            width: "max-content",
+            minWidth: "min(420px, calc(100vw - 2rem))",
+            maxWidth: "600px",
+            borderColor: "var(--border)",
+          }}
+        >
+          <div className="flex items-center gap-4 px-6 py-4">
+            <div className="flex-shrink-0">
+              <div
+                className="size-10 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: "rgba(23, 37, 84, 0.1)" }}
+              >
+                <CheckCircle className="size-6 text-primary" strokeWidth={2.5} />
+              </div>
             </div>
+            <p className="text-foreground flex-1 min-w-0" dir="auto">
+              {message}
+            </p>
+            <button
+              type="button"
+              onClick={onDismissRequest}
+              className="flex-shrink-0 size-8 rounded-[var(--radius)] hover:bg-muted/50 flex items-center justify-center transition-colors group"
+              aria-label="סגור"
+            >
+              <X className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+            </button>
           </div>
-          <p className="text-foreground flex-1 min-w-0" dir="auto">
-            {message}
-          </p>
-          <button
-            type="button"
-            onClick={onDismissRequest}
-            className="flex-shrink-0 size-8 rounded-[var(--radius)] hover:bg-muted/50 flex items-center justify-center transition-colors group"
-            aria-label="סגור"
-          >
-            <X className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-          </button>
         </div>
       </div>
     </div>
