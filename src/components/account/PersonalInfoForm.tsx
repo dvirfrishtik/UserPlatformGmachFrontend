@@ -838,11 +838,14 @@ function ReverificationAlert({
   timePeriod,
   isVerified,
   onReverify,
+  attachToField,
 }: {
   type: "email" | "phone" | "address";
   timePeriod: string;
   isVerified: boolean;
   onReverify: () => void;
+  /** מצמיד ויזואלית לשדה קלט ספציפי (למשל מייל ראשי) */
+  attachToField?: boolean;
 }) {
   const getTypeText = () => {
     switch (type) {
@@ -855,15 +858,26 @@ function ReverificationAlert({
     }
   };
 
+  const boxClass = cn(
+    "w-full animate-in fade-in duration-300 border border-border/80",
+    attachToField
+      ? "rounded-lg px-3 py-3 bg-muted/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]"
+      : "px-5 py-4 bg-page-section",
+  );
+
   if (isVerified) {
     return (
       <div
-        className="flex gap-3 items-center px-5 py-4 w-full bg-page-section animate-in fade-in duration-300"
-        style={{ borderRadius: "var(--radius-card)" }}
+        className={cn(boxClass, "flex gap-3 items-center")}
+        style={attachToField ? { borderRadius: "var(--radius-button)" } : { borderRadius: "var(--radius-card)" }}
         dir="rtl"
+        role="status"
       >
         <CheckCircle className="size-5 text-primary shrink-0" strokeWidth={2} />
-        <p style={{ fontSize: "var(--text-lg)", color: "var(--foreground)" }}>
+        <p
+          className={attachToField ? "text-sm font-medium" : ""}
+          style={{ fontSize: attachToField ? undefined : "var(--text-lg)", color: "var(--foreground)" }}
+        >
           הכתובת עודכנה בהצלחה!
         </p>
       </div>
@@ -872,20 +886,32 @@ function ReverificationAlert({
 
   return (
     <div
-      className="flex flex-wrap gap-4 items-center px-5 py-4 w-full bg-page-section animate-in fade-in duration-300"
-      style={{ borderRadius: "var(--radius-card)" }}
+      className={cn(boxClass, "flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4")}
+      style={attachToField ? { borderRadius: "var(--radius-button)" } : { borderRadius: "var(--radius-card)" }}
       dir="rtl"
+      role="region"
+      aria-label="נדרש אימות מחדש לכתובת המייל"
     >
       <p
-        className="flex-1 min-w-[200px]"
-        style={{ fontSize: "var(--text-base)", color: "var(--foreground)" }}
+        className={cn(
+          "flex-1 min-w-0 text-pretty",
+          attachToField ? "text-sm leading-snug pe-1" : "min-w-[200px]",
+        )}
+        style={{ fontSize: attachToField ? undefined : "var(--text-base)", color: "var(--foreground)" }}
       >
-        חלפו {timePeriod} מאז שעודכנה {getTypeText()}, יש לאמת את הכתובת מחדש
+        {attachToField ? (
+          <>
+            <span className="font-medium text-foreground">לגבי כתובת המייל הזו: </span>
+            חלפו {timePeriod} מאז שעודכנה {getTypeText()}, יש לאמת את הכתובת מחדש.
+          </>
+        ) : (
+          <>חלפו {timePeriod} מאז שעודכנה {getTypeText()}, יש לאמת את הכתובת מחדש</>
+        )}
       </p>
       <button
         type="button"
         onClick={onReverify}
-        className="h-[35px] px-4 py-2 flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90 transition-opacity shrink-0"
+        className="h-[35px] px-4 py-2 flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90 transition-opacity shrink-0 self-start sm:self-center"
         style={{
           borderRadius: "var(--radius-button)",
           fontSize: "var(--text-sm)",
@@ -1412,44 +1438,53 @@ export function PersonalInfoForm() {
             ) : null}
           </div>
 
-          {emailNeedsReverification ? (
-            <ReverificationAlert
-              type="email"
-              timePeriod="שנתיים"
-              isVerified={emailReverified}
-              onReverify={handleEmailReverification}
-            />
-          ) : null}
-
           {emails.map((email) => (
-            <div key={email.id} className="flex gap-2 items-end">
-              <div className="flex flex-col gap-2 flex-1 min-w-0">
-                <label htmlFor={`email-${email.id}`} className="text-sm font-medium">
-                  {email.label}
-                </label>
-                <Input
-                  id={`email-${email.id}`}
-                  type="email"
-                  value={email.value}
-                  onFocus={() => setFocusedEmailId(email.id)}
-                  onBlur={() => setFocusedEmailId(null)}
-                  onChange={(e) => {
-                    setEmails(
-                      emails.map((em) =>
-                        em.id === email.id ? { ...em, value: e.target.value } : em,
-                      ),
-                    );
-                  }}
-                />
+            <div key={email.id} className="flex flex-col gap-2 w-full min-w-0">
+              <div className="flex gap-2 items-end">
+                <div className="flex flex-col gap-2 flex-1 min-w-0">
+                  <label htmlFor={`email-${email.id}`} className="text-sm font-medium">
+                    {email.label}
+                  </label>
+                  <Input
+                    id={`email-${email.id}`}
+                    type="email"
+                    value={email.value}
+                    onFocus={() => setFocusedEmailId(email.id)}
+                    onBlur={() => setFocusedEmailId(null)}
+                    onChange={(e) => {
+                      setEmails(
+                        emails.map((em) =>
+                          em.id === email.id ? { ...em, value: e.target.value } : em,
+                        ),
+                      );
+                    }}
+                    aria-describedby={
+                      email.isDefault && emailNeedsReverification
+                        ? "email-reverify-banner"
+                        : undefined
+                    }
+                  />
+                </div>
+                {!email.isDefault ? (
+                  <div
+                    className={cn(
+                      "transition-all duration-200 overflow-hidden shrink-0",
+                      focusedEmailId === email.id ? "w-[45px] opacity-100" : "w-0 opacity-0 pointer-events-none",
+                    )}
+                  >
+                    <DeleteButton onClick={() => setPendingDelete({ type: "email", id: email.id })} />
+                  </div>
+                ) : null}
               </div>
-              {!email.isDefault ? (
-                <div
-                  className={cn(
-                    "transition-all duration-200 overflow-hidden shrink-0",
-                    focusedEmailId === email.id ? "w-[45px] opacity-100" : "w-0 opacity-0 pointer-events-none",
-                  )}
-                >
-                  <DeleteButton onClick={() => setPendingDelete({ type: "email", id: email.id })} />
+              {email.isDefault && emailNeedsReverification ? (
+                <div id="email-reverify-banner" className="w-full">
+                  <ReverificationAlert
+                    type="email"
+                    timePeriod="שנתיים"
+                    isVerified={emailReverified}
+                    onReverify={handleEmailReverification}
+                    attachToField
+                  />
                 </div>
               ) : null}
             </div>
