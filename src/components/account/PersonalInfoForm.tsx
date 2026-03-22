@@ -182,8 +182,10 @@ function ConfirmDeleteDialog({
   );
 }
 
-const TOAST_EXIT_MS = 420;
-const TOAST_MOTION_MS = 400;
+/** זמן להמתין אחרי תחילת יציאה לפני unmount — חייב לעבור את משך ה-CSS */
+const TOAST_EXIT_MS = 520;
+const TOAST_ENTER_MS = 480;
+const TOAST_LEAVE_MS = 440;
 
 type PersonalInfoToastState = { id: number; message: string; exiting: boolean };
 
@@ -198,28 +200,38 @@ function Toast({
 }) {
   const [entered, setEntered] = useState(false);
   useEffect(() => {
-    const id = requestAnimationFrame(() => setEntered(true));
-    return () => cancelAnimationFrame(id);
+    let inner = 0;
+    const outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => setEntered(true));
+    });
+    return () => {
+      cancelAnimationFrame(outer);
+      if (inner) cancelAnimationFrame(inner);
+    };
   }, []);
 
   const visible = entered && !exiting;
 
   return (
     <div
-      className="fixed bottom-12 left-1/2 z-[120] -translate-x-1/2 pointer-events-none"
+      className="fixed bottom-12 left-1/2 z-[120] -translate-x-1/2 pointer-events-none [contain:layout]"
       aria-live="polite"
     >
       <div
         className={cn(
-          "pointer-events-auto will-change-[opacity,transform] transition-[opacity,transform]",
-          visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-10 scale-[0.97]",
+          "pointer-events-auto origin-bottom transform-gpu transition-[transform,opacity] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+          visible
+            ? "translate-y-0 opacity-100"
+            : "translate-y-[calc(100%+1.5rem)] opacity-0",
+          exiting && "ease-[cubic-bezier(0.4,0,1,1)]",
           exiting ? "pointer-events-none" : "",
         )}
         style={{
-          transitionDuration: `${TOAST_MOTION_MS}ms`,
+          transitionDuration: exiting ? `${TOAST_LEAVE_MS}ms` : `${TOAST_ENTER_MS}ms`,
+          transitionProperty: "transform, opacity",
           transitionTimingFunction: exiting
             ? "cubic-bezier(0.4, 0, 1, 1)"
-            : "cubic-bezier(0.22, 1, 0.36, 1)",
+            : "cubic-bezier(0.16, 1, 0.3, 1)",
         }}
         dir="rtl"
       >
