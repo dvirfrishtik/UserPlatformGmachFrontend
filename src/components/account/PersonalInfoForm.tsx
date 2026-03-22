@@ -1073,7 +1073,7 @@ export function PersonalInfoForm() {
     setEmailToVerify("");
   };
 
-  const handleVerificationSubmit = () => {
+  const handleVerificationSubmit = (_file: File) => {
     setOriginalValues({ ...formValues });
     setOriginalPhones(structuredClone(phones));
     setOriginalEmails(structuredClone(emails));
