@@ -1087,9 +1087,29 @@ export function PersonalInfoForm() {
   const handleConfirmDelete = () => {
     if (!pendingDelete) return;
     if (pendingDelete.type === "phone") {
-      setPhones((prev) => prev.filter((p) => p.id !== pendingDelete.id));
+      setPhones((prev) => {
+        if (prev.length <= 1) return prev;
+        const deleted = prev.find((p) => p.id === pendingDelete.id);
+        const next = prev.filter((p) => p.id !== pendingDelete.id);
+        const mustPromoteDefault =
+          Boolean(deleted?.isDefault) || !next.some((p) => p.isDefault);
+        if (mustPromoteDefault) {
+          return next.map((p, i) => ({ ...p, isDefault: i === 0 }));
+        }
+        return next;
+      });
     } else {
-      setEmails((prev) => prev.filter((e) => e.id !== pendingDelete.id));
+      setEmails((prev) => {
+        if (prev.length <= 1) return prev;
+        const deleted = prev.find((e) => e.id === pendingDelete.id);
+        const next = prev.filter((e) => e.id !== pendingDelete.id);
+        const mustPromoteDefault =
+          Boolean(deleted?.isDefault) || !next.some((e) => e.isDefault);
+        if (mustPromoteDefault) {
+          return next.map((e, i) => ({ ...e, isDefault: i === 0 }));
+        }
+        return next;
+      });
     }
     setFocusedPhoneId(null);
     setFocusedEmailId(null);
@@ -1379,7 +1399,7 @@ export function PersonalInfoForm() {
                   }}
                 />
               </div>
-              {!phone.isDefault ? (
+              {phones.length > 1 ? (
                 <div
                   className={cn(
                     "transition-all duration-200 overflow-hidden shrink-0",
@@ -1467,7 +1487,7 @@ export function PersonalInfoForm() {
                     }
                   />
                 </div>
-                {!email.isDefault ? (
+                {emails.length > 1 ? (
                   <div
                     className={cn(
                       "transition-all duration-200 overflow-hidden shrink-0",
