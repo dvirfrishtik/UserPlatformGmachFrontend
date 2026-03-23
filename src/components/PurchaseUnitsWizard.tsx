@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { X, Plus, Minus, ChevronDown, Info } from 'lucide-react';
 
 interface ChildOption {
@@ -87,12 +87,43 @@ function AvatarIcon({ size = 40 }: { size?: number }) {
   );
 }
 
+export type PurchasePaymentMode = "credit" | "bank";
+
+export type NewCreditCardDraft = {
+  cardholderName: string;
+  number: string;
+  expiry: string;
+  cvv: string;
+};
+
+const emptyNewCard: NewCreditCardDraft = {
+  cardholderName: "",
+  number: "",
+  expiry: "",
+  cvv: "",
+};
+
+function isNewCreditCardComplete(c: NewCreditCardDraft): boolean {
+  const digits = c.number.replace(/\D/g, "");
+  if (digits.length < 13 || digits.length > 19) return false;
+  if (!c.cardholderName.trim()) return false;
+  const exp = c.expiry.replace(/\D/g, "");
+  if (exp.length !== 4) return false;
+  const mm = Number(exp.slice(0, 2));
+  if (mm < 1 || mm > 12) return false;
+  const cvv = c.cvv.replace(/\s/g, "");
+  if (!/^\d{3,4}$/.test(cvv)) return false;
+  return true;
+}
+
 export function PurchaseUnitsWizard({ isOpen, onClose, children, initialSelectedChildId }: PurchaseUnitsWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   const [unitCount, setUnitCount] = useState(0);
   const [selectedTrack, setSelectedTrack] = useState<"קלאסי" | "פריסה מורחבת">("קלאסי");
+  const [paymentMode, setPaymentMode] = useState<PurchasePaymentMode>("bank");
   const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
+  const [newCreditCard, setNewCreditCard] = useState<NewCreditCardDraft>(emptyNewCard);
   const [showSuccess, setShowSuccess] = useState(false);
   const totalSteps = 4;
 
@@ -106,7 +137,9 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children, initialSelected
       setCurrentStep(1);
       setUnitCount(0);
       setSelectedTrack("קלאסי");
+      setPaymentMode("bank");
       setSelectedPaymentId(null);
+      setNewCreditCard(emptyNewCard);
       setShowSuccess(false);
     }
   }, [isOpen, initialSelectedChildId]);
@@ -132,15 +165,28 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children, initialSelected
     setSelectedChildId(null);
     setUnitCount(0);
     setSelectedTrack("קלאסי");
+    setPaymentMode("bank");
     setSelectedPaymentId(null);
+    setNewCreditCard(emptyNewCard);
     setShowSuccess(false);
     onClose();
   };
 
+  const handlePaymentModeChange = (mode: PurchasePaymentMode) => {
+    setPaymentMode(mode);
+    setSelectedPaymentId(null);
+    setNewCreditCard(emptyNewCard);
+  };
+
+  const step3PaymentOk =
+    paymentMode === "bank"
+      ? selectedPaymentId !== null
+      : isNewCreditCardComplete(newCreditCard);
+
   const isNextDisabled =
     (currentStep === 1 && !selectedChildId) ||
     (currentStep === 2 && unitCount === 0) ||
-    (currentStep === 3 && !selectedPaymentId);
+    (currentStep === 3 && !step3PaymentOk);
 
   return (
     /* Backdrop */
@@ -220,8 +266,12 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children, initialSelected
               )}
               {currentStep === 3 && (
                 <StepSelectPayment
+                  paymentMode={paymentMode}
+                  onPaymentModeChange={handlePaymentModeChange}
                   selectedPaymentId={selectedPaymentId}
-                  onSelect={setSelectedPaymentId}
+                  onSelectPayment={setSelectedPaymentId}
+                  newCreditCard={newCreditCard}
+                  onNewCreditCardChange={setNewCreditCard}
                 />
               )}
               {currentStep === 4 && (
@@ -229,7 +279,17 @@ export function PurchaseUnitsWizard({ isOpen, onClose, children, initialSelected
                   childName={children.find(c => c.id === selectedChildId)?.name ?? ""}
                   unitCount={unitCount}
                   selectedTrack={selectedTrack}
-                  paymentMethod={PAYMENT_METHODS.find(p => p.id === selectedPaymentId) ?? null}
+                  paymentMode={paymentMode}
+                  bankPaymentMethod={
+                    paymentMode === "bank"
+                      ? PAYMENT_METHODS.find((p) => p.id === selectedPaymentId) ?? null
+                      : null
+                  }
+                  creditCardLast4={
+                    paymentMode === "credit"
+                      ? newCreditCard.number.replace(/\D/g, "").slice(-4) || null
+                      : null
+                  }
                 />
               )}
             </div>
@@ -971,6 +1031,7 @@ interface PaymentMethod {
   monthlyCharge: number;
 }
 
+/** רק הוראות קבע בנקאיות — לרכישה בכרטיס נדרש כרטיס חדש בלבד */
 const PAYMENT_METHODS: PaymentMethod[] = [
   {
     id: "pm-1",
@@ -978,13 +1039,6 @@ const PAYMENT_METHODS: PaymentMethod[] = [
     name: "דיסקונט",
     accountNumber: "10-4839853",
     monthlyCharge: 6043,
-  },
-  {
-    id: "pm-2",
-    type: "credit",
-    name: "MAX",
-    accountNumber: "4932",
-    monthlyCharge: 1232,
   },
   {
     id: "pm-3",
@@ -995,43 +1049,250 @@ const PAYMENT_METHODS: PaymentMethod[] = [
   },
 ];
 
+function formatCardNumberDisplay(raw: string): string {
+  const d = raw.replace(/\D/g, "").slice(0, 19);
+  return d.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+}
+
+function formatExpiryDisplay(raw: string): string {
+  const d = raw.replace(/\D/g, "").slice(0, 4);
+  if (d.length <= 2) return d;
+  return `${d.slice(0, 2)}/${d.slice(2)}`;
+}
+
+const newCardInputStyle: CSSProperties = {
+  width: "100%",
+  height: "44px",
+  padding: "0 14px",
+  borderRadius: "8px",
+  border: "1px solid #E5E9F9",
+  backgroundColor: "#FFFFFF",
+  fontSize: "15px",
+  color: "#141E44",
+  outline: "none",
+  textAlign: "right",
+};
+
+const newCardLabelStyle: CSSProperties = {
+  fontSize: "13px",
+  fontWeight: "var(--font-weight-semibold)",
+  color: "#495157",
+  marginBottom: "6px",
+  textAlign: "right",
+};
+
 /* ─── Step 3: Select Payment Method ─── */
 function StepSelectPayment({
+  paymentMode,
+  onPaymentModeChange,
   selectedPaymentId,
-  onSelect,
+  onSelectPayment,
+  newCreditCard,
+  onNewCreditCardChange,
 }: {
+  paymentMode: PurchasePaymentMode;
+  onPaymentModeChange: (mode: PurchasePaymentMode) => void;
   selectedPaymentId: string | null;
-  onSelect: (id: string) => void;
+  onSelectPayment: (id: string) => void;
+  newCreditCard: NewCreditCardDraft;
+  onNewCreditCardChange: (v: NewCreditCardDraft) => void;
 }) {
+  const isCredit = paymentMode === "credit";
+
   return (
-    <div className="flex flex-col items-end w-full">
-      {/* Title */}
-      <p style={{
-        fontSize: "16px",
-        color: "#141E44",
-        fontWeight: "var(--font-weight-normal)",
-        textAlign: "right",
-        marginBottom: "20px",
-        lineHeight: "20px",
-        width: "100%",
-      }}>
+    <div className="flex flex-col items-stretch w-full max-w-[640px] mx-auto">
+      <p
+        style={{
+          fontSize: "16px",
+          color: "#141E44",
+          fontWeight: "var(--font-weight-normal)",
+          textAlign: "right",
+          marginBottom: "16px",
+          lineHeight: "20px",
+          width: "100%",
+        }}
+      >
         בחירת אמצעי תשלום
       </p>
 
-      {/* Payment methods grid - 3 columns */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 w-full" style={{ gap: "14px" }}>
-        {PAYMENT_METHODS.map((method) => {
-          const isSelected = selectedPaymentId === method.id;
-          return (
-            <PaymentMethodCard
-              key={method.id}
-              method={method}
-              isSelected={isSelected}
-              onClick={() => onSelect(method.id)}
-            />
-          );
-        })}
+      {/* Toggle — אותו סגנון כמו בחירת מסלול יחידות */}
+      <div className="flex justify-start w-full mb-6">
+        <div
+          className="flex p-1 gap-1 rounded-full"
+          style={{ backgroundColor: "var(--page-section)", borderRadius: "300px" }}
+        >
+          <button
+            type="button"
+            onClick={() => onPaymentModeChange("bank")}
+            className="px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-colors whitespace-nowrap border-none cursor-pointer"
+            style={{
+              backgroundColor: !isCredit ? "#172554" : "transparent",
+              fontSize: "13px",
+              fontWeight: !isCredit ? "var(--font-weight-semibold)" : "var(--font-weight-normal)",
+              color: !isCredit ? "#FFFFFF" : "var(--muted-foreground)",
+            }}
+          >
+            הוראת קבע בנקאית
+          </button>
+          <button
+            type="button"
+            onClick={() => onPaymentModeChange("credit")}
+            className="px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-colors whitespace-nowrap border-none cursor-pointer"
+            style={{
+              backgroundColor: isCredit ? "#172554" : "transparent",
+              fontSize: "13px",
+              fontWeight: isCredit ? "var(--font-weight-semibold)" : "var(--font-weight-normal)",
+              color: isCredit ? "#FFFFFF" : "var(--muted-foreground)",
+            }}
+          >
+            כרטיס אשראי
+          </button>
+        </div>
       </div>
+
+      {isCredit ? (
+        <div
+          className="w-full rounded-lg border p-5 sm:p-6"
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderColor: "#E5E9F9",
+            boxShadow: "0 0 12px rgba(24, 47, 67, 0.06)",
+          }}
+        >
+          <div className="flex items-start gap-3 mb-5" dir="rtl">
+            <div
+              className="flex shrink-0 items-center justify-center rounded-full"
+              style={{ width: "44px", height: "44px", backgroundColor: "#EFF6FF" }}
+            >
+              <CreditCardIcon size={22} color="#172554" />
+            </div>
+            <div className="flex-1 min-w-0 text-right">
+              <p
+                style={{
+                  fontSize: "16px",
+                  fontWeight: "var(--font-weight-bold)",
+                  color: "#141E44",
+                  marginBottom: "4px",
+                }}
+              >
+                הוספת כרטיס אשראי חדש
+              </p>
+              <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: "20px" }}>
+                לתשלום בכרטיס אשראי יש להזין כרטיס חדש. לא ניתן לחייב כרטיס שמור מהחשבון.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4" dir="rtl">
+            <div>
+              <label htmlFor="pu-cardholder" style={newCardLabelStyle}>
+                שם בעל הכרטיס
+              </label>
+              <input
+                id="pu-cardholder"
+                type="text"
+                autoComplete="cc-name"
+                placeholder="כפי שמופיע על הכרטיס"
+                value={newCreditCard.cardholderName}
+                onChange={(e) =>
+                  onNewCreditCardChange({ ...newCreditCard, cardholderName: e.target.value })
+                }
+                style={newCardInputStyle}
+              />
+            </div>
+            <div>
+              <label htmlFor="pu-cardnumber" style={newCardLabelStyle}>
+                מספר כרטיס
+              </label>
+              <input
+                id="pu-cardnumber"
+                type="text"
+                inputMode="numeric"
+                autoComplete="cc-number"
+                placeholder="0000 0000 0000 0000"
+                value={formatCardNumberDisplay(newCreditCard.number)}
+                onChange={(e) =>
+                  onNewCreditCardChange({
+                    ...newCreditCard,
+                    number: e.target.value.replace(/\D/g, "").slice(0, 19),
+                  })
+                }
+                style={{ ...newCardInputStyle, letterSpacing: "0.04em" }}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="pu-expiry" style={newCardLabelStyle}>
+                  תוקף (MM/YY)
+                </label>
+                <input
+                  id="pu-expiry"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="cc-exp"
+                  placeholder="MM/YY"
+                  value={formatExpiryDisplay(newCreditCard.expiry)}
+                  onChange={(e) =>
+                    onNewCreditCardChange({
+                      ...newCreditCard,
+                      expiry: e.target.value.replace(/\D/g, "").slice(0, 4),
+                    })
+                  }
+                  style={newCardInputStyle}
+                />
+              </div>
+              <div>
+                <label htmlFor="pu-cvv" style={newCardLabelStyle}>
+                  קוד אבטחה (CVV)
+                </label>
+                <input
+                  id="pu-cvv"
+                  type="password"
+                  inputMode="numeric"
+                  autoComplete="cc-csc"
+                  placeholder="•••"
+                  maxLength={4}
+                  value={newCreditCard.cvv}
+                  onChange={(e) =>
+                    onNewCreditCardChange({
+                      ...newCreditCard,
+                      cvv: e.target.value.replace(/\D/g, "").slice(0, 4),
+                    })
+                  }
+                  style={newCardInputStyle}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          <p
+            style={{
+              fontSize: "14px",
+              color: "#6B7280",
+              textAlign: "right",
+              marginBottom: "14px",
+              lineHeight: "20px",
+            }}
+          >
+            בחרו הוראת קבע פעילה מהרשימה. לא ניתן להוסיף כאן הוראה חדשה.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 w-full" style={{ gap: "14px" }}>
+            {PAYMENT_METHODS.map((method) => {
+              const isSelected = selectedPaymentId === method.id;
+              return (
+                <PaymentMethodCard
+                  key={method.id}
+                  method={method}
+                  isSelected={isSelected}
+                  onClick={() => onSelectPayment(method.id)}
+                />
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -1116,12 +1377,16 @@ function StepSummary({
   childName,
   unitCount,
   selectedTrack,
-  paymentMethod,
+  paymentMode,
+  bankPaymentMethod,
+  creditCardLast4,
 }: {
   childName: string;
   unitCount: number;
   selectedTrack: "קלאסי" | "פריסה מורחבת";
-  paymentMethod: PaymentMethod | null;
+  paymentMode: PurchasePaymentMode;
+  bankPaymentMethod: PaymentMethod | null;
+  creditCardLast4: string | null;
 }) {
   const isExtended = selectedTrack === "פריסה מורחבת";
   const monthlyAmount = unitCount * (isExtended ? 50 : 40);
@@ -1161,7 +1426,17 @@ function StepSummary({
         <SummaryRow label="עבור" value={childName} />
         <SummaryRow label="סכום חודשי לתרומה" value={`₪${monthlyAmount.toLocaleString('he-IL')}`} bold />
         <SummaryRow label="משך תקופת התרומה" value={`${totalMonths} חודשים`} />
-        <SummaryRow label="אמצעי תשלום" value={paymentMethod ? `${paymentMethod.name} ${paymentMethod.accountNumber}` : "-"} isLast />
+        <SummaryRow
+          label="אמצעי תשלום"
+          value={
+            paymentMode === "bank" && bankPaymentMethod
+              ? `הוראת קבע — ${bankPaymentMethod.name} ${bankPaymentMethod.accountNumber}`
+              : paymentMode === "credit" && creditCardLast4
+                ? `כרטיס אשראי חדש (•••• ${creditCardLast4})`
+                : "-"
+          }
+          isLast
+        />
 
         {/* Spacer between sections */}
         <div style={{ height: "20px" }} />
