@@ -1120,20 +1120,8 @@ function StepSelectPayment({
         בחירת אמצעי תשלום
       </p>
 
-      {/* אמצעי תשלום — פס רדיו מחובר כמו בחירת יום חיוב (ChangeChargeDayPopup) */}
+      {/* פס רדיו מחובר כמו בחירת יום חיוב (ChangeChargeDayPopup) */}
       <div style={{ marginBottom: "32px" }}>
-        <label
-          style={{
-            display: "block",
-            fontSize: "var(--text-sm)",
-            fontWeight: "var(--font-weight-normal)",
-            color: "var(--muted-foreground)",
-            marginBottom: "12px",
-            textAlign: "right",
-          }}
-        >
-          אמצעי תשלום
-        </label>
         <div
           className="hidden sm:flex"
           style={{ direction: "rtl" }}
